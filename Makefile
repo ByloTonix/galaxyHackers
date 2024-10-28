@@ -1,5 +1,5 @@
-FORMAT_DIRS=data
-LINTER_DIRS=data
+FORMAT_DIRS=galaxy
+LINTER_DIRS=galaxy
 TOML_FILES=poetry.lock pyproject.toml
 POETRY_EXEC=poetry
 PYTHON_EXEC=$(POETRY_EXEC) run python
