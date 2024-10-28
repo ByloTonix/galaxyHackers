@@ -23,10 +23,6 @@ settings.SEGMENTATION_SAMPLES_PATH = Path(settings.SEGMENTATION_PATH, "samples/"
 settings.SEGMENTATION_SAMPLES_DESCRIPTION_PATH = Path(settings.SEGMENTATION_SAMPLES_PATH, "description/")
 settings.SEGMENTATION_MAPS_PATH = Path(settings.SEGMENTATION_PATH, "maps/")
 
-settings.COMET_API_KEY = settings.comet.api_key
-settings.COMET_WORKSPACE = settings.comet.workspace
-settings.COMET_PROJECT_NAME = settings.comet.project_name
-
 
 # TODO: fix FALLBACK_URL in MAP_ACT_CONFIG and DR5_CONFIG
 settings.MAP_ACT_CONFIG = {

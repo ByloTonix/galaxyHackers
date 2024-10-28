@@ -1,13 +1,10 @@
-from comet_ml import Experiment
+import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import data
-import segmentation
-import metrics
-import argparse
-import torch_optimizer as optimizer
+from torch.optim.lr_scheduler import ExponentialLR
 
+import torch_optimizer as optimizer
 from config import settings
 
 import models.spinalnet_resnet as spinalnet_resnet
@@ -17,37 +14,52 @@ import models.spinalnet_vgg as spinalnet_vgg
 import models.vitL16 as vitL16
 import models.alexnet_vgg as alexnet_vgg
 import models.resnet18 as resnet18
-
-from train import Trainer
+import models.baseline as baseline
+import  data
+# import data.segmentation as segmentation
+# import metrics.metrics as metrics
 from data import DataPart
+from train import Trainer
+import metrics
+import segmentation
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-_, dataloaders = data.create_dataloaders()
+
+from comet_ml import Experiment
+
+
+
+all_models = [
+    ('Baseline', baseline),
+    ('ResNet18', resnet18),
+    ('EfficientNet', effnet),
+    ('DenseNet', densenet),
+    ('SpinalNet_ResNet', spinalnet_resnet),
+    ('SpinalNet_VGG', spinalnet_vgg),
+    ('ViTL16', vitL16),
+    ('AlexNet_VGG', alexnet_vgg)
+]
+
+all_optimizers = [
+    ('SGD', optim.SGD),
+    ('Rprop', optim.Rprop),
+    ('Adam', optim.Adam),
+    ('NAdam', optim.NAdam),
+    ('RAdam', optim.RAdam),
+    ('AdamW', optim.AdamW),
+    #('Adagrad', optim.Adagrad),
+    ('RMSprop', optim.RMSprop),
+    #('Adadelta', optim.Adadelta),
+    ('DiffGrad', optimizer.DiffGrad),
+    # ('LBFGS', optim.LBFGS)
+]
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+datasets, dataloaders = data.create_dataloaders()
 
 train_loader = dataloaders[DataPart.TRAIN]
 val_loader = dataloaders[DataPart.VALIDATE]
 test_loader = dataloaders[DataPart.TEST_DR5]
 
-all_models = [
-    ("ResNet18", resnet18),
-    ("EfficientNet", effnet),
-    ("DenseNet", densenet),
-    ("SpinalNet_ResNet", spinalnet_resnet),
-    ("SpinalNet_VGG", spinalnet_vgg),
-    ("ViTL16", vitL16),
-    ("AlexNet_VGG", alexnet_vgg),
-]
-
-all_optimizers = [
-    ("SGD", optim.SGD),
-    ("Rprop", optim.Rprop),
-    ("Adam", optim.Adam),
-    ("NAdam", optim.NAdam),
-    ("RAdam", optim.RAdam),
-    ("AdamW", optim.AdamW),
-    ("RMSprop", optim.RMSprop),
-    ("DiffGrad", optimizer.DiffGrad),
-]
 
 parser = argparse.ArgumentParser(description="Model training")
 parser.add_argument(
@@ -94,14 +106,6 @@ lr = args.lr
 momentum = args.mm
 optimizer_name = args.optimizer
 
-# criterion = nn.CrossEntropyLoss()
-criterion = nn.BCELoss()
-
-results = {}
-val_results = {}
-
-classes = ("random", "clusters")
-
 experiment = Experiment(
     api_key=settings.COMET_API_KEY,
     project_name="cluster-search",
@@ -113,11 +117,20 @@ experiment.log_parameters(
     {
         "models": [name for name, _ in selected_models],
         "num_epochs": num_epochs,
-        "learning_rate": lr,
         "momentum": momentum,
         "optimizer": optimizer_name,
     }
 )
+
+
+# criterion = nn.CrossEntropyLoss()
+criterion = nn.BCELoss()
+
+results = {}
+val_results = {}
+
+classes = ('random', 'clusters')
+
 
 for model_name, model in selected_models:
 
@@ -129,75 +142,38 @@ for model_name, model in selected_models:
     else:
         optimizer = optimizer_class(model.parameters(), lr=lr)
 
+    scheduler = ExponentialLR(optimizer, gamma=0.8)
+
     trainer = Trainer(
+        model_name=model_name,
         model=model,
         criterion=criterion,
+        optimizer_name=optimizer_name,
         optimizer=optimizer,
+        lr_scheduler=scheduler,
+
         train_dataloader=train_loader,
         val_dataloader=val_loader,
+        experiment=experiment
     )
+    
+    trainer.find_lr(1e-6, 0.01, 70)
 
-    trainer.train(num_epochs)
+    try:
+        trainer.train(num_epochs)
 
-    for step in range(trainer.global_step):
-        experiment.log_metrics(
-            {
-                f"{model_name}_{optimizer_name}_train_loss": trainer.history[
-                    "train_loss"
-                ][step],
-                f"{model_name}_{optimizer_name}_train_accuracy": trainer.history[
-                    "train_acc"
-                ][step],
-            },
-            step=step + 1,
-        )
+    finally:
 
-    for epoch in range(num_epochs):
-        print(
-            f"Epoch {epoch} - Val Loss: {trainer.history['val_loss'][epoch]}, Val Accuracy: {trainer.history['val_acc'][epoch]}"
-        )
-        experiment.log_metrics(
-            {
-                f"{model_name}_{optimizer_name}_val_loss": trainer.history["val_loss"][
-                    epoch
-                ],
-                f"{model_name}_{optimizer_name}_val_accuracy": trainer.history[
-                    "val_acc"
-                ][epoch],
-            },
-            epoch=epoch,
-        )
+        predictions, *_ = trainer.test(test_loader)
+        metrics.modelPerformance(model_name, optimizer_name, predictions, classes)
 
-    train_table_data = [
-        [step, trainer.history["train_loss"][step], trainer.history["train_acc"][step]]
-        for step in range(trainer.global_step)
-    ]
-    val_table_data = [
-        [epoch, trainer.history["val_loss"][epoch], trainer.history["val_acc"][epoch]]
-        for epoch in range(num_epochs)
-    ]
+        metrics.combine_metrics(selected_models, optimizer_name)
 
-    experiment.log_table(
-        filename=f"{model_name}_train_metrics.csv",
-        tabular_data=train_table_data,
-        headers=["Step", "Train Loss", "Train Accuracy"],
-    )
+        experiment.end()
 
-    experiment.log_table(
-        filename=f"{model_name}_val_metrics.csv",
-        tabular_data=val_table_data,
-        headers=["Epoch", "Validation Loss", "Validation Accuracy"],
-    )
+        del model
+        torch.cuda.empty_cache()
 
-    predictions, *_ = trainer.test(test_loader)
-    metrics.modelPerformance(model_name, optimizer_name, predictions, classes)
-
-    del model
-    torch.cuda.empty_cache()
-
-metrics.combine_metrics(selected_models, optimizer_name)
-
-experiment.end()
 
 for model_name, model in selected_models:
     segmentation.create_segmentation_plots(

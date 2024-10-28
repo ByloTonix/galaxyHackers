@@ -131,10 +131,10 @@ def modelPerformance(model_name, optimizer_name,
     red_shift_predictions['bucket'] = pd.qcut(red_shift_predictions['red_shift'], n_bins)
 
     # Calculate recall for each bin
-    recall_per_bin = red_shift_predictions.groupby('bucket').apply(lambda x: recall_score(x['y_true'], x['y_pred']))
+    recall_per_bin = red_shift_predictions.groupby('bucket', observed=False).apply(lambda x: recall_score(x['y_true'], x['y_pred']))
 
     # Calculate proportions of red_shift_type within each bin
-    proportions = red_shift_predictions.groupby('bucket')['red_shift_type'].value_counts(normalize=True).unstack().fillna(0)
+    proportions = red_shift_predictions.groupby('bucket', observed=False)['red_shift_type'].value_counts(normalize=True).unstack().fillna(0)
 
     fig = plt.figure() # Create matplotlib figure
 
