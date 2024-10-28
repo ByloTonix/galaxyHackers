@@ -1,0 +1,36 @@
+galaxy.metrics
+==============
+
+.. py:module:: galaxy.metrics
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   galaxy.metrics.probabilities_hist
+   galaxy.metrics.plot_loss_by_model
+   galaxy.metrics.plot_accuracies_by_model
+   galaxy.metrics.modelPerformance
+   galaxy.metrics.combine_metrics
+
+
+Module Contents
+---------------
+
+.. py:function:: probabilities_hist(predictions_clusters, predictions_non_clusters, model_path)
+
+.. py:function:: plot_loss_by_model(model_name: str, result: dict, val_result: dict, path: str)
+
+.. py:function:: plot_accuracies_by_model(model_name: str, result: dict, val_result: dict, path: str)
+
+.. py:function:: modelPerformance(model_name, optimizer_name, predictions: pandas.DataFrame, classes, f_beta=2)
+
+   Plots distributions of probabilities of classes, ROC and Precision-Recall curves, change of loss and accuracy throughout training,
+   confusion matrix and its weighted version and saves them in .png files,
+   counts accuracy, precision, recall, false positive rate and f1-score and saves them in .txt file
+
+
+.. py:function:: combine_metrics(selected_models: list, optimizer_name)
+

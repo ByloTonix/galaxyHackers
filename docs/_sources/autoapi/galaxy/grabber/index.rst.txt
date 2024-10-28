@@ -1,0 +1,92 @@
+galaxy.grabber
+==============
+
+.. py:module:: galaxy.grabber
+
+.. autoapi-nested-parse::
+
+   Script to fetch cutouts from the legacy survey
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   galaxy.grabber.args
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   galaxy.grabber.load_catalogue
+   galaxy.grabber.make_url
+   galaxy.grabber.cadc_cutout_url
+   galaxy.grabber.make_filename
+   galaxy.grabber.process_unwise
+   galaxy.grabber.process_vlass_image
+   galaxy.grabber.grab_vlass_cutouts
+   galaxy.grabber.grab_vlass_unwise_cutouts
+   galaxy.grabber.divide_chunks
+   galaxy.grabber.grab_cutouts
+   galaxy.grabber.grab_cutout
+   galaxy.grabber.download_url
+   galaxy.grabber.parse_args
+
+
+Module Contents
+---------------
+
+.. py:function:: load_catalogue(catalog, pandas=False)
+
+.. py:function:: make_url(ra, dec, survey='unwise-neo7', s_arcmin=3, s_px=512, format='fits')
+
+.. py:function:: cadc_cutout_url(ql_url, coords, radius)
+
+.. py:function:: make_filename(name, format='fits')
+
+.. py:function:: process_unwise(fname, band='w1')
+
+.. py:function:: process_vlass_image(infile, outfile, ext=0, scale_unit=True, sfactor=1000)
+
+.. py:function:: grab_vlass_cutouts(target_file, output_dir=None, vlass_dir='', unwise_dir='', **kwargs)
+
+.. py:function:: grab_vlass_unwise_cutouts(target_file, output_dir=None, vlass_dir='', unwise_dir='', **kwargs)
+
+.. py:function:: divide_chunks(l, n)
+
+.. py:function:: grab_cutouts(target_file: Union[str, pandas.DataFrame], name_col: str = 'Component_name', ra_col: str = 'RA', dec_col: str = 'DEC', survey: str = 'vlass1.2', output_dir: str = '', imgsize_arcmin: float = 1.5, imgsize_pix: int = 150, prefix: str = '', suffix: str = '', extra_processing: Optional[Callable] = None, extra_proc_kwds: Dict[Any, Any] = dict(), file_format: str = 'fits') -> None
+
+   Function to download image cutouts from any survey.
+   ​
+       Arguments:
+           target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target
+                                              coordinates and names.
+   ​
+       Keyword Arguments:
+           name_col {str} -- The column name in target_file that contains the desired file name
+                            (default: {"Component_name"})
+           ra_col {str} -- RA column name (default: {"RA"})
+           dec_col {str} -- Dec column name (default: {"DEC"})
+           survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
+           output_dir {str} -- Output path for the image cutouts (default: {""})
+           prefix {str} -- Prefix for the output filename (default {""})
+           suffix {str} -- Suffix for the output filename (default {survey})
+           imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
+           imgsize_pix {int} -- Image size in pixels (default: {500})
+
+
+.. py:function:: grab_cutout(ra, dec, outfile, survey='vlass1.2', imgsize_arcmin=3.0, imgsize_pix=300, extra_processing=None, file_format=None, extra_proc_kwds=dict())
+
+.. py:function:: download_url(url: str, outfile: str, max_attempts: int = 100)
+
+.. py:function:: parse_args()
+
+   Parse input arguments
+
+
+.. py:data:: args
+

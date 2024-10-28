@@ -60,3 +60,14 @@ prune_branches:
 	git branch | grep -v "dev" | grep -v "master" | xargs git branch -D
 
 
+.PHONY: run
+run:
+	python -m galaxy.main      
+
+
+.PHONY: build_doc
+build_doc:
+	poetry run make -C docs html
+	touch docs/_build/html/.nojekyll
+	cp docs/_build/html/.nojekyll docs/
+	cp -r docs/_build/html/* docs/

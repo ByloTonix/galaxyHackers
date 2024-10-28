@@ -15,3 +15,6 @@ __pycache__/*
 .secrets.*
 
 .DS_Store
+
+# Sphinx documentation
+docs/_build/

@@ -1,0 +1,119 @@
+galaxy.train
+============
+
+.. py:module:: galaxy.train
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   galaxy.train.Trainer
+   galaxy.train.Predictor
+
+
+Module Contents
+---------------
+
+.. py:class:: Trainer(model_name: str, model: torch.nn.Module, optimizer_name: str, optimizer: torch.optim.Optimizer, train_dataloader: torch.utils.data.DataLoader, val_dataloader: torch.utils.data.DataLoader, experiment: comet_ml.Experiment, criterion: Any | None = None, lr_scheduler: torch.optim.lr_scheduler.LRScheduler | None = None, lr_scheduler_type: str = 'per_epoch', batch_size: int = 128)
+
+   .. py:attribute:: model_name
+
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: optimizer_name
+
+
+   .. py:attribute:: optimizer
+
+
+   .. py:attribute:: criterion
+
+
+   .. py:attribute:: lr_scheduler
+
+
+   .. py:attribute:: lr_scheduler_type
+
+
+   .. py:attribute:: train_dataloader
+
+
+   .. py:attribute:: val_dataloader
+
+
+   .. py:attribute:: experiment
+
+
+   .. py:attribute:: batch_size
+
+
+   .. py:attribute:: history
+
+
+   .. py:attribute:: device
+      :value: 'cpu'
+
+
+
+   .. py:attribute:: global_step
+      :value: 0
+
+
+
+   .. py:attribute:: cache
+
+
+   .. py:method:: post_train_batch()
+
+
+   .. py:method:: post_val_batch()
+
+
+   .. py:method:: post_train_stage()
+
+
+   .. py:method:: post_val_stage()
+
+
+   .. py:method:: save_checkpoint()
+
+
+   .. py:method:: log_metrics(loss, acc, mode: str = 'train', step: int | None = None, epoch: int | None = None)
+
+
+   .. py:method:: train(num_epochs: int)
+
+
+   .. py:method:: test(test_dataloader: torch.utils.data.DataLoader)
+
+
+   .. py:method:: compute_all(batch)
+
+
+   .. py:method:: cache_states()
+
+
+   .. py:method:: rollback_states()
+
+
+   .. py:method:: find_lr(min_lr: float = 1e-06, max_lr: float = 0.1, num_lrs: int = 20, smoothing_window=30, smooth_beta: float = 0.8) -> dict
+
+
+.. py:class:: Predictor(model: torch.nn.Module, device)
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: device
+
+
+   .. py:method:: predict(dataloader: torch.utils.data.DataLoader)
+
+
+   .. py:method:: compute_all(batch)
+
+

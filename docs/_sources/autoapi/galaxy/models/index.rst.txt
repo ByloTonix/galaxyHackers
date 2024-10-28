@@ -1,0 +1,22 @@
+galaxy.models
+=============
+
+.. py:module:: galaxy.models
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/galaxy/models/alexnet_vgg/index
+   /autoapi/galaxy/models/baseline/index
+   /autoapi/galaxy/models/densenet/index
+   /autoapi/galaxy/models/effnet/index
+   /autoapi/galaxy/models/resnet18/index
+   /autoapi/galaxy/models/spinalnet_resnet/index
+   /autoapi/galaxy/models/spinalnet_vgg/index
+   /autoapi/galaxy/models/vitL16/index
+
+

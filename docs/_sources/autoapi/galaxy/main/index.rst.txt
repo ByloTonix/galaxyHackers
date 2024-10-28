@@ -1,0 +1,75 @@
+galaxy.main
+===========
+
+.. py:module:: galaxy.main
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   galaxy.main.all_models
+   galaxy.main.all_optimizers
+   galaxy.main.device
+   galaxy.main.train_loader
+   galaxy.main.val_loader
+   galaxy.main.test_loader
+   galaxy.main.parser
+   galaxy.main.args
+   galaxy.main.selected_models
+   galaxy.main.num_epochs
+   galaxy.main.lr
+   galaxy.main.momentum
+   galaxy.main.optimizer_name
+   galaxy.main.experiment
+   galaxy.main.criterion
+   galaxy.main.results
+   galaxy.main.val_results
+   galaxy.main.classes
+   galaxy.main.model
+
+
+Module Contents
+---------------
+
+.. py:data:: all_models
+
+.. py:data:: all_optimizers
+
+.. py:data:: device
+
+.. py:data:: train_loader
+
+.. py:data:: val_loader
+
+.. py:data:: test_loader
+
+.. py:data:: parser
+
+.. py:data:: args
+
+.. py:data:: selected_models
+
+.. py:data:: num_epochs
+
+.. py:data:: lr
+
+.. py:data:: momentum
+
+.. py:data:: optimizer_name
+
+.. py:data:: experiment
+
+.. py:data:: criterion
+
+.. py:data:: results
+
+.. py:data:: val_results
+
+.. py:data:: classes
+   :value: ('random', 'clusters')
+
+
+.. py:data:: model
+

@@ -1,0 +1,22 @@
+galaxy.config
+=============
+
+.. py:module:: galaxy.config
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   galaxy.config.settings
+   galaxy.config.required_paths
+
+
+Module Contents
+---------------
+
+.. py:data:: settings
+
+.. py:data:: required_paths
+
