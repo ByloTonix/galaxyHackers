@@ -28,6 +28,7 @@ from torchvision import transforms
 from galaxy import grabber, util
 from galaxy.config import settings
 
+from abc import ABC, abstractmethod
 
 np.random.seed(settings.SEED)
 
@@ -39,6 +40,12 @@ main_transforms = [
     transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD),
 ]
 
+class DataSource(str, Enum):
+
+    DR5 = "dr5"
+    MC = "mc"
+    SGA = "sga"
+    GAIA = "gaia"
 
 class DataPart(str, Enum):
 
@@ -150,14 +157,36 @@ def download_data():
             #     )
 
 
+required_columns = set(['idx', 'ra_deg', 'dec_deg', 'name'])
+optional_columns = set(['red_shift', 'red_shift_type'])
+
+def inherit_columns(frame: pd.DataFrame):
+
+    frame['idx']= np.arange(len(frame))
+
+    frame_columns = set(frame.columns)
+
+    assert required_columns.issubset(frame_columns), "Some required columns are missed"
+
+    missed_optional = optional_columns.difference(frame_columns)
+
+    if missed_optional:
+        for col in missed_optional:
+            frame[col] = pd.NA
+
+    frame = frame.reset_index(drop=True)
+    
+    return frame
+
 def read_dr5():
 
-    dr5: atpy.Table = atpy.Table().read(settings.DR5_CLUSTERS_PATH)
-    dr5_frame = dr5.to_pandas().reset_index(drop=True)
+    table: atpy.Table = atpy.Table().read(settings.DR5_CLUSTERS_PATH)
 
-    dr5_frame["name"] = dr5_frame["name"].astype(str)
+    frame = table.to_pandas().reset_index(drop=True)
 
-    dr5_frame = dr5_frame.rename(
+    frame["name"] = frame["name"].astype(str)
+
+    frame = frame.rename(
         columns={
             "RADeg": "ra_deg",
             "decDeg": "dec_deg",
@@ -165,11 +194,11 @@ def read_dr5():
             "redshiftType": "red_shift_type",
         }
     )
-    dr5_frame = dr5_frame.reset_index(drop=True)
-    dr5_frame.index.name = "idx"
-    dr5_frame = dr5_frame.reset_index(drop=False)
 
-    return dr5_frame
+    frame = frame.loc['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']
+
+    frame = inherit_columns(frame)
+    return frame
 
 def read_mc():
     # the catalogue of MaDCoWS in VizieR
@@ -181,28 +210,30 @@ def read_mc():
     catalogs = Vizier.get_catalogs(catalog_list.keys())
 
     interesting_table: atpy.Table = catalogs[os.path.join(CATALOGUE, "table3")]
-    mc_frame = interesting_table.to_pandas().reset_index(drop=True)
+    frame = interesting_table.to_pandas().reset_index(drop=True)
 
-    mc_frame["ra_deg"] = mc_frame["RAJ2000"].apply(
+    frame["ra_deg"] = frame["RAJ2000"].apply(
         lambda x: Angle(util.to_hms_format(x)).degree
     )
-    mc_frame["dec_deg"] = mc_frame["DEJ2000"].apply(
+    frame["dec_deg"] = frame["DEJ2000"].apply(
         lambda x: Angle(util.to_dms_format(x)).degree
     )
 
-    mc_frame = mc_frame.rename(columns={"Name": "name"})
+    frame = frame.rename(columns={"Name": "name"})
 
-    mc_frame["red_shift"] = np.where(
-        mc_frame["Specz"].notna(), mc_frame["Specz"], mc_frame["Photz"]
+    frame["red_shift"] = np.where(
+        frame["Specz"].notna(), frame["Specz"], frame["Photz"]
     )
-    mc_frame["red_shift_type"] = np.where(mc_frame["Specz"].notna(), "spec", np.nan)
-    mc_frame["red_shift_type"] = np.where(
-        mc_frame["Photz"].notna() & mc_frame["red_shift_type"].isna(), "phot", np.nan
+    frame["red_shift_type"] = np.where(frame["Specz"].notna(), "spec", pd.NA)
+    frame["red_shift_type"] = np.where(
+        frame["Photz"].notna() & frame["red_shift_type"].isna(), "phot", pd.NA
     )
 
-    return mc_frame
+    frame = inherit_columns(frame)
 
+    return frame
 
+# TODO apply inherit_columns to frames
 def get_all_clusters():
     """Concat clusters from act_dr5 and madcows to create negative classes in samples"""
 
@@ -267,6 +298,7 @@ def generate_candidates_dr5() -> coord.SkyCoord:
 
     # Generating positions of every pixel of telescope's sky zone
     positions = np.array(np.rad2deg(imap_98.posmap()))
+
     ras, decs = positions[1].ravel(), positions[0].ravel()
 
     # Shuffling candidates, imitating samples
