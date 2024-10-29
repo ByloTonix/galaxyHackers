@@ -5,6 +5,8 @@ WORKDIR = "./"
 MAP_ACT_ROUTE = "act_planck_dr5.01_s08s18_AA_f220_daynight_fullivar.fits"
 DR5_CLUSTERS_ROUTE = "DR5_cluster-catalog_v1.1.fits"
 ARCHIVE_DR5_URL = "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/"
+SGA_ROUTE = "SGA-2020.fits"
 
 MAP_ACT_FILENAME = "map_act.fits"
 DR5_CLUSTERS_FILENAME = "dr5.fits"
+SGA_FILENAME = "sga.fits"

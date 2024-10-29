@@ -7,6 +7,8 @@ import sys
 from enum import Enum
 from pathlib import Path
 from zipfile import ZipFile
+from collections import defaultdict
+
 
 import astropy.coordinates as coord
 import astropy.table as atpy
@@ -23,7 +25,7 @@ from pixell import enmap
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-from galaxy import grabber
+from galaxy import grabber, util
 from galaxy.config import settings
 
 
@@ -39,6 +41,7 @@ main_transforms = [
 
 
 class DataPart(str, Enum):
+
     TRAIN = "train"
     VALIDATE = "validate"
     TEST_DR5 = "test_dr5"
@@ -96,15 +99,7 @@ class ClusterDataset(Dataset):
         return img
 
 
-def bar_progress(current, total, width=80):
-    progress_message = "Downloading: %d%% [%d / %d] bytes" % (
-        current / total * 100,
-        current,
-        total,
-    )
-    # Don't use print() as it will print in new line every time.
-    sys.stdout.write("\r" + progress_message)
-    sys.stdout.flush()
+
 
 
 """Obtain GAIA stars catalogue"""
@@ -130,24 +125,29 @@ def read_gaia():
 
 def download_data():
 
-    for config in [settings.MAP_ACT_CONFIG, settings.DR5_CONFIG]:
+    for config in [settings.MAP_ACT_CONFIG, settings.DR5_CONFIG, settings.SGA_CONFIG]:
 
         if not os.path.exists(config.OUTPUT_PATH):
-            try:
-                wget.download(url=config.URL, out=settings.DATA_PATH, bar=bar_progress)
+            wget.download(
+                url=config.URL, out=str(settings.DATA_PATH), bar=util.bar_progress
+            )
+            if config.ZIPPED_OUTPUT_PATH is not None:
                 with ZipFile(config.ZIPPED_OUTPUT_PATH, "r") as zObject:
                     zObject.extractall(path=settings.DATA_PATH)
-                rename_dict = config.RENAME_DICT
 
-                os.rename(rename_dict.SOURCE, rename_dict.TARGET)
+            rename_dict = config.RENAME_DICT
+
+            os.rename(rename_dict.SOURCE, rename_dict.TARGET)
+
+            if config.ZIPPED_OUTPUT_PATH is not None:
                 os.remove(config.ZIPPED_OUTPUT_PATH)
-            except Exception:
-                # Getting 403, what credentials needed?
-                wget.download(
-                    url=config.FALLBACK_URL,
-                    out=config.OUTPUT_PATH,
-                    bar=bar_progress,
-                )
+            # except Exception:
+            #     # Getting 403, what credentials needed?
+            #     wget.download(
+            #         url=config.FALLBACK_URL,
+            #         out=config.OUTPUT_PATH,
+            #         bar=bar_progress,
+            #     )
 
 
 def read_dr5():
@@ -171,17 +171,6 @@ def read_dr5():
 
     return dr5_frame
 
-
-def to_hms_format(time_str):
-    parts = time_str.split()
-    return f"{parts[0]}h{parts[1]}m{parts[2]}s"
-
-
-def to_dms_format(time_str):
-    parts = time_str.split()
-    return f"{parts[0]}d{parts[1]}m{parts[2]}s"
-
-
 def read_mc():
     # the catalogue of MaDCoWS in VizieR
     CATALOGUE = "J/ApJS/240/33/"
@@ -195,10 +184,10 @@ def read_mc():
     mc_frame = interesting_table.to_pandas().reset_index(drop=True)
 
     mc_frame["ra_deg"] = mc_frame["RAJ2000"].apply(
-        lambda x: Angle(to_hms_format(x)).degree
+        lambda x: Angle(util.to_hms_format(x)).degree
     )
     mc_frame["dec_deg"] = mc_frame["DEJ2000"].apply(
-        lambda x: Angle(to_dms_format(x)).degree
+        lambda x: Angle(util.to_dms_format(x)).degree
     )
 
     mc_frame = mc_frame.rename(columns={"Name": "name"})
@@ -441,34 +430,14 @@ def ddos():
         )
 
 
-"""Create dataloaders"""
 
-
-# def show_original(img):
-#     denormalized_img = img.clone()
-#     for channel, m, s in zip(denormalized_img, TORCHVISION_MEAN, TORCHVISION_STD):
-#         channel.mul_(s).add_(m)
-
-#     denormalized_img = denormalized_img.numpy()
-#     plt.imshow(np.transpose(denormalized_img, (1, 2, 0)))
-
-
-def check_catalogs():
-
-    is_map = os.path.exists(settings.MAP_ACT_PATH)
-    is_dr5 = os.path.exists(settings.DR5_CLUSTERS_PATH)
-
-    if not is_map or not is_dr5:
-        download_data()
 
 
 def create_dataloaders():
 
-    check_catalogs()
+    download_data()
 
     ddos()
-
-    from collections import defaultdict
 
     data_transforms = defaultdict(lambda: transforms.Compose(main_transforms))
 
