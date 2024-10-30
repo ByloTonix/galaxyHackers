@@ -40,12 +40,14 @@ main_transforms = [
     transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD),
 ]
 
+
 class DataSource(str, Enum):
 
     DR5 = "dr5"
     MC = "mc"
     SGA = "sga"
     GAIA = "gaia"
+
 
 class DataPart(str, Enum):
 
@@ -106,9 +108,6 @@ class ClusterDataset(Dataset):
         return img
 
 
-
-
-
 """Obtain GAIA stars catalogue"""
 
 
@@ -157,12 +156,13 @@ def download_data():
             #     )
 
 
-required_columns = set(['idx', 'ra_deg', 'dec_deg', 'name'])
-optional_columns = set(['red_shift', 'red_shift_type'])
+required_columns = set(["idx", "ra_deg", "dec_deg", "name"])
+optional_columns = set(["red_shift", "red_shift_type"])
+
 
 def inherit_columns(frame: pd.DataFrame):
 
-    frame['idx']= np.arange(len(frame))
+    frame["idx"] = np.arange(len(frame))
 
     frame_columns = set(frame.columns)
 
@@ -175,8 +175,9 @@ def inherit_columns(frame: pd.DataFrame):
             frame[col] = pd.NA
 
     frame = frame.reset_index(drop=True)
-    
+
     return frame
+
 
 def read_dr5():
 
@@ -195,10 +196,11 @@ def read_dr5():
         }
     )
 
-    frame = frame.loc['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']
+    frame = frame.loc["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]
 
     frame = inherit_columns(frame)
     return frame
+
 
 def read_mc():
     # the catalogue of MaDCoWS in VizieR
@@ -232,6 +234,7 @@ def read_mc():
     frame = inherit_columns(frame)
 
     return frame
+
 
 # TODO apply inherit_columns to frames
 def get_all_clusters():
@@ -457,12 +460,10 @@ def ddos():
             ra_col="ra_deg",
             dec_col="dec_deg",
             output_dir=path,
-            survey="unwise-neo7",
+            survey=settings.LEGACY_SURVEY_LAYER,
+            bands=settings.LEGACY_SURVEY_BANDS,
             imgsize_pix=224,
         )
-
-
-
 
 
 def create_dataloaders():

@@ -10,3 +10,8 @@ SGA_ROUTE = "SGA-2020.fits"
 MAP_ACT_FILENAME = "map_act.fits"
 DR5_CLUSTERS_FILENAME = "dr5.fits"
 SGA_FILENAME = "sga.fits"
+		
+[legacy_survey]
+LAYER = "unwise-neo7"
+BANDS = "griz"
+VLAYER = "vlass1.2"
