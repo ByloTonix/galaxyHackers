@@ -190,7 +190,7 @@ def read_dr5():
         }
     )
 
-    frame = frame.loc['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']
+    frame = frame.loc[:, ['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']]
 
     frame = inherit_columns(frame)
     return frame
@@ -225,6 +225,9 @@ def read_mc():
     )
 
     frame = inherit_columns(frame)
+
+    frame = frame.loc[:, ['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']]
+
 
     return frame
 
