@@ -138,16 +138,11 @@ def download_data():
             wget.download(
                 url=config.URL, out=str(settings.DATA_PATH), bar=util.bar_progress
             )
-            if config.ZIPPED_OUTPUT_PATH is not None:
-                with ZipFile(config.ZIPPED_OUTPUT_PATH, "r") as zObject:
-                    zObject.extractall(path=settings.DATA_PATH)
 
             rename_dict = config.RENAME_DICT
 
             os.rename(rename_dict.SOURCE, rename_dict.TARGET)
 
-            if config.ZIPPED_OUTPUT_PATH is not None:
-                os.remove(config.ZIPPED_OUTPUT_PATH)
             # except Exception:
             #     # Getting 403, what credentials needed?
             #     wget.download(
