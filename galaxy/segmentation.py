@@ -155,9 +155,7 @@ def create_map_dataloader(
     map_type: MapType, ra_start: float, dec_start: float, map_dir: Path, survey=None,
         bands=None, imgsize_pix=224
 ):  # id: 0 for small segmentation maps, 1 - for a big one
-    
-    survey = survey or settings.LEGACY_SURVEY_LAYER
-    bands = bands or settings.LEGACY_SURVEY_BANDS
+
     name = []
     ras, decs = [], []
 

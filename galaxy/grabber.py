@@ -1,32 +1,150 @@
 """Script to fetch cutouts from the legacy survey"""
 
 import os
-import sys
 import time
-import urllib
 import numpy as np
 import pandas as pd
-import argparse
 import wget
-from typing import Any, Callable, Dict, Mapping, Optional, Union
-from astropy.io import fits
+from typing import Any, Callable, Dict, Optional, Union
 from astropy.table import Table
 from urllib.error import HTTPError, URLError
 from config import settings
 import threading
 
+from galaxy import util
 
-def load_catalogue(catalog, pandas=False):
-    fmt = "fits" if catalog.endswith("fits") else "csv"
-    rcat = Table.read(catalog, format=fmt)
+from pathlib import Path
 
-    if pandas:
-        rcat = rcat.to_pandas()
-        if fmt == "fits":
-            for col in rcat.columns[rcat.dtypes == object]:
-                rcat[col] = rcat[col].str.decode("ascii")
+class Grabber:
 
-    return rcat
+    def __init__(self,
+        
+        survey_layer: str | None = None,
+        bands: str | None = None,
+        imgsize_arcmin: float = 1.5,
+        imgsize_pix: int = 224,
+        extra_processing: Optional[Callable] = None,
+        extra_processing_kwargs: Dict[Any, Any] = dict(),
+        ):
+
+        self.survey_layer = survey_layer or settings.LEGACY_SURVEY.LAYER
+        self.bands = bands or settings.LEGACY_SURVEY.BANDS
+        self.imgsize_arcmin = imgsize_arcmin
+        self.imgsize_pix = imgsize_pix
+        self.extra_processing = extra_processing
+        self.extra_processing_kwargs = extra_processing_kwargs
+
+
+    def make_url(self, ra, dec, s_arcmin=3, s_px=512, format="fits"):
+
+        # Convert coords to string
+        ra, dec = str(np.round(ra, 5)), str(np.round(dec, 5))
+
+        # Set pixscale
+        s_arcsec = 60 * s_arcmin
+        pxscale = 0.262  # s_arcsec / s_px
+
+        # Convert image scales to string
+        s_px, pxscale = str(s_px), str(np.round(pxscale, 4))
+
+        url = (
+            f"http://legacysurvey.org/viewer/cutout.{format}"
+            f"?ra={ra}&dec={dec}"
+            f"&layer={self.survey_layer}&pixscale={pxscale}&size={s_px}"
+        )
+
+        if self.bands:
+            url += f"&bands={self.bands}"
+
+        return url
+
+
+
+    def grab_cutout(
+        self,
+        ra: float,
+        dec: float,
+        output_path: Path
+    ):
+
+        url = self.make_url(
+            ra=ra,
+            dec=dec
+        )
+
+        if not os.path.exists(output_path):
+            status = download_url(url, output_path)
+            if status and (self.extra_processing is not None):
+                self.extra_processing(output_path, **self.extra_processing_kwargs)
+
+
+
+    def grab_cutouts(
+        self,
+        targets: pd.DataFrame,
+        name_col: str = "name",
+        ra_col: str = "ra_deg",
+        dec_col: str = "dec_deg",
+        output_dir: str = "",
+        suffix: str = "",
+        file_format: str = "fits"
+
+    ) -> None:
+        """Function to download image cutouts from any survey.
+        ​
+            Arguments:
+                target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target
+                                                coordinates and names.
+        ​
+            Keyword Arguments:
+                name_col {str} -- The column name in target_file that contains the desired file name
+                                (default: {"Component_name"})
+                ra_col {str} -- RA column name (default: {"RA"})
+                dec_col {str} -- Dec column name (default: {"DEC"})
+                survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
+                output_dir {str} -- Output path for the image cutouts (default: {""})
+                prefix {str} -- Prefix for the output filename (default {""})
+                suffix {str} -- Suffix for the output filename (default {survey})
+                imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
+                imgsize_pix {int} -- Image size in pixels (default: {500})
+        """
+
+        suffix = suffix or self.survey
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+
+        holds = []
+        for idx, target in targets.iterrows():
+
+            name = idx
+            # name = target[name_col]
+            a = target[ra_col]
+            d = target[dec_col]
+
+            outfile = os.path.join(output_dir, f"{name}.{file_format}")
+
+            holds.append((a, d, outfile))
+
+        bighold = list(util.divide_chunks(holds, 20))
+        print(len(bighold))
+
+        # TODO Seems suboptimal, maybe asyncio?
+        for i in range(len(bighold)):
+            jobs = []
+            for j in range(0, len(bighold[i])):
+
+                ra, dec, outfile = bighold[i][j]
+                thread = threading.Thread(
+                    target=self.grab_cutout,
+                    args=(ra, dec, outfile),
+                )
+                jobs.append(thread)
+                thread.start()
+            for k in jobs:
+                k.join()
+
 
 
 def download_url(url: str, outfile: str, max_attempts: int = 100):
@@ -48,160 +166,24 @@ def download_url(url: str, outfile: str, max_attempts: int = 100):
     return False
 
 
-def divide_chunks(l, n):
-    for i in range(0, len(l), n):
-        yield l[i : i + n]
 
 
-def make_url(ra, dec, layer=None, bands=None, s_arcmin=3, s_px=512, format="fits"):
-    layer = layer or settings.LEGACY_SURVEY_LAYER
-    bands = bands or settings.LEGACY_SURVEY_BANDS
-
-    # Convert coords to string
-    ra, dec = str(np.round(ra, 5)), str(np.round(dec, 5))
-
-    # Set pixscale
-    s_arcsec = 60 * s_arcmin
-    pxscale = 0.262  # s_arcsec / s_px
-
-    # Convert image scales to string
-    s_px, pxscale = str(s_px), str(np.round(pxscale, 4))
-
-    url = (
-        f"http://legacysurvey.org/viewer/cutout.{format}"
-        f"?ra={ra}&dec={dec}"
-        f"&layer={layer}&pixscale={pxscale}&size={s_px}"
-    )
-
-    if bands:
-        url += f"&bands={bands}"
-
-    return url
 
 
-def grab_cutouts(
-    target_file: Union[str, pd.DataFrame],
-    name_col: str = "Component_name",
-    ra_col: str = "RA",
-    dec_col: str = "DEC",
-    survey: str = None,
-    bands: Optional[str] = None,
-    output_dir: str = "",
-    imgsize_arcmin: float = 1.5,
-    imgsize_pix: int = 150,
-    prefix: str = "",
-    suffix: str = "",
-    extra_processing: Optional[Callable] = None,
-    extra_proc_kwds: Dict[Any, Any] = dict(),
-    file_format: str = "fits",
-) -> None:
-    """Function to download image cutouts from any survey.
-    ​
-        Arguments:
-            target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target
-                                               coordinates and names.
-    ​
-        Keyword Arguments:
-            name_col {str} -- The column name in target_file that contains the desired file name
-                             (default: {"Component_name"})
-            ra_col {str} -- RA column name (default: {"RA"})
-            dec_col {str} -- Dec column name (default: {"DEC"})
-            survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
-            output_dir {str} -- Output path for the image cutouts (default: {""})
-            prefix {str} -- Prefix for the output filename (default {""})
-            suffix {str} -- Suffix for the output filename (default {survey})
-            imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
-            imgsize_pix {int} -- Image size in pixels (default: {500})
-    """
-    if isinstance(target_file, str):
-        targets = load_catalogue(target_file, pandas=True)
-    else:
-        targets = target_file
-
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    if suffix == "":
-        suffix = survey
-
-    holds = []
-    for name_optional, target in targets.iterrows():
-
-        name = name_optional
-        # name = target[name_col]
-
-        a = target[ra_col]
-        d = target[dec_col]
-
-        outfile = os.path.join(output_dir, f"{name}.{file_format}")
-        # grab_cutout(
-        #     a,
-        #     d,
-        #     outfile,
-        #     survey=survey,
-        #     imgsize_arcmin=imgsize_arcmin,
-        #     imgsize_pix=imgsize_pix,
-        #     extra_processing=extra_processing,
-        # )
-        holds.append((a, d, outfile))
-
-    bighold = list(divide_chunks(holds, 20))
-    print(len(bighold))
-
-    # TODO Seems suboptimal, maybe asyncio?
-    for i in range(len(bighold)):
-        jobs = []
-        for j in range(0, len(bighold[i])):
-
-            ra, dec, outfile = bighold[i][j]
-            thread = threading.Thread(
-                target=grab_cutout,
-                args=(
-                    ra,
-                    dec,
-                    outfile,
-                    survey,
-                    bands,
-                    imgsize_arcmin,
-                    imgsize_pix,
-                    extra_processing,
-                    file_format,
-                ),
-            )
-            jobs.append(thread)
-            thread.start()
-        for k in jobs:
-            k.join()
 
 
-def grab_cutout(
-    ra,
-    dec,
-    outfile,
-    survey=None,
-    bands=None,
-    imgsize_arcmin=3.0,
-    imgsize_pix=300,
-    extra_processing=None,
-    file_format=None,
-    extra_proc_kwds=dict(),
-):
-    survey = survey or settings.LEGACY_SURVEY_VLAYER
-    bands = bands or settings.LEGACY_SURVEY_BANDS
+# def load_catalogue(catalog, pandas=False):
+#     fmt = "fits" if catalog.endswith("fits") else "csv"
+#     rcat = Table.read(catalog, format=fmt)
 
-    url = make_url(
-        ra=ra,
-        dec=dec,
-        layer=survey,
-        bands=bands,
-        s_arcmin=imgsize_arcmin,
-        s_px=imgsize_pix,
-        format=file_format,
-    )
-    if not os.path.exists(outfile):
-        status = download_url(url, outfile)
-        if status and (extra_processing is not None):
-            extra_processing(outfile, **extra_proc_kwds)
+#     if pandas:
+#         rcat = rcat.to_pandas()
+#         if fmt == "fits":
+#             for col in rcat.columns[rcat.dtypes == object]:
+#                 rcat[col] = rcat[col].str.decode("ascii")
+
+#     return rcat
+
 
 
 # def cadc_cutout_url(ql_url, coords, radius):

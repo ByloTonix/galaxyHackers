@@ -27,10 +27,6 @@ settings.SEGMENTATION_SAMPLES_DESCRIPTION_PATH = Path(
 )
 settings.SEGMENTATION_MAPS_PATH = Path(settings.SEGMENTATION_PATH, "maps/")
 
-settings.LEGACY_SURVEY_LAYER = settings.legacy_survey.layer
-settings.LEGACY_SURVEY_BANDS = settings.legacy_survey.bands
-settings.LEGACY_SURVEY_VLAYER = settings.legacy_survey.vlayer
-
 # TODO: fix FALLBACK_URL in MAP_ACT_CONFIG and DR5_CONFIG
 settings.MAP_ACT_CONFIG = {
     "RENAME_DICT": {

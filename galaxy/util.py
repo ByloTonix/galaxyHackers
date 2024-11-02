@@ -19,3 +19,7 @@ def to_hms_format(time_str):
 def to_dms_format(time_str):
     parts = time_str.split()
     return f"{parts[0]}d{parts[1]}m{parts[2]}s"
+
+def divide_chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i : i + n]

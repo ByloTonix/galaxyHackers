@@ -459,8 +459,6 @@ def ddos():
             ra_col="ra_deg",
             dec_col="dec_deg",
             output_dir=path,
-            survey=settings.LEGACY_SURVEY_LAYER,
-            bands=settings.LEGACY_SURVEY_BANDS,
             imgsize_pix=224,
         )
 
