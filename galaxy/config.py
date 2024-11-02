@@ -38,8 +38,7 @@ settings.MAP_ACT_CONFIG = {
         "TARGET": settings.MAP_ACT_PATH,
     },
     "URL": "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/maps/act_planck_dr5.01_s08s18_AA_f220_daynight_fullivar.fits",
-    "ZIPPED_OUTPUT_PATH": Path(settings.DATA_PATH, "ACT.zip"),
-    "FALLBACK_URL": "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/maps/act_planck_dr5.01_s08s18_AA_f220_daynight_fullivar.fits",
+    # "FALLBACK_URL": "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/maps/act_planck_dr5.01_s08s18_AA_f220_daynight_fullivar.fits",
     "OUTPUT_PATH": str(settings.MAP_ACT_PATH),
 }
 
@@ -49,8 +48,7 @@ settings.DR5_CONFIG = {
         "TARGET": settings.DR5_CLUSTERS_PATH,
     },
     "URL": "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/DR5_cluster-catalog_v1.1.fits",
-    "ZIPPED_OUTPUT_PATH": Path(settings.DATA_PATH, "dr5.zip"),
-    "FALLBACK_URL": "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/DR5_cluster-catalog_v1.1.fits",
+    # "FALLBACK_URL": "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/DR5_cluster-catalog_v1.1.fits",
     "OUTPUT_PATH": str(settings.DR5_CLUSTERS_PATH),
 }
 
@@ -60,9 +58,8 @@ settings.SGA_CONFIG = {
         "TARGET": settings.SGA_PATH,
     },
     "URL": "https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits",
-    "ZIPPED_OUTPUT_PATH": None,
-    "FALLBACK_URL": "https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits",
-    "OUTPUT_PATH": str(settings.SGA_PATH),
+    # "FALLBACK_URL" : 'https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits',
+    "OUTPUT_PATH": str(settings.SGA_PATH) 
 }
 
 

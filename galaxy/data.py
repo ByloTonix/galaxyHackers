@@ -137,16 +137,11 @@ def download_data():
             wget.download(
                 url=config.URL, out=str(settings.DATA_PATH), bar=util.bar_progress
             )
-            if config.ZIPPED_OUTPUT_PATH is not None:
-                with ZipFile(config.ZIPPED_OUTPUT_PATH, "r") as zObject:
-                    zObject.extractall(path=settings.DATA_PATH)
 
             rename_dict = config.RENAME_DICT
 
             os.rename(rename_dict.SOURCE, rename_dict.TARGET)
 
-            if config.ZIPPED_OUTPUT_PATH is not None:
-                os.remove(config.ZIPPED_OUTPUT_PATH)
             # except Exception:
             #     # Getting 403, what credentials needed?
             #     wget.download(
@@ -196,7 +191,8 @@ def read_dr5():
         }
     )
 
-    frame = frame.loc["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]
+
+    frame = frame.loc[:, ['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']]
 
     frame = inherit_columns(frame)
     return frame
@@ -232,6 +228,9 @@ def read_mc():
     )
 
     frame = inherit_columns(frame)
+
+    frame = frame.loc[:, ['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']]
+
 
     return frame
 
