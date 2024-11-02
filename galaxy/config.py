@@ -18,7 +18,7 @@ settings.PREDICTIONS_PATH = Path(settings.STORAGE_PATH, "predictions/")
 
 settings.MAP_ACT_PATH = Path(settings.DATA_PATH, settings.MAP_ACT_FILENAME)
 settings.DR5_CLUSTERS_PATH = Path(settings.DATA_PATH, settings.DR5_CLUSTERS_FILENAME)
-settings.SGA_PATH =  Path(settings.DATA_PATH, settings.SGA_FILENAME)
+settings.SGA_PATH = Path(settings.DATA_PATH, settings.SGA_FILENAME)
 
 settings.SEGMENTATION_PATH = Path(settings.STORAGE_PATH, "segmentation/")
 settings.SEGMENTATION_SAMPLES_PATH = Path(settings.SEGMENTATION_PATH, "samples/")
@@ -27,6 +27,9 @@ settings.SEGMENTATION_SAMPLES_DESCRIPTION_PATH = Path(
 )
 settings.SEGMENTATION_MAPS_PATH = Path(settings.SEGMENTATION_PATH, "maps/")
 
+settings.LEGACY_SURVEY_LAYER = settings.legacy_survey.layer
+settings.LEGACY_SURVEY_BANDS = settings.legacy_survey.bands
+settings.LEGACY_SURVEY_VLAYER = settings.legacy_survey.vlayer
 
 # TODO: fix FALLBACK_URL in MAP_ACT_CONFIG and DR5_CONFIG
 settings.MAP_ACT_CONFIG = {
@@ -50,10 +53,10 @@ settings.DR5_CONFIG = {
 }
 
 settings.SGA_CONFIG = {
-     "RENAME_DICT" : {
-         "SOURCE": Path(settings.DATA_PATH, settings.SGA_ROUTE), 
-         "TARGET":  settings.SGA_PATH 
-         },
+    "RENAME_DICT": {
+        "SOURCE": Path(settings.DATA_PATH, settings.SGA_ROUTE),
+        "TARGET": settings.SGA_PATH,
+    },
     "URL": "https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits",
     # "FALLBACK_URL" : 'https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits',
     "OUTPUT_PATH": str(settings.SGA_PATH) 

@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, Mapping, Optional, Union
 from astropy.io import fits
 from astropy.table import Table
 from urllib.error import HTTPError, URLError
+from config import settings
 import threading
 
 
@@ -52,14 +53,16 @@ def divide_chunks(l, n):
         yield l[i : i + n]
 
 
-def make_url(ra, dec, survey="unwise-neo7", s_arcmin=3, s_px=512, format="fits"):
+def make_url(ra, dec, layer=None, bands=None, s_arcmin=3, s_px=512, format="fits"):
+    layer = layer or settings.LEGACY_SURVEY_LAYER
+    bands = bands or settings.LEGACY_SURVEY_BANDS
+
     # Convert coords to string
-    ra = str(np.round(ra, 5))
-    dec = str(np.round(dec, 5))
+    ra, dec = str(np.round(ra, 5)), str(np.round(dec, 5))
 
     # Set pixscale
     s_arcsec = 60 * s_arcmin
-    pxscale =  0.262#s_arcsec / s_px
+    pxscale = 0.262  # s_arcsec / s_px
 
     # Convert image scales to string
     s_px, pxscale = str(s_px), str(np.round(pxscale, 4))
@@ -67,8 +70,12 @@ def make_url(ra, dec, survey="unwise-neo7", s_arcmin=3, s_px=512, format="fits")
     url = (
         f"http://legacysurvey.org/viewer/cutout.{format}"
         f"?ra={ra}&dec={dec}"
-        f"&layer={survey}&pixscale={pxscale}&size={s_px}"
+        f"&layer={layer}&pixscale={pxscale}&size={s_px}"
     )
+
+    if bands:
+        url += f"&bands={bands}"
+
     return url
 
 
@@ -77,7 +84,8 @@ def grab_cutouts(
     name_col: str = "Component_name",
     ra_col: str = "RA",
     dec_col: str = "DEC",
-    survey: str = "vlass1.2",
+    survey: str = None,
+    bands: Optional[str] = None,
     output_dir: str = "",
     imgsize_arcmin: float = 1.5,
     imgsize_pix: int = 150,
@@ -85,26 +93,26 @@ def grab_cutouts(
     suffix: str = "",
     extra_processing: Optional[Callable] = None,
     extra_proc_kwds: Dict[Any, Any] = dict(),
-    file_format: str='fits',
+    file_format: str = "fits",
 ) -> None:
     """Function to download image cutouts from any survey.
-​
-    Arguments:
-        target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target 
-                                           coordinates and names.
-​
-    Keyword Arguments:
-        name_col {str} -- The column name in target_file that contains the desired file name 
-                         (default: {"Component_name"})
-        ra_col {str} -- RA column name (default: {"RA"})
-        dec_col {str} -- Dec column name (default: {"DEC"})
-        survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
-        output_dir {str} -- Output path for the image cutouts (default: {""})
-        prefix {str} -- Prefix for the output filename (default {""})
-        suffix {str} -- Suffix for the output filename (default {survey})
-        imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
-        imgsize_pix {int} -- Image size in pixels (default: {500})
-     """
+    ​
+        Arguments:
+            target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target
+                                               coordinates and names.
+    ​
+        Keyword Arguments:
+            name_col {str} -- The column name in target_file that contains the desired file name
+                             (default: {"Component_name"})
+            ra_col {str} -- RA column name (default: {"RA"})
+            dec_col {str} -- Dec column name (default: {"DEC"})
+            survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
+            output_dir {str} -- Output path for the image cutouts (default: {""})
+            prefix {str} -- Prefix for the output filename (default {""})
+            suffix {str} -- Suffix for the output filename (default {survey})
+            imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
+            imgsize_pix {int} -- Image size in pixels (default: {500})
+    """
     if isinstance(target_file, str):
         targets = load_catalogue(target_file, pandas=True)
     else:
@@ -125,9 +133,7 @@ def grab_cutouts(
         a = target[ra_col]
         d = target[dec_col]
 
-        outfile = os.path.join(
-            output_dir, f"{name}.{file_format}"
-        )
+        outfile = os.path.join(output_dir, f"{name}.{file_format}")
         # grab_cutout(
         #     a,
         #     d,
@@ -155,10 +161,11 @@ def grab_cutouts(
                     dec,
                     outfile,
                     survey,
+                    bands,
                     imgsize_arcmin,
                     imgsize_pix,
                     extra_processing,
-                    file_format
+                    file_format,
                 ),
             )
             jobs.append(thread)
@@ -171,25 +178,30 @@ def grab_cutout(
     ra,
     dec,
     outfile,
-    survey="vlass1.2",
+    survey=None,
+    bands=None,
     imgsize_arcmin=3.0,
     imgsize_pix=300,
     extra_processing=None,
     file_format=None,
     extra_proc_kwds=dict(),
 ):
+    survey = survey or settings.LEGACY_SURVEY_VLAYER
+    bands = bands or settings.LEGACY_SURVEY_BANDS
+
     url = make_url(
-        ra=ra, dec=dec, 
-        survey=survey, 
-        s_arcmin=imgsize_arcmin, 
-        s_px=imgsize_pix, 
-        format=file_format
+        ra=ra,
+        dec=dec,
+        layer=survey,
+        bands=bands,
+        s_arcmin=imgsize_arcmin,
+        s_px=imgsize_pix,
+        format=file_format,
     )
     if not os.path.exists(outfile):
         status = download_url(url, outfile)
         if status and (extra_processing is not None):
             extra_processing(outfile, **extra_proc_kwds)
-
 
 
 # def cadc_cutout_url(ql_url, coords, radius):
@@ -300,12 +312,6 @@ def grab_cutout(
 #         extra_proc_kwds={"band": "w1"},
 #         **kwargs,
 #     )
-
-
-
-
-
-
 
 
 # def parse_args():

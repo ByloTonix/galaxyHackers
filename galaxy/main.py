@@ -1,3 +1,5 @@
+import sys
+import os
 import argparse
 
 import torch
@@ -6,6 +8,9 @@ import torch.optim as optim
 import torch_optimizer as optimizer
 from comet_ml import Experiment
 from torch.optim.lr_scheduler import ExponentialLR
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parent_dir)
 
 from galaxy import data, metrics, segmentation, train
 from galaxy.config import settings
