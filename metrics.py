@@ -1,6 +1,14 @@
 import numpy as np
 
-from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score, fbeta_score, roc_auc_score, auc
+from sklearn.metrics import (
+    precision_score,
+    recall_score,
+    accuracy_score,
+    f1_score,
+    fbeta_score,
+    roc_auc_score,
+    auc,
+)
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from sklearn.metrics import roc_curve
@@ -15,62 +23,49 @@ import pandas as pd
 
 from config import settings
 
+
 def probabilities_hist(predictions_clusters, predictions_non_clusters, pdf):
     bins = np.arange(0, 1.01, 0.05)
     plt.figure()
-    plt.hist(predictions_clusters, bins, color='green', alpha=0.5, label='clusters')
-    plt.hist(predictions_non_clusters, bins, color='red', alpha=0.5, label='non-clusters')
-    plt.legend(loc='upper right')
-    plt.title('Class prediction')
-    # plt.savefig(metrics_pdf_name, format="pdf")
+    plt.hist(predictions_clusters, bins, color="green", alpha=0.5, label="clusters")
+    plt.hist(
+        predictions_non_clusters, bins, color="red", alpha=0.5, label="non-clusters"
+    )
+    plt.legend(loc="upper right")
+    plt.title("Class prediction")
     pdf.savefig()
-    plt.close()
-
-# NOT YET IMPLEMENTED
-def plot_loss_by_model(model_name: str, result: dict, val_result: dict, path: str):
-    plt.figure(figsize=(10, 6))
-
-    # available flags for customizing: linestyle="--", linewidth=2, marker,
-    plt.plot(result['epochs'], result['losses'], label="train", marker=".")
-    plt.plot(val_result['val_epochs'], val_result['val_losses'], label="valid", marker="*")
-
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Losses per Epoch')
-    plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.5)
-
-    plt.savefig(path)
     plt.close()
 
 
 def plot_roc_curve(pdf, predictions: pd.DataFrame):
     fpr, tpr, _ = roc_curve(predictions.y_true, predictions.y_probs)
     plt.figure()
-    plt.plot(fpr, tpr, linewidth=2, label='')
-    plt.plot([0, 1], [0, 1], 'k--')
-    plt.xlabel('False Positive Rate, FPR')
-    plt.ylabel('True Positive Rate, TPR')
-    plt.title('ROC curve')
-    plt.grid(True, linestyle='--', alpha=0.5)
-    # plt.savefig(metrics_pdf_name, format="pdf")
+    plt.plot(fpr, tpr, linewidth=2, label="")
+    plt.plot([0, 1], [0, 1], "k--")
+    plt.xlabel("False Positive Rate, FPR")
+    plt.ylabel("True Positive Rate, TPR")
+    plt.title("ROC curve")
+    plt.grid(True, linestyle="--", alpha=0.5)
     pdf.savefig()
     plt.close()
 
+
 def plot_pr_curve(pdf, predictions: pd.DataFrame):
-    precisions, recalls, _ = precision_recall_curve(predictions.y_true, predictions.y_probs)
+    precisions, recalls, _ = precision_recall_curve(
+        predictions.y_true, predictions.y_probs
+    )
     # calculate Area Under the PR curve
     pr_auc = auc(recalls, precisions)
     plt.figure()
     plt.plot(recalls, precisions, linewidth=2)
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('Precision-Recall curve')
-    plt.grid(True, linestyle='--', alpha=0.5)
-    # plt.savefig(metrics_pdf_name, format="pdf")
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.title("Precision-Recall curve")
+    plt.grid(True, linestyle="--", alpha=0.5)
     pdf.savefig()
     plt.close()
     return pr_auc
+
 
 def plot_confusion_matrices(pdf, predictions: pd.DataFrame, classes):
     cm = confusion_matrix(predictions.y_true, predictions.y_pred)
@@ -84,29 +79,40 @@ def plot_confusion_matrices(pdf, predictions: pd.DataFrame, classes):
     plt.close()
 
     plt.figure()
-    _ = ConfusionMatrixDisplay(confusion_matrix=weighted_cm, display_labels=classes).plot()
-    # plt.savefig(metrics_pdf_name, format="pdf")
+    _ = ConfusionMatrixDisplay(
+        confusion_matrix=weighted_cm, display_labels=classes
+    ).plot()
     pdf.savefig()
     plt.close()
     return tn, fp, fn, tp
 
+
 def plot_red_shift(pdf, predictions: pd.DataFrame):
     red_shift_predictions = predictions.loc[predictions.red_shift.notna()]
-    red_shift_predictions = red_shift_predictions.sort_values(by='red_shift')
+    red_shift_predictions = red_shift_predictions.sort_values(by="red_shift")
 
     n_bins = 10
     # Create 10 equal-sized buckets based on red_shift
-    red_shift_predictions['bucket'] = pd.qcut(red_shift_predictions['red_shift'], n_bins)
+    red_shift_predictions["bucket"] = pd.qcut(
+        red_shift_predictions["red_shift"], n_bins
+    )
 
     # Calculate recall for each bin
-    recall_per_bin = red_shift_predictions.groupby('bucket').apply(lambda x: recall_score(x['y_true'], x['y_pred']))
+    recall_per_bin = red_shift_predictions.groupby("bucket").apply(
+        lambda x: recall_score(x["y_true"], x["y_pred"])
+    )
 
     # Calculate proportions of red_shift_type within each bin
-    proportions = red_shift_predictions.groupby('bucket')['red_shift_type'].value_counts(normalize=True).unstack().fillna(0)
+    proportions = (
+        red_shift_predictions.groupby("bucket")["red_shift_type"]
+        .value_counts(normalize=True)
+        .unstack()
+        .fillna(0)
+    )
 
-    fig = plt.figure() 
-    ax = fig.add_subplot(111) 
-    ax2 = ax.twinx() 
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax2 = ax.twinx()
 
     width = 0.3
 
@@ -114,56 +120,116 @@ def plot_red_shift(pdf, predictions: pd.DataFrame):
     for i in range(proportions.shape[1]):
         bars.append(proportions.iloc[:, i] * recall_per_bin)
 
-    bars[0].plot(kind='bar', stacked=True, figsize=(10, 6), ax=ax, color='skyblue', position=0, width=width, edgecolor="black")
+    bars[0].plot(
+        kind="bar",
+        stacked=True,
+        figsize=(10, 6),
+        ax=ax,
+        color="skyblue",
+        position=0,
+        width=width,
+        edgecolor="black",
+    )
     for i in range(1, len(bars)):
-        bars[i].plot(kind='bar', stacked=True, bottom=bars[i-1], ax=ax, color=plt.cm.Paired(i), position=0, width=width, edgecolor="black")
+        bars[i].plot(
+            kind="bar",
+            stacked=True,
+            bottom=bars[i - 1],
+            ax=ax,
+            color=plt.cm.Paired(i),
+            position=0,
+            width=width,
+            edgecolor="black",
+        )
 
     bars = []
     for i in range(proportions.shape[1]):
         bars.append(proportions.iloc[:, i])
 
-    bars[0].plot(kind='bar', stacked=True, figsize=(10, 6), ax=ax2, color='skyblue', position=1, width=width,edgecolor='black')
+    bars[0].plot(
+        kind="bar",
+        stacked=True,
+        figsize=(10, 6),
+        ax=ax2,
+        color="skyblue",
+        position=1,
+        width=width,
+        edgecolor="black",
+    )
     for i in range(1, len(bars)):
-        bars[i].plot(kind='bar', stacked=True, bottom=bars[i-1], ax=ax2, color=plt.cm.Paired(i), position=1, width=width,edgecolor='black')
+        bars[i].plot(
+            kind="bar",
+            stacked=True,
+            bottom=bars[i - 1],
+            ax=ax2,
+            color=plt.cm.Paired(i),
+            position=1,
+            width=width,
+            edgecolor="black",
+        )
 
-    plt.title('Recall by Red Shift Bins with Proportional Coloring by Red Shift Type')
-    plt.xlabel('Red Shift Bin')
-    plt.ylabel('Recall')
-    plt.legend(proportions.columns, title='Red Shift Type', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.title("Recall by Red Shift Bins with Proportional Coloring by Red Shift Type")
+    plt.xlabel("Red Shift Bin")
+    plt.ylabel("Recall")
+    plt.legend(
+        proportions.columns,
+        title="Red Shift Type",
+        bbox_to_anchor=(1.05, 1),
+        loc="upper left",
+    )
     plt.tight_layout()
-    # plt.savefig(metrics_pdf_name, format="pdf")
     pdf.savefig(fig)
     plt.close()
 
 
-# NOT YET IMPLEMENTED
-def plot_accuracies_by_model(model_name: str, result: dict, val_result: dict, path: str):
+def plot_loss_by_model(train_table_data, val_table_data, pdf):
     plt.figure(figsize=(10, 6))
-    plt.plot(result['epochs'], result['accuracies'], label="train", marker=".")
-    plt.plot(val_result['val_epochs'], val_result['val_accuracies'], label="valid", marker="*")
 
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
-    plt.title('Accuracy per Epoch')
+    # available flags for customizing: linestyle="--", linewidth=2, marker,
+    plt.plot(train_table_data[0], train_table_data[1], label="train", marker=".")
+    plt.plot(val_table_data[0], val_table_data[1], label="valid", marker="*")
+
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Losses per Epoch")
     plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.grid(True, linestyle="--", alpha=0.5)
 
-    plt.savefig(path)
+    pdf.savefig()
     plt.close()
 
 
-def modelPerformance(model_name, optimizer_name,
-                     predictions: pd.DataFrame,
-                     classes, 
-                     f_beta = 2,
-                    #  result, val_result
-                     ):
-    '''
+def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
+    plt.figure(figsize=(10, 6))
+    plt.plot(train_table_data[0], train_table_data[2], label="train", marker=".")
+    plt.plot(val_table_data[0], val_table_data[2], label="valid", marker="*")
+
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy per Epoch")
+    plt.legend()
+    plt.grid(True, linestyle="--", alpha=0.5)
+
+    pdf.savefig()
+    plt.close()
+
+
+def modelPerformance(
+    model_name,
+    optimizer_name,
+    predictions: pd.DataFrame,
+    classes,
+    #  num_epochs, # already mentioned in train_table_data and val_table_data
+    train_table_data,
+    val_table_data,
+    f_beta=2,
+):
+    """
     Plots distributions of probabilities of classes, ROC and Precision-Recall curves, change of loss and accuracy throughout training,
     confusion matrix and its weighted version and saves them in .png files,
     counts accuracy, precision, recall, false positive rate and f1-score and saves them in .txt file
-    '''
-                         
+    """
+
     acc = accuracy_score(predictions.y_true, predictions.y_pred)
     precision = precision_score(predictions.y_true, predictions.y_pred)
     recall = recall_score(predictions.y_true, predictions.y_pred)
@@ -174,7 +240,7 @@ def modelPerformance(model_name, optimizer_name,
 
     model_path = Path(settings.METRICS_PATH, f"{model_name}_{optimizer_name}")
     os.makedirs(model_path, exist_ok=True)
-    pdf = PdfPages(Path(model_path, 'metrics_plots.pdf'))
+    pdf = PdfPages(Path(model_path, "metrics_plots.pdf"))
     # metrics_pdf_name = Path(model_path, 'metrics_plots.pdf')
 
     # plot probablities distribution
@@ -188,7 +254,13 @@ def modelPerformance(model_name, optimizer_name,
 
     # confusion matrices
     tn, fp, fn, tp = plot_confusion_matrices(pdf, predictions, classes)
-    fpr_measure = fp/(fp+tn)
+    fpr_measure = fp / (fp + tn)
+
+    # change of loss throughout epochs
+    plot_loss_by_model(train_table_data, val_table_data, pdf)
+
+    # change of accuracies througout epochs
+    plot_accuracies_by_model(train_table_data, val_table_data, pdf)
 
     # recall by red shift
     plot_red_shift(pdf, predictions)
@@ -207,7 +279,7 @@ def modelPerformance(model_name, optimizer_name,
         "F-beta score": fbeta_measure,
     }
 
-    with open(Path(model_path, 'metrics.json'), "w") as file:
+    with open(Path(model_path, "metrics.json"), "w") as file:
         json.dump(metrics, file)
 
 

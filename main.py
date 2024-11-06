@@ -190,7 +190,13 @@ for model_name, model in selected_models:
     )
 
     predictions, *_ = trainer.test(test_loader)
-    metrics.modelPerformance(model_name, optimizer_name, predictions, classes)
+    metrics.modelPerformance(model_name, 
+                             optimizer_name, 
+                             predictions, 
+                             classes, 
+                             train_table_data, 
+                             val_table_data
+                             )
 
     del model
     torch.cuda.empty_cache()
