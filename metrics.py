@@ -185,9 +185,15 @@ def plot_red_shift(pdf, predictions: pd.DataFrame):
 def plot_loss_by_model(train_table_data, val_table_data, pdf):
     plt.figure(figsize=(10, 6))
 
+    train_epochs = [row[0] for row in train_table_data]
+    train_losses = [row[1] for row in train_table_data]
+
+    val_epochs = [row[0] for row in val_table_data]
+    val_losses = [row[1] for row in val_table_data]
+
     # available flags for customizing: linestyle="--", linewidth=2, marker,
-    plt.plot(train_table_data[0], train_table_data[1], label="train", marker=".")
-    plt.plot(val_table_data[0], val_table_data[1], label="valid", marker="*")
+    plt.plot(train_epochs, train_losses, label="train", marker=".")
+    plt.plot(val_epochs, val_losses, label="valid", marker="*")
 
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
@@ -201,8 +207,15 @@ def plot_loss_by_model(train_table_data, val_table_data, pdf):
 
 def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
     plt.figure(figsize=(10, 6))
-    plt.plot(train_table_data[0], train_table_data[2], label="train", marker=".")
-    plt.plot(val_table_data[0], val_table_data[2], label="valid", marker="*")
+
+    train_epochs = [row[0] for row in train_table_data]
+    train_accuracies = [row[2] for row in train_table_data]
+
+    val_epochs = [row[0] for row in val_table_data]
+    val_accuracies = [row[2] for row in val_table_data]
+
+    plt.plot(train_epochs, train_accuracies, label="train", marker=".")
+    plt.plot(val_epochs, val_accuracies, label="valid", marker="*")
 
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
