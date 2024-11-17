@@ -55,7 +55,7 @@ settings.SGA_CONFIG = {
     },
     "URL": "https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits",
     # "FALLBACK_URL" : 'https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits',
-    "OUTPUT_PATH": str(settings.SGA_PATH) 
+    "OUTPUT_PATH": str(settings.SGA_PATH),
 }
 
 

@@ -15,5 +15,5 @@ SGA_FILENAME = "sga.fits"
 
 [LEGACY_SURVEY]
 LAYER = "unwise-neo7"
+# LAYER = "vlass1.2"
 BANDS = "griz"
-VLAYER = "vlass1.2"

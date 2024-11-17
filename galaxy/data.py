@@ -3,12 +3,9 @@
 """To create dataloaders you need to adress only function create_dataloaders()"""
 
 import os
-import sys
+from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from zipfile import ZipFile
-from collections import defaultdict
-
 
 import astropy.coordinates as coord
 import astropy.table as atpy
@@ -28,7 +25,6 @@ from torchvision import transforms
 from galaxy import grabber, util
 from galaxy.config import settings
 
-from abc import ABC, abstractmethod
 
 np.random.seed(settings.SEED)
 
@@ -46,6 +42,7 @@ class DataSource(str, Enum):
     DR5 = "dr5"
     MC = "mc"
     SGA = "sga"
+    TYC2 = "tyc2"
     GAIA = "gaia"
 
 
@@ -53,11 +50,64 @@ class DataPart(str, Enum):
 
     TRAIN = "train"
     VALIDATE = "validate"
-    TEST_DR5 = "test_dr5"
-    TEST_MC = "test_mc"
+    TEST = "test"
+    MC = "mc"
     GAIA = "gaia"
 
 
+# class SurveyLayer(str, Enum):
+#     UNWISE_NEO7 = "unwise-neo7"
+#     VLASS1_2 = "vlass1.2"
+
+
+import torch
+import torch.nn.functional as F
+
+def shift_and_mirror_pad(image, shift_x, shift_y):
+    """
+    Shifts the image by (shift_x, shift_y) and applies mirror-padding.
+
+    Parameters:
+    - image (Tensor): Input tensor of shape (C, H, W)
+    - shift_x (int): Horizontal shift (positive: right, negative: left)
+    - shift_y (int): Vertical shift (positive: down, negative: up)
+
+    Returns:
+    - Tensor: Augmented image tensor of shape (C, H, W)
+    """
+    C, H, W = image.shape
+
+    # Initialize padding
+    pad_left = max(shift_x, 0)
+    pad_right = max(-shift_x, 0)
+    pad_top = max(shift_y, 0)
+    pad_bottom = max(-shift_y, 0)
+
+    # Apply mirror padding
+    padded_image = F.pad(image, (pad_left, pad_right, pad_top, pad_bottom), mode='reflect')
+
+    # Calculate cropping indices
+    crop_left = pad_right
+    crop_right = crop_left + W
+    crop_top = pad_bottom
+    crop_bottom = crop_top + H
+
+    # Crop the image to original size
+    shifted_image = padded_image[:, crop_top:crop_bottom, crop_left:crop_right]
+
+    return shifted_image
+
+class ShiftAndMirrorPadTransform:
+    def __init__(self, max_shift_x: int = 20, max_shift_y: int = 20):
+        self.max_shift_x = max_shift_x
+        self.max_shift_y = max_shift_y
+
+    def __call__(self, image):
+        # Random shift values within the specified range
+        shift_x = torch.randint(-self.max_shift_x, self.max_shift_x + 1, (1,)).item()
+        shift_y = torch.randint(-self.max_shift_y, self.max_shift_y + 1, (1,)).item()
+        return shift_and_mirror_pad(image, shift_x, shift_y)
+    
 class ClusterDataset(Dataset):
     def __init__(self, images_dir_path: str, description_csv_path: str, transform=None):
         super().__init__()
@@ -100,30 +150,14 @@ class ClusterDataset(Dataset):
 
         return sample
 
+
+
     @staticmethod
     def _read_img(fits_path: Path):
         with fits.open(fits_path) as hdul:
             img = torch.Tensor(hdul[0].data.astype(np.float64))
 
         return img
-
-
-"""Obtain GAIA stars catalogue"""
-
-
-def read_gaia():
-    job = Gaia.launch_job_async(
-        "select DESIGNATION, ra, dec from gaiadr3.gaia_source "
-        "where random_index between 0 and 1000000 and phot_g_mean_mag < 12 and parallax is not null"
-    )
-    gaiaResponse = job.get_results().to_pandas()
-    gaia_frame = (
-        gaiaResponse.sample(frac=1, random_state=settings.SEED)
-        .reset_index(drop=True)
-        .rename(columns={"DESIGNATION": "name", "ra": "ra_deg", "dec": "dec_deg"})
-    )
-
-    return gaia_frame
 
 
 """Obtain ACT_DR5, clusters identified there and in MaDCoWS"""
@@ -151,13 +185,17 @@ def download_data():
             #     )
 
 
-required_columns = set(["idx", "ra_deg", "dec_deg", "name"])
+
+# 
+
+
+required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source"])
 optional_columns = set(["red_shift", "red_shift_type"])
 
 
 def inherit_columns(frame: pd.DataFrame):
 
-    frame["idx"] = np.arange(len(frame))
+    frame['idx'] = np.arange(len(frame))
 
     frame_columns = set(frame.columns)
 
@@ -192,7 +230,8 @@ def read_dr5():
     )
 
 
-    frame = frame.loc[:, ['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']]
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+    frame['source'] = DataSource.DR5.value
 
     frame = inherit_columns(frame)
     return frame
@@ -227,30 +266,121 @@ def read_mc():
         frame["Photz"].notna() & frame["red_shift_type"].isna(), "phot", pd.NA
     )
 
+
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+
+    frame['source'] = DataSource.MC.value
+
     frame = inherit_columns(frame)
 
-    frame = frame.loc[:, ['ra_deg', 'dec_deg', 'name', 'red_shift', 'red_shift_type']]
+    return frame
 
+def read_sga(sample_size=10_000):
+
+    table: atpy.Table = atpy.Table().read(settings.SGA_PATH)
+    frame = table.to_pandas().reset_index(drop=True)
+
+
+    frame = frame.rename(
+        columns={
+            "SGA_ID": "name",
+            "RA": "ra_deg",
+            "DEC": "dec_deg",
+            "Z_LEDA": "red_shift",
+        }
+    )
+
+    # Нет точного указания, Светлана сказала скорее всего так.
+    frame['red_shift_type'] = 'phot'
+
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+
+    # Убираем выбросы слева
+    frame = frame[frame.red_shift>0]
+
+    # Убираем выбросы справа
+    q_hi  = frame["red_shift"].quantile(0.995)
+    frame = frame[(frame["red_shift"] < q_hi)]
+
+    # Сэмплируем по бинам относительно red_shift. Хочется чтобы объекты в выборке были распределены равномерно
+    n_bins = 10
+    seps = np.linspace(0, frame["red_shift"].max(), num=n_bins+1)
+    bins = zip(seps[:-1], seps[1:])
+
+    # Вычисляем размер бина
+    sub_sample_size = sample_size // n_bins
+    sub_samples = []
+
+    # Сэмплируем в каждом бине равномерно
+    for low, high in bins:
+        sub_frame = frame.loc[frame["red_shift"].between(low, high)]
+        sub_samples.append(sub_frame.sample(n=sub_sample_size, random_state=settings.SEED))
+    
+    # Склеиваем
+    sample = pd.concat(sub_samples, axis=0).sort_index()
+    sample.index = np.arange(len(sample))
+
+    frame['source'] = DataSource.SGA.value
+
+    frame = inherit_columns(frame)
 
     return frame
 
 
-# TODO apply inherit_columns to frames
-def get_all_clusters():
-    """Concat clusters from act_dr5 and madcows to create negative classes in samples"""
+def read_tyc2(sample_size=5_000):
 
-    mc = read_mc()
-    dr5 = read_dr5()
+    frame = Vizier(row_limit=-1).get_catalogs(catalog='I/259/tyc2')
+    frame: pd.DataFrame = frame[frame.keys()[0]].to_pandas().reset_index(drop=True)
 
-    needed_cols = ["name", "ra_deg", "dec_deg"]
-    clusters_dr5_mc = pd.concat([dr5[needed_cols], mc[needed_cols]], ignore_index=True)
+    frame = frame.drop_duplicates("TYC2")
 
-    return clusters_dr5_mc
+
+    frame = frame.rename(
+            columns={
+                "TYC2": "name",
+                "RA_ICRS_": "ra_deg",
+                "DE_ICRS_": "dec_deg",
+            }
+        )
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name"]]
+
+    frame = frame.sample(n=sample_size, random_state=settings.SEED)
+
+    frame['source'] = DataSource.TYC2.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
+
+"""Obtain GAIA stars catalogue"""
+
+
+def read_gaia():
+    job = Gaia.launch_job_async(
+        "select DESIGNATION, ra, dec from gaiadr3.gaia_source "
+        "where random_index between 0 and 1000000 and phot_g_mean_mag < 12 and parallax is not null"
+    )
+    gaiaResponse = job.get_results().to_pandas()
+    gaia_frame = (
+        gaiaResponse.sample(frac=1, random_state=settings.SEED)
+        .reset_index(drop=True)
+        .rename(columns={"DESIGNATION": "name", "ra": "ra_deg", "dec": "dec_deg"})
+    )
+
+    # TODO привести в соответствие с остальными датасетами (DR5, MC, ...)
+    return gaia_frame
 
 
 def get_cluster_catalog() -> coord.SkyCoord:
 
-    clusters = get_all_clusters()
+    mc = read_mc()
+    dr5 = read_dr5()
+
+    clusters = pd.concat([dr5, mc], ignore_index=True)
 
     # The catalog of known found galaxies
     catalog = coord.SkyCoord(
@@ -262,6 +392,7 @@ def get_cluster_catalog() -> coord.SkyCoord:
 
 def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord:
 
+    # TODO Написать не только относительно скоплений, но и относительно галактик и звёзд
     catalog = get_cluster_catalog()
 
     _, d2d, _ = candidates.match_to_catalog_sky(catalog)
@@ -277,20 +408,20 @@ def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord
 
     return filtered_candidates
 
+# TODO Переключиться на нативную генерацию таблицы из SkyCoord
+# def candidates_to_df(candidates: coord.SkyCoord) -> pd.DataFrame:
 
-def candidates_to_df(candidates: coord.SkyCoord) -> pd.DataFrame:
+#     b_values = candidates.galactic.b.degree
+#     l_values = candidates.galactic.l.degree
 
-    b_values = candidates.galactic.b.degree
-    l_values = candidates.galactic.l.degree
+#     names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(l_values, b_values)]
 
-    names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(l_values, b_values)]
+#     data = pd.DataFrame(
+#         np.array([names, candidates.ra.deg, candidates.dec.deg]).T,
+#         columns=["name", "ra_deg", "dec_deg"],
+#     )
 
-    data = pd.DataFrame(
-        np.array([names, candidates.ra.deg, candidates.dec.deg]).T,
-        columns=["name", "ra_deg", "dec_deg"],
-    )
-
-    return data
+#     return data
 
 
 def generate_candidates_dr5() -> coord.SkyCoord:
@@ -357,53 +488,12 @@ def create_negative_class_mc():
     return frame
 
 
-def create_data_dr5():
-    clusters = read_dr5()
-    clusters = clusters[["name", "ra_deg", "dec_deg", "red_shift", "red_shift_type"]]
-    clusters["target"] = 1
-    random = create_negative_class_dr5()
-    random["target"] = 0
-    data_dr5 = pd.concat([clusters, random]).reset_index(drop=True)
-    data_dr5[["ra_deg", "dec_deg"]] = data_dr5[["ra_deg", "dec_deg"]].astype(float)
+def create_data_train():
+    pass
 
-    data_dr5 = data_dr5.sample(frac=1, random_state=1)
+def create_data_test():
+    pass
 
-    data_dr5.loc[:, "red_shift_type"] = data_dr5["red_shift_type"].astype(str)
-
-    data_dr5 = data_dr5.reset_index(drop=True)
-    data_dr5.index.name = "idx"
-
-    return data_dr5
-
-
-def create_data_mc():
-    clusters = read_mc()
-    clusters = clusters[["name", "ra_deg", "dec_deg", "red_shift", "red_shift_type"]]
-    clusters["target"] = 1
-    random = create_negative_class_mc()
-    random["target"] = 0
-    data_mc = pd.concat([clusters, random]).reset_index(drop=True)
-
-    data_mc[["ra_deg", "dec_deg"]] = data_mc[["ra_deg", "dec_deg"]].astype(float)
-
-    data_mc.loc[:, "red_shift_type"] = data_mc["red_shift_type"].astype(str)
-
-    data_mc = data_mc.reset_index(drop=True)
-    data_mc.index.name = "idx"
-
-    return data_mc
-
-
-def create_data_gaia():
-
-    clusters = read_gaia()
-
-    clusters["red_shift"] = np.nan
-    clusters["red_shift_type"] = "nan"
-    clusters["target"] = 0
-    clusters.index.name = "idx"
-
-    return clusters
 
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
@@ -432,8 +522,8 @@ def train_val_test_split():
     pairs = [
         (DataPart.TRAIN, train),
         (DataPart.VALIDATE, validate),
-        (DataPart.TEST_DR5, test_dr5),
-        (DataPart.TEST_MC, test_mc),
+        (DataPart.TEST, test_dr5),
+        (DataPart.MC, test_mc),
         (DataPart.GAIA, gaia),
     ]
 
@@ -453,14 +543,9 @@ def ddos():
         description.to_csv(description_file_path, index=True)
 
         path = os.path.join(settings.DATA_PATH, part.value)
-        grabber.grab_cutouts(
-            target_file=description,
-            name_col="name",
-            ra_col="ra_deg",
-            dec_col="dec_deg",
-            output_dir=path,
-            imgsize_pix=224,
-        )
+
+        g = grabber.Grabber()
+        g.grab_cutouts(targets=description, output_dir=path)
 
 
 def create_dataloaders():
@@ -486,7 +571,6 @@ def create_dataloaders():
     for part in list(DataPart):
 
         cluster_dataset = ClusterDataset(
-            os.path.join(settings.DATA_PATH, part.value),
             os.path.join(settings.DESCRIPTION_PATH, f"{part.value}.csv"),
         )
 

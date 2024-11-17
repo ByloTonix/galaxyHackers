@@ -152,8 +152,13 @@ def grab_surrounding(
 
 
 def create_map_dataloader(
-    map_type: MapType, ra_start: float, dec_start: float, map_dir: Path, survey=None,
-        bands=None, imgsize_pix=224
+    map_type: MapType,
+    ra_start: float,
+    dec_start: float,
+    map_dir: Path,
+    survey=None,
+    bands=None,
+    imgsize_pix=224,
 ):  # id: 0 for small segmentation maps, 1 - for a big one
 
     name = []
@@ -199,16 +204,8 @@ def create_map_dataloader(
 
     map_data.to_csv(description_path)
 
-    grabber.grab_cutouts(
-        target_file=map_data,
-        name_col="name",
-        ra_col="ra_deg",
-        dec_col="dec_deg",
-        output_dir=map_dir,
-        survey=survey, 
-        bands=bands,
-        imgsize_pix=224,
-    )
+    g = grabber.Grabber()
+    g.grab_cutouts(targets=map_data, output_dir=map_dir)
 
     dataset = data.ClusterDataset(map_dir, description_path)
 

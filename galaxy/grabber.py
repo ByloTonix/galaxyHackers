@@ -1,31 +1,50 @@
 """Script to fetch cutouts from the legacy survey"""
 
 import os
+import threading
 import time
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional
+from urllib.error import HTTPError, URLError
+
 import numpy as np
 import pandas as pd
 import wget
-from typing import Any, Callable, Dict, Optional, Union
-from astropy.table import Table
-from urllib.error import HTTPError, URLError
-from config import settings
-import threading
 
 from galaxy import util
+from galaxy.config import settings
 
-from pathlib import Path
+
+def download_url(url: str, outfile: str, max_attempts: int = 100):
+    # Often encounter the following error:
+    # urllib.error.HTTPError: HTTP Error 504: Gateway Time-out
+    # Repeat the download attempt for up to `max_attempts` tries
+    # Return True if the download was successful
+    for attempt in range(max_attempts):
+        try:
+            wget.download(url=url, out=outfile)
+            return True
+        except HTTPError as e:
+            print(f"Failed attempt {attempt} to download {outfile} with an HTTPError")
+        except URLError as e:
+            print(f"Failed attempt {attempt} to download {outfile} with a URLError")
+        time.sleep(1)
+
+    print(f"Failed to download image {outfile}")
+    return False
+
 
 class Grabber:
 
-    def __init__(self,
-        
+    def __init__(
+        self,
         survey_layer: str | None = None,
         bands: str | None = None,
         imgsize_arcmin: float = 1.5,
         imgsize_pix: int = 224,
         extra_processing: Optional[Callable] = None,
         extra_processing_kwargs: Dict[Any, Any] = dict(),
-        ):
+    ):
 
         self.survey_layer = survey_layer or settings.LEGACY_SURVEY.LAYER
         self.bands = bands or settings.LEGACY_SURVEY.BANDS
@@ -33,7 +52,6 @@ class Grabber:
         self.imgsize_pix = imgsize_pix
         self.extra_processing = extra_processing
         self.extra_processing_kwargs = extra_processing_kwargs
-
 
     def make_url(self, ra, dec, s_arcmin=3, s_px=512, format="fits"):
 
@@ -58,26 +76,14 @@ class Grabber:
 
         return url
 
+    def grab_cutout(self, ra: float, dec: float, output_path: Path):
 
-
-    def grab_cutout(
-        self,
-        ra: float,
-        dec: float,
-        output_path: Path
-    ):
-
-        url = self.make_url(
-            ra=ra,
-            dec=dec
-        )
+        url = self.make_url(ra=ra, dec=dec)
 
         if not os.path.exists(output_path):
             status = download_url(url, output_path)
             if status and (self.extra_processing is not None):
                 self.extra_processing(output_path, **self.extra_processing_kwargs)
-
-
 
     def grab_cutouts(
         self,
@@ -87,8 +93,7 @@ class Grabber:
         dec_col: str = "dec_deg",
         output_dir: str = "",
         suffix: str = "",
-        file_format: str = "fits"
-
+        file_format: str = "fits",
     ) -> None:
         """Function to download image cutouts from any survey.
         ​
@@ -109,11 +114,10 @@ class Grabber:
                 imgsize_pix {int} -- Image size in pixels (default: {500})
         """
 
-        suffix = suffix or self.survey
+        suffix = suffix or self.survey_layer
 
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-
 
         holds = []
         for idx, target in targets.iterrows():
@@ -146,32 +150,6 @@ class Grabber:
                 k.join()
 
 
-
-def download_url(url: str, outfile: str, max_attempts: int = 100):
-    # Often encounter the following error:
-    # urllib.error.HTTPError: HTTP Error 504: Gateway Time-out
-    # Repeat the download attempt for up to `max_attempts` tries
-    # Return True if the download was successful
-    for attempt in range(max_attempts):
-        try:
-            wget.download(url=url, out=outfile)
-            return True
-        except HTTPError as e:
-            print(f"Failed attempt {attempt} to download {outfile} with an HTTPError")
-        except URLError as e:
-            print(f"Failed attempt {attempt} to download {outfile} with a URLError")
-        time.sleep(1)
-
-    print(f"Failed to download image {outfile}")
-    return False
-
-
-
-
-
-
-
-
 # def load_catalogue(catalog, pandas=False):
 #     fmt = "fits" if catalog.endswith("fits") else "csv"
 #     rcat = Table.read(catalog, format=fmt)
@@ -183,7 +161,6 @@ def download_url(url: str, outfile: str, max_attempts: int = 100):
 #                 rcat[col] = rcat[col].str.decode("ascii")
 
 #     return rcat
-
 
 
 # def cadc_cutout_url(ql_url, coords, radius):
