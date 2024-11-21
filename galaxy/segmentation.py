@@ -80,11 +80,11 @@ plot_radius = {
 
 # Map type, Data part and target class for each sample
 sample_soures = {
-    SampleName.CLUSTER_SMALL: (MapType.SMALL, data.DataPart.TEST_DR5, 1),
-    SampleName.RANDOM_SMALL: (MapType.SMALL, data.DataPart.TEST_DR5, 0),
+    SampleName.CLUSTER_SMALL: (MapType.SMALL, data.DataPart.TEST, 1),
+    SampleName.RANDOM_SMALL: (MapType.SMALL, data.DataPart.TEST, 0),
     SampleName.GAIA_SMALL: (MapType.SMALL, data.DataPart.GAIA, 0),
-    SampleName.DR5_BIG: (MapType.BIG, data.DataPart.TEST_DR5, 1),
-    SampleName.MC_BIG: (MapType.BIG, data.DataPart.TEST_MC, 1),
+    SampleName.DR5_BIG: (MapType.BIG, data.DataPart.TEST, 1),
+    SampleName.MC_BIG: (MapType.BIG, data.DataPart.MC, 1),
 }
 
 
