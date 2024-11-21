@@ -259,7 +259,7 @@ def modelPerformance(
 
     model_path = Path(settings.METRICS_PATH, f"{model_name}_{optimizer_name}")
     os.makedirs(model_path, exist_ok=True)
-    pdf = PdfPages(Path(model_path, "metrics_plots.pdf"))
+    pdf = PdfPages(Path(model_path, f"{model_name}_metrics_plots.pdf"))
     # metrics_pdf_name = Path(model_path, 'metrics_plots.pdf')
 
     # plot probablities distribution
