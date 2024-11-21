@@ -196,12 +196,12 @@ def plot_loss_by_model(train_table_data, val_table_data, pdf):
     ax1.plot(train_epochs, train_losses, label="train", marker=".", color='blue')
     ax2.plot(val_epochs, val_losses, label="valid", marker=".", color='green')
 
-    ax1.xlabel("Step")
-    ax1.ylabel("Accuracy")
+    ax1.set_xlabel("Step")
+    ax1.set_ylabel("Loss")
     ax1.grid(True, linestyle="--", alpha=0.5)
 
     ax2.set_xlabel("Epoch")
-    ax2.set_ylabel("Accuracy")
+    ax2.set_ylabel("Loss")
     ax2.grid(True, linestyle="--", alpha=0.5)
 
     pdf.savefig()
@@ -221,8 +221,8 @@ def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
     ax1.plot(train_epochs, train_accuracies, label="train", marker=".", color='blue')
     ax2.plot(val_epochs, val_accuracies, label="valid", marker=".", color='green') 
     
-    ax1.xlabel("Step")
-    ax1.ylabel("Accuracy")
+    ax1.set_xlabel("Step")
+    ax1.set_ylabel("Accuracy")
     ax1.grid(True, linestyle="--", alpha=0.5)
 
     ax2.set_xlabel("Epoch")
