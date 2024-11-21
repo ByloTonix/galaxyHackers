@@ -161,7 +161,7 @@ class Trainer:
         test_losses = []
         test_accs = []
 
-        y_pred, y_probs, y_true, descriptions = [], [], [], []
+        y_pred, y_probs, y_true, descriptions = [], [], [], [] #y_true - the real class of object in the dataset
         y_negative_target_probs = []
 
         for batch in tqdm(test_dataloader):
