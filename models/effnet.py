@@ -37,7 +37,8 @@ class SpinalNet_EfficientNet(nn.Module):
         return x
 
 def load_model(num_class=2):
-    model = timm.create_model('efficientnet_b0', pretrained=True)
+    # model = timm.create_model('efficientnet_b0', pretrained=True)
+    model = timm.create_model('efficientnet_b0', pretrained=False)
 
     # Cloning pretrained weights of old layer
     weight = model.conv_stem.weight.clone()

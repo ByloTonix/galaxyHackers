@@ -8,8 +8,3 @@ ARCHIVE_DR5_URL = "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/"
 
 MAP_ACT_FILENAME = "map_act.fits"
 DR5_CLUSTERS_FILENAME = "dr5.fits"
-
-[comet]
-API_KEY = "api-key"
-WORKSPACE = "workspace-name"
-PROJECT_NAME = "cluster-search"

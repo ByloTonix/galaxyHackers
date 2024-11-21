@@ -5,7 +5,8 @@ from torchvision import models
 class ResNet18(nn.Module):
     def __init__(self, num_classes=2):
         super(ResNet18, self).__init__()
-        self.resnet = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+        self.resnet = models.resnet18()
+        # self.resnet = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
 
         # Cloning pretrained weights of old layer
         weight = self.resnet.conv1.weight.clone()
