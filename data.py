@@ -239,35 +239,30 @@ def read_act_mcmf():
     """
     Obtain Vizier ACT_MCMF Catalogue.
     """
-    CATALOGUE = "J/A+A/690/A322/catalog"
-    Vizier.ROW_LIMIT = -1
+    CATALOGUE = "J/A+A/690/A322/"
+
     catalog_list = Vizier.find_catalogs(CATALOGUE)
+    Vizier.ROW_LIMIT = -1
     catalogs = Vizier.get_catalogs(catalog_list.keys())
-    interesting_table = catalogs[os.path.join(CATALOGUE, "catalog")]
-    frame = interesting_table.to_pandas().reset_index(drop=True)
-    frame["ra_deg"] = frame["RA_ICRS"].apply(
-        lambda x: Angle(to_hms_format(x)).degree
+
+    interesting_table: atpy.Table = catalogs[os.path.join(CATALOGUE, "catalog")]
+    mc_frame = interesting_table.to_pandas().reset_index(drop=True)
+
+    mc_frame = mc_frame.rename(columns={"Name": "name", "RAJ2000": "ra_deg", "DEJ2000": "dec_deg"})
+
+    mc_frame["red_shift"] = np.where(
+        mc_frame["zsp1"].notna(),
+        mc_frame["zsp1"],
+        np.where(mc_frame["z1C"].notna(), mc_frame["z1C"], mc_frame["z2C"])
     )
-    frame["dec_deg"] = frame["DE_ICRS"].apply(
-        lambda x: Angle(to_dms_format(x)).degree
+
+    mc_frame["red_shift_type"] = np.where(
+        mc_frame["zsp1"].notna(), "spec",
+        np.where(mc_frame["z1C"].notna(), "z1C", "z2C")
     )
-    frame = frame.rename(
-        columns={
-            "Name": "name",
-            "z_phot": "red_shift",
-            "z_spec": "red_shift_spec",
-        }
-    )
-    frame["red_shift_type"] = np.where(
-        frame["red_shift_spec"].notna(), "spec", "phot"
-    )
-    frame["red_shift"] = np.where(
-        frame["red_shift_spec"].notna(), frame["red_shift_spec"], frame["red_shift"]
-    )
-    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
-    frame["source"] = DataSource.ACT_MCMF.value
-    frame = inherit_columns(frame)
-    return frame
+
+    return mc_frame
+
 
 
 def get_all_clusters():
@@ -441,6 +436,24 @@ def create_data_gaia():
 
     return clusters
 
+def create_data_act_mcmf():
+    clusters = read_act_mcmf()
+    clusters = clusters[["name", "ra_deg", "dec_deg", "red_shift", "red_shift_type"]]
+    clusters["target"] = 1
+    random = create_negative_class_mc()
+    random["target"] = 0
+    data_mc = pd.concat([clusters, random]).reset_index(drop=True)
+
+    data_mc[["ra_deg", "dec_deg"]] = data_mc[["ra_deg", "dec_deg"]].astype(float)
+
+    data_mc.loc[:, "red_shift_type"] = data_mc["red_shift_type"].astype(str)
+
+
+    data_mc = data_mc.reset_index(drop=True)
+    data_mc.index.name = "idx"
+
+    return data_mc
+
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
 
@@ -448,7 +461,7 @@ def create_data_gaia():
 def train_val_test_split():
     dr5 = create_data_dr5()
     test_mc = create_data_mc()
-
+    act_mcmf = create_data_act_mcmf()
 
     for part in list(DataPart):
         path = os.path.join(settings.DATA_PATH, part.value)
@@ -470,12 +483,13 @@ def train_val_test_split():
 
 
     pairs = [
-        (DataPart.TRAIN, train),
-        (DataPart.VALIDATE, validate),
-        (DataPart.TEST_DR5, test_dr5),
-        (DataPart.TEST_MC, test_mc),
-        (DataPart.GAIA, gaia)
-    ]
+          (DataPart.TRAIN, train),
+          (DataPart.VALIDATE, validate),
+          (DataPart.TEST_DR5, test_dr5),
+          (DataPart.TEST_MC, test_mc),
+          (DataPart.GAIA, gaia),
+          (DataPart.ACT_MCMF, act_mcmf)
+      ]
 
     return dict(pairs)
 
