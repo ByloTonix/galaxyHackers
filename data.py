@@ -42,12 +42,17 @@ main_transforms = [
     transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD)
 ]
 
+class DataSource(str, Enum):
+    ACT_MCMF = "act_mcmf"
+
 class DataPart(str, Enum):
     TRAIN = "train"
     VALIDATE = "validate"
     TEST_DR5 = "test_dr5"
     TEST_MC = "test_mc"
     GAIA = "gaia"
+    ACT_MCMF = "act_mcmf"
+
 
 
 class ClusterDataset(Dataset):
@@ -56,7 +61,7 @@ class ClusterDataset(Dataset):
 
         self.images_dir_path = images_dir_path
         self.description_df = pd.read_csv(
-            description_csv_path, 
+            description_csv_path,
             index_col=0,
             dtype={"target": int}
         )
@@ -167,7 +172,7 @@ def read_dr5():
 
     dr5_frame = dr5_frame.rename(columns={
         "RADeg": "ra_deg",
-        "decDeg": "dec_deg", 
+        "decDeg": "dec_deg",
         "redshift": "red_shift",
         "redshiftType": "red_shift_type",
         })
@@ -188,6 +193,19 @@ def to_dms_format(time_str):
     parts = time_str.split()
     return f"{parts[0]}d{parts[1]}m{parts[2]}s"
 
+required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source"])
+optional_columns = set(["red_shift", "red_shift_type"])
+
+def inherit_columns(frame: pd.DataFrame):
+    frame['idx'] = np.arange(len(frame))
+    frame_columns = set(frame.columns)
+    assert required_columns.issubset(frame_columns), "Some required columns are missed"
+    missed_optional = optional_columns.difference(frame_columns)
+    if missed_optional:
+        for col in missed_optional:
+            frame[col] = pd.NA
+    frame = frame.reset_index(drop=True)
+    return frame
 
 def read_mc():
     # the catalogue of MaDCoWS in VizieR
@@ -216,6 +234,40 @@ def read_mc():
 
 
     return mc_frame
+
+def read_act_mcmf():
+    """
+    Obtain Vizier ACT_MCMF Catalogue.
+    """
+    CATALOGUE = "J/A+A/690/A322/catalog"
+    Vizier.ROW_LIMIT = -1
+    catalog_list = Vizier.find_catalogs(CATALOGUE)
+    catalogs = Vizier.get_catalogs(catalog_list.keys())
+    interesting_table = catalogs[os.path.join(CATALOGUE, "catalog")]
+    frame = interesting_table.to_pandas().reset_index(drop=True)
+    frame["ra_deg"] = frame["RA_ICRS"].apply(
+        lambda x: Angle(to_hms_format(x)).degree
+    )
+    frame["dec_deg"] = frame["DE_ICRS"].apply(
+        lambda x: Angle(to_dms_format(x)).degree
+    )
+    frame = frame.rename(
+        columns={
+            "Name": "name",
+            "z_phot": "red_shift",
+            "z_spec": "red_shift_spec",
+        }
+    )
+    frame["red_shift_type"] = np.where(
+        frame["red_shift_spec"].notna(), "spec", "phot"
+    )
+    frame["red_shift"] = np.where(
+        frame["red_shift_spec"].notna(), frame["red_shift_spec"], frame["red_shift"]
+    )
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+    frame["source"] = DataSource.ACT_MCMF.value
+    frame = inherit_columns(frame)
+    return frame
 
 
 def get_all_clusters():
@@ -378,7 +430,7 @@ def create_data_mc():
     return data_mc
 
 def create_data_gaia():
-    
+
     clusters = read_gaia()
 
     clusters['red_shift'] = np.nan
@@ -409,7 +461,7 @@ def train_val_test_split():
 
     validate = validate.reset_index(drop=True)
     validate.index.name = "idx"
-    
+
     test_dr5 = test_dr5.reset_index(drop=True)
     test_dr5.index.name = "idx"
 
@@ -493,11 +545,11 @@ def create_dataloaders():
                                                 transforms.RandomHorizontalFlip(),
                                             ]
                                         )
-   
+
 
     custom_datasets = {}
     dataloaders = {}
-    for part in list(DataPart): 
+    for part in list(DataPart):
 
         cluster_dataset = ClusterDataset(
             os.path.join(settings.DATA_PATH, part.value),
