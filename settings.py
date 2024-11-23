@@ -1,5 +1,5 @@
 import os
-import urllib.parse
+
 
 SEED = 1
 WORKDIR = "./"

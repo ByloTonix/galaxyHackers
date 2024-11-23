@@ -1,18 +1,18 @@
 """Script to fetch cutouts from the legacy survey"""
 
+import argparse
 import os
-import sys
+import threading
 import time
 import urllib
+from typing import Any, Callable, Dict, Optional, Union
+from urllib.error import HTTPError, URLError
+
 import numpy as np
 import pandas as pd
-import argparse
 import wget
-from typing import Any, Callable, Dict, Mapping, Optional, Union
 from astropy.io import fits
 from astropy.table import Table
-from urllib.error import HTTPError, URLError
-import threading
 
 
 def load_catalogue(catalog, pandas=False):
@@ -35,7 +35,7 @@ def make_url(ra, dec, survey="unwise-neo7", s_arcmin=3, s_px=512, format="fits")
 
     # Set pixscale
     s_arcsec = 60 * s_arcmin
-    pxscale =  0.262#s_arcsec / s_px
+    pxscale = 0.262  # s_arcsec / s_px
 
     # Convert image scales to string
     s_px, pxscale = str(s_px), str(np.round(pxscale, 4))
@@ -123,7 +123,11 @@ def process_vlass_image(infile, outfile, ext=0, scale_unit=True, sfactor=1000):
 
 
 def grab_vlass_cutouts(
-    target_file, output_dir=None, vlass_dir="", unwise_dir="", **kwargs,
+    target_file,
+    output_dir=None,
+    vlass_dir="",
+    unwise_dir="",
+    **kwargs,
 ):
     if output_dir is not None:
         vlass_dir = output_dir
@@ -135,7 +139,11 @@ def grab_vlass_cutouts(
 
 
 def grab_vlass_unwise_cutouts(
-    target_file, output_dir=None, vlass_dir="", unwise_dir="", **kwargs,
+    target_file,
+    output_dir=None,
+    vlass_dir="",
+    unwise_dir="",
+    **kwargs,
 ):
     if output_dir is not None:
         vlass_dir = output_dir
@@ -176,26 +184,26 @@ def grab_cutouts(
     suffix: str = "",
     extra_processing: Optional[Callable] = None,
     extra_proc_kwds: Dict[Any, Any] = dict(),
-    file_format: str='fits',
+    file_format: str = "fits",
 ) -> None:
     """Function to download image cutouts from any survey.
-​
-    Arguments:
-        target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target 
-                                           coordinates and names.
-​
-    Keyword Arguments:
-        name_col {str} -- The column name in target_file that contains the desired file name 
-                         (default: {"Component_name"})
-        ra_col {str} -- RA column name (default: {"RA"})
-        dec_col {str} -- Dec column name (default: {"DEC"})
-        survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
-        output_dir {str} -- Output path for the image cutouts (default: {""})
-        prefix {str} -- Prefix for the output filename (default {""})
-        suffix {str} -- Suffix for the output filename (default {survey})
-        imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
-        imgsize_pix {int} -- Image size in pixels (default: {500})
-     """
+    ​
+        Arguments:
+            target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target
+                                               coordinates and names.
+    ​
+        Keyword Arguments:
+            name_col {str} -- The column name in target_file that contains the desired file name
+                             (default: {"Component_name"})
+            ra_col {str} -- RA column name (default: {"RA"})
+            dec_col {str} -- Dec column name (default: {"DEC"})
+            survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
+            output_dir {str} -- Output path for the image cutouts (default: {""})
+            prefix {str} -- Prefix for the output filename (default {""})
+            suffix {str} -- Suffix for the output filename (default {survey})
+            imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
+            imgsize_pix {int} -- Image size in pixels (default: {500})
+    """
     if isinstance(target_file, str):
         targets = load_catalogue(target_file, pandas=True)
     else:
@@ -209,13 +217,11 @@ def grab_cutouts(
 
     holds = []
     for _, target in targets.iterrows():
-        name = _ #target[name_col]
+        name = _  # target[name_col]
         a = target[ra_col]
         d = target[dec_col]
 
-        outfile = os.path.join(
-            output_dir, make_filename(name=_,  format=file_format)
-        )
+        outfile = os.path.join(output_dir, make_filename(name=_, format=file_format))
         # grab_cutout(
         #     a,
         #     d,
@@ -242,7 +248,7 @@ def grab_cutouts(
                     imgsize_arcmin,
                     imgsize_pix,
                     extra_processing,
-                    file_format
+                    file_format,
                 ),
             )
             jobs.append(thread)
@@ -263,7 +269,12 @@ def grab_cutout(
     extra_proc_kwds=dict(),
 ):
     url = make_url(
-        ra=ra, dec=dec, survey=survey, s_arcmin=imgsize_arcmin, s_px=imgsize_pix, format=file_format
+        ra=ra,
+        dec=dec,
+        survey=survey,
+        s_arcmin=imgsize_arcmin,
+        s_px=imgsize_pix,
+        format=file_format,
     )
     if not os.path.exists(outfile):
         status = download_url(url, outfile)

@@ -1,25 +1,24 @@
-import numpy as np
-
-from sklearn.metrics import (
-    precision_score,
-    recall_score,
-    accuracy_score,
-    f1_score,
-    fbeta_score,
-    roc_auc_score,
-    auc,
-)
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-
-from sklearn.metrics import roc_curve
-from sklearn.metrics import precision_recall_curve
-
-from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib.pyplot as plt
 import json
 import os
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+from matplotlib.backends.backend_pdf import PdfPages
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    accuracy_score,
+    auc,
+    confusion_matrix,
+    f1_score,
+    fbeta_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
+)
 
 from config import settings
 
@@ -184,7 +183,7 @@ def plot_red_shift(pdf, predictions: pd.DataFrame):
 
 def plot_loss_by_model(train_table_data, val_table_data, pdf):
     fig, ax = plt.subplots(figsize=(10, 6))
-    fig.suptitle('Loss on train and validation')
+    fig.suptitle("Loss on train and validation")
 
     train_epochs = [row[0] for row in train_table_data]
     train_losses = [row[1] for row in train_table_data]
@@ -207,7 +206,7 @@ def plot_loss_by_model(train_table_data, val_table_data, pdf):
 
 def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
     fig, ax = plt.subplots(figsize=(10, 6))
-    fig.suptitle('Accuracy on train and validation')
+    fig.suptitle("Accuracy on train and validation")
 
     train_epochs = [row[0] for row in train_table_data]
     train_accuracies = [row[2] for row in train_table_data]
@@ -215,8 +214,16 @@ def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
     val_epochs = [row[0] for row in val_table_data]
     val_accuracies = [row[2] for row in val_table_data]
 
-    ax.plot(train_epochs, train_accuracies, label="Train Accuracy", marker=".", color="blue")
-    ax.plot(val_epochs, val_accuracies, label="Validation Accuracy", marker=".", color="green")
+    ax.plot(
+        train_epochs, train_accuracies, label="Train Accuracy", marker=".", color="blue"
+    )
+    ax.plot(
+        val_epochs,
+        val_accuracies,
+        label="Validation Accuracy",
+        marker=".",
+        color="green",
+    )
 
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Accuracy")

@@ -4,30 +4,25 @@ To create segmentation maps for randomly chosen clusters, random objects and sta
 To create a segmentation map with larger scale for a randomly chosen cluster use function saveBigSegMap()
 '''
 
-import legacy_for_img
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from PIL import Image
-import timm
-import torch
-from torchvision import transforms
-from torch.utils.data import Dataset, DataLoader
-import astropy.coordinates as coord
-from astropy import units as u
 import os
-import matplotlib as mpl
-from matplotlib import cm
-import data
-from config import settings
-from zipfile import ZipFile 
-import wget
+from enum import Enum
 from pathlib import Path
 
-from enum import Enum
+import astropy.coordinates as coord
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import torch
+from astropy import units as u
+from matplotlib import cm
+from torch.utils.data import DataLoader
 
-from data import DataPart, ClusterDataset
+import data
+import legacy_for_img
+from config import settings
+from data import ClusterDataset, DataPart
 from train import Predictor
+
 
 def load_model(model: torch.nn.Module, optimizer_name, device):
 

@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class Baseline(nn.Module):
     def __init__(self, num_classes):
         super(Baseline, self).__init__()
@@ -46,8 +47,8 @@ class Baseline(nn.Module):
         # Apply softmax to get probabilities
         x = F.softmax(x, dim=1)
         return x
-    
+
+
 def load_model(num_classes=2):
     model = Baseline(num_classes=num_classes)
     return model
-

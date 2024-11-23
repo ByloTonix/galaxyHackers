@@ -1,5 +1,5 @@
-FORMAT_DIRS=data
-LINTER_DIRS=data
+FORMAT_DIRS=./
+LINTER_DIRS=./
 TOML_FILES=poetry.lock pyproject.toml
 POETRY_EXEC=poetry
 PYTHON_EXEC=$(POETRY_EXEC) run python
@@ -8,8 +8,6 @@ PYTHON_EXEC=$(POETRY_EXEC) run python
 .PHONY: help
 help:  ## Показать это сообщение
 	@grep -E -h '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
-
-
 
 .PHONY: install
 install:  ## Установить зависимости
@@ -58,5 +56,3 @@ pylint:
 .PHONY: prune_branches
 prune_branches:
 	git branch | grep -v "dev" | grep -v "master" | xargs git branch -D
-
-

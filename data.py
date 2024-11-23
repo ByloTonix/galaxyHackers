@@ -7,26 +7,21 @@ import sys
 from enum import Enum
 from pathlib import Path
 from zipfile import ZipFile
-from tqdm import tqdm
 
 import astropy.coordinates as coord
 import astropy.table as atpy
 import astropy.units as u
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
 import wget
 from astropy.coordinates import Angle
+from astropy.io import fits
 from astroquery.gaia import Gaia
 from astroquery.vizier import Vizier
-from PIL import Image
 from pixell import enmap
 from torch.utils.data import DataLoader, Dataset
-from torchvision import transforms, utils
-
-from astropy.io import fits
-
+from torchvision import transforms
 
 import legacy_for_img
 from config import settings
@@ -39,11 +34,13 @@ TORCHVISION_STD = [106.89880134344101, 100.32284196853638]
 
 main_transforms = [
     transforms.Resize((224, 224)),
-    transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD)
+    transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD),
 ]
+
 
 class DataSource(str, Enum):
     ACT_MCMF = "act_mcmf"
+
 
 class DataPart(str, Enum):
     TRAIN = "train"
@@ -54,20 +51,19 @@ class DataPart(str, Enum):
     ACT_MCMF = "act_mcmf"
 
 
-
 class ClusterDataset(Dataset):
-    def __init__(self, images_dir_path: str, description_csv_path: str, transform = None):
+    def __init__(self, images_dir_path: str, description_csv_path: str, transform=None):
         super().__init__()
 
         self.images_dir_path = images_dir_path
         self.description_df = pd.read_csv(
-            description_csv_path,
-            index_col=0,
-            dtype={"target": int}
+            description_csv_path, index_col=0, dtype={"target": int}
         )
 
         self.description_df.index = self.description_df.index.astype(str)
-        self.description_df.loc[:, "red_shift"] = self.description_df["red_shift"].astype(float)
+        self.description_df.loc[:, "red_shift"] = self.description_df[
+            "red_shift"
+        ].astype(float)
         self.description_df.index.name = "idx"
 
         self.transform = transform
@@ -94,8 +90,6 @@ class ClusterDataset(Dataset):
             "red_shift_type": str(row["red_shift_type"]),
         }
         sample = {"image": img, "label": row["target"], "description": description}
-
-
 
         return sample
 
@@ -145,9 +139,7 @@ def download_data():
 
         if not os.path.exists(config.OUTPUT_PATH):
             try:
-                wget.download(
-                    url=config.URL, out=settings.DATA_PATH, bar=bar_progress
-                )
+                wget.download(url=config.URL, out=settings.DATA_PATH, bar=bar_progress)
                 with ZipFile(config.ZIPPED_OUTPUT_PATH, "r") as zObject:
                     zObject.extractall(path=settings.DATA_PATH)
                 rename_dict = config.RENAME_DICT
@@ -170,16 +162,17 @@ def read_dr5():
 
     dr5_frame["name"] = dr5_frame["name"].astype(str)
 
-    dr5_frame = dr5_frame.rename(columns={
-        "RADeg": "ra_deg",
-        "decDeg": "dec_deg",
-        "redshift": "red_shift",
-        "redshiftType": "red_shift_type",
-        })
+    dr5_frame = dr5_frame.rename(
+        columns={
+            "RADeg": "ra_deg",
+            "decDeg": "dec_deg",
+            "redshift": "red_shift",
+            "redshiftType": "red_shift_type",
+        }
+    )
     dr5_frame = dr5_frame.reset_index(drop=True)
     dr5_frame.index.name = "idx"
     dr5_frame = dr5_frame.reset_index(drop=False)
-
 
     return dr5_frame
 
@@ -193,11 +186,13 @@ def to_dms_format(time_str):
     parts = time_str.split()
     return f"{parts[0]}d{parts[1]}m{parts[2]}s"
 
+
 required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source"])
 optional_columns = set(["red_shift", "red_shift_type"])
 
+
 def inherit_columns(frame: pd.DataFrame):
-    frame['idx'] = np.arange(len(frame))
+    frame["idx"] = np.arange(len(frame))
     frame_columns = set(frame.columns)
     assert required_columns.issubset(frame_columns), "Some required columns are missed"
     missed_optional = optional_columns.difference(frame_columns)
@@ -206,6 +201,7 @@ def inherit_columns(frame: pd.DataFrame):
             frame[col] = pd.NA
     frame = frame.reset_index(drop=True)
     return frame
+
 
 def read_mc():
     # the catalogue of MaDCoWS in VizieR
@@ -228,12 +224,16 @@ def read_mc():
 
     mc_frame = mc_frame.rename(columns={"Name": "name"})
 
-    mc_frame["red_shift"] = np.where(mc_frame["Specz"].notna(), mc_frame["Specz"], mc_frame["Photz"])
-    mc_frame["red_shift_type"] = np.where(mc_frame["Specz"].notna(),"spec", np.nan)
-    mc_frame["red_shift_type"] = np.where(mc_frame["Photz"].notna() & mc_frame["red_shift_type"].isna(), "phot", np.nan)
-
+    mc_frame["red_shift"] = np.where(
+        mc_frame["Specz"].notna(), mc_frame["Specz"], mc_frame["Photz"]
+    )
+    mc_frame["red_shift_type"] = np.where(mc_frame["Specz"].notna(), "spec", np.nan)
+    mc_frame["red_shift_type"] = np.where(
+        mc_frame["Photz"].notna() & mc_frame["red_shift_type"].isna(), "phot", np.nan
+    )
 
     return mc_frame
+
 
 def read_act_mcmf():
     """
@@ -248,21 +248,23 @@ def read_act_mcmf():
     interesting_table: atpy.Table = catalogs[os.path.join(CATALOGUE, "catalog")]
     mc_frame = interesting_table.to_pandas().reset_index(drop=True)
 
-    mc_frame = mc_frame.rename(columns={"Name": "name", "RAJ2000": "ra_deg", "DEJ2000": "dec_deg"})
+    mc_frame = mc_frame.rename(
+        columns={"Name": "name", "RAJ2000": "ra_deg", "DEJ2000": "dec_deg"}
+    )
 
     mc_frame["red_shift"] = np.where(
         mc_frame["zsp1"].notna(),
         mc_frame["zsp1"],
-        np.where(mc_frame["z1C"].notna(), mc_frame["z1C"], mc_frame["z2C"])
+        np.where(mc_frame["z1C"].notna(), mc_frame["z1C"], mc_frame["z2C"]),
     )
 
     mc_frame["red_shift_type"] = np.where(
-        mc_frame["zsp1"].notna(), "spec",
-        np.where(mc_frame["z1C"].notna(), "z1C", "z2C")
+        mc_frame["zsp1"].notna(),
+        "spec",
+        np.where(mc_frame["z1C"].notna(), "z1C", "z2C"),
     )
 
     return mc_frame
-
 
 
 def get_all_clusters():
@@ -385,7 +387,6 @@ def create_negative_class_mc():
     return frame
 
 
-
 def create_data_dr5():
     clusters = read_dr5()
     clusters = clusters[["name", "ra_deg", "dec_deg", "red_shift", "red_shift_type"]]
@@ -398,7 +399,6 @@ def create_data_dr5():
     data_dr5 = data_dr5.sample(frac=1, random_state=1)
 
     data_dr5.loc[:, "red_shift_type"] = data_dr5["red_shift_type"].astype(str)
-
 
     data_dr5 = data_dr5.reset_index(drop=True)
     data_dr5.index.name = "idx"
@@ -418,23 +418,23 @@ def create_data_mc():
 
     data_mc.loc[:, "red_shift_type"] = data_mc["red_shift_type"].astype(str)
 
-
     data_mc = data_mc.reset_index(drop=True)
     data_mc.index.name = "idx"
 
     return data_mc
 
+
 def create_data_gaia():
 
     clusters = read_gaia()
 
-    clusters['red_shift'] = np.nan
-    clusters['red_shift_type'] = 'nan'
+    clusters["red_shift"] = np.nan
+    clusters["red_shift_type"] = "nan"
     clusters["target"] = 0
     clusters.index.name = "idx"
 
-
     return clusters
+
 
 def create_data_act_mcmf():
     clusters = read_act_mcmf()
@@ -447,7 +447,6 @@ def create_data_act_mcmf():
     data_mc[["ra_deg", "dec_deg"]] = data_mc[["ra_deg", "dec_deg"]].astype(float)
 
     data_mc.loc[:, "red_shift_type"] = data_mc["red_shift_type"].astype(str)
-
 
     data_mc = data_mc.reset_index(drop=True)
     data_mc.index.name = "idx"
@@ -467,9 +466,8 @@ def train_val_test_split():
         path = os.path.join(settings.DATA_PATH, part.value)
         os.makedirs(path, exist_ok=True)
 
-
     train, validate, test_dr5 = np.split(
-       dr5, [int(0.6 * len(dr5)), int(0.8 * len(dr5))]
+        dr5, [int(0.6 * len(dr5)), int(0.8 * len(dr5))]
     )
 
     validate = validate.reset_index(drop=True)
@@ -478,18 +476,16 @@ def train_val_test_split():
     test_dr5 = test_dr5.reset_index(drop=True)
     test_dr5.index.name = "idx"
 
-
     gaia = create_data_gaia()
 
-
     pairs = [
-          (DataPart.TRAIN, train),
-          (DataPart.VALIDATE, validate),
-          (DataPart.TEST_DR5, test_dr5),
-          (DataPart.TEST_MC, test_mc),
-          (DataPart.GAIA, gaia),
-          (DataPart.ACT_MCMF, act_mcmf)
-      ]
+        (DataPart.TRAIN, train),
+        (DataPart.VALIDATE, validate),
+        (DataPart.TEST_DR5, test_dr5),
+        (DataPart.TEST_MC, test_mc),
+        (DataPart.GAIA, gaia),
+        (DataPart.ACT_MCMF, act_mcmf),
+    ]
 
     return dict(pairs)
 
@@ -514,7 +510,7 @@ def ddos():
             dec_col="dec_deg",
             output_dir=path,
             survey="unwise-neo7",
-            imgsize_pix=224
+            imgsize_pix=224,
         )
 
 
@@ -530,8 +526,6 @@ def ddos():
 #     plt.imshow(np.transpose(denormalized_img, (1, 2, 0)))
 
 
-
-
 def check_catalogs():
 
     is_map = os.path.exists(settings.MAP_ACT_PATH)
@@ -539,6 +533,7 @@ def check_catalogs():
 
     if not is_map or not is_dr5:
         download_data()
+
 
 def create_dataloaders():
 
@@ -551,15 +546,14 @@ def create_dataloaders():
     data_transforms = defaultdict(lambda: transforms.Compose(main_transforms))
 
     data_transforms[DataPart.TRAIN] = transforms.Compose(
-                                            [
-                                                *main_transforms,
-                                                transforms.RandomRotation(
-                                                    15,
-                                                ),
-                                                transforms.RandomHorizontalFlip(),
-                                            ]
-                                        )
-
+        [
+            *main_transforms,
+            transforms.RandomRotation(
+                15,
+            ),
+            transforms.RandomHorizontalFlip(),
+        ]
+    )
 
     custom_datasets = {}
     dataloaders = {}
@@ -567,7 +561,7 @@ def create_dataloaders():
 
         cluster_dataset = ClusterDataset(
             os.path.join(settings.DATA_PATH, part.value),
-            os.path.join(settings.DESCRIPTION_PATH, f"{part.value}.csv")
+            os.path.join(settings.DESCRIPTION_PATH, f"{part.value}.csv"),
         )
 
         custom_datasets[part] = cluster_dataset

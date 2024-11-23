@@ -1,56 +1,57 @@
-from comet_ml import Experiment
 import argparse
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch_optimizer as optimizer
+from comet_ml import Experiment
 from torch.optim.lr_scheduler import ExponentialLR
 
-import torch_optimizer as optimizer
-from config import settings
-
-import models.spinalnet_resnet as spinalnet_resnet
-import models.effnet as effnet
+import data
+import metrics
+import models.alexnet_vgg as alexnet_vgg
+import models.baseline as baseline
 import models.densenet as densenet
+import models.effnet as effnet
+import models.resnet18 as resnet18
+import models.spinalnet_resnet as spinalnet_resnet
 import models.spinalnet_vgg as spinalnet_vgg
 import models.vitL16 as vitL16
-import models.alexnet_vgg as alexnet_vgg
-import models.resnet18 as resnet18
-import models.baseline as baseline
-import  data
+import segmentation
+from config import settings
+
 # import data.segmentation as segmentation
 # import metrics.metrics as metrics
 from data import DataPart
 from train import Trainer
-import metrics
-import segmentation
 
 
 all_models = [
-    ('Baseline', baseline),
-    ('ResNet18', resnet18),
-    ('EfficientNet', effnet),
-    ('DenseNet', densenet),
-    ('SpinalNet_ResNet', spinalnet_resnet),
-    ('SpinalNet_VGG', spinalnet_vgg),
-    ('ViTL16', vitL16),
-    ('AlexNet_VGG', alexnet_vgg)
+    ("Baseline", baseline),
+    ("ResNet18", resnet18),
+    ("EfficientNet", effnet),
+    ("DenseNet", densenet),
+    ("SpinalNet_ResNet", spinalnet_resnet),
+    ("SpinalNet_VGG", spinalnet_vgg),
+    ("ViTL16", vitL16),
+    ("AlexNet_VGG", alexnet_vgg),
 ]
 
 all_optimizers = [
-    ('SGD', optim.SGD),
-    ('Rprop', optim.Rprop),
-    ('Adam', optim.Adam),
-    ('NAdam', optim.NAdam),
-    ('RAdam', optim.RAdam),
-    ('AdamW', optim.AdamW),
-    #('Adagrad', optim.Adagrad),
-    ('RMSprop', optim.RMSprop),
-    #('Adadelta', optim.Adadelta),
-    ('DiffGrad', optimizer.DiffGrad),
+    ("SGD", optim.SGD),
+    ("Rprop", optim.Rprop),
+    ("Adam", optim.Adam),
+    ("NAdam", optim.NAdam),
+    ("RAdam", optim.RAdam),
+    ("AdamW", optim.AdamW),
+    # ('Adagrad', optim.Adagrad),
+    ("RMSprop", optim.RMSprop),
+    # ('Adadelta', optim.Adadelta),
+    ("DiffGrad", optimizer.DiffGrad),
     # ('LBFGS', optim.LBFGS)
 ]
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 datasets, dataloaders = data.create_dataloaders()
 
 train_loader = dataloaders[DataPart.TRAIN]
@@ -126,7 +127,7 @@ criterion = nn.BCELoss()
 results = {}
 val_results = {}
 
-classes = ('random', 'clusters')
+classes = ("random", "clusters")
 
 for model_name, model in selected_models:
 
@@ -147,10 +148,9 @@ for model_name, model in selected_models:
         optimizer_name=optimizer_name,
         optimizer=optimizer,
         lr_scheduler=scheduler,
-
         train_dataloader=train_loader,
         val_dataloader=val_loader,
-        experiment=experiment
+        experiment=experiment,
     )
 
     trainer.find_lr(1e-6, 0.01, 70)
@@ -175,13 +175,14 @@ for model_name, model in selected_models:
     finally:
 
         predictions, *_ = trainer.test(test_loader)
-        metrics.modelPerformance(model_name,
-                             optimizer_name,
-                             predictions,
-                             classes,
-                             train_table_data,
-                             val_table_data
-                             )
+        metrics.modelPerformance(
+            model_name,
+            optimizer_name,
+            predictions,
+            classes,
+            train_table_data,
+            val_table_data,
+        )
 
         metrics.combine_metrics(selected_models, optimizer_name)
 
