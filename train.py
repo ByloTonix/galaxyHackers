@@ -20,7 +20,7 @@ from comet_ml import Experiment
 
 
 class Trainer:
-    def __init__(self, 
+    def __init__(self,
                  model_name: str,
                  model: nn.Module,
                  optimizer_name: str,
@@ -28,12 +28,12 @@ class Trainer:
                  train_dataloader: DataLoader,
                  val_dataloader: DataLoader,
                  experiment: Experiment,
-                 criterion: Any | None = None, 
+                 criterion: Any | None = None,
                  lr_scheduler: LRScheduler | None = None,
                  lr_scheduler_type: str = 'per_epoch',
                  batch_size: int = 128):
-        
-        self.model_name = model_name 
+
+        self.model_name = model_name
         self.model = model
         self.optimizer_name = optimizer_name
         self.optimizer = optimizer
@@ -44,6 +44,9 @@ class Trainer:
         self.val_dataloader = val_dataloader
         self.experiment = experiment
         self.batch_size = batch_size
+
+        self.train_table_data = []
+        self.val_table_data = []
 
         self.history = defaultdict(list)
 
@@ -75,24 +78,24 @@ class Trainer:
 
 
     def save_checkpoint(self):
-        
+
         filename = f'best_weights_{self.model.__class__.__name__}_{self.optimizer.__class__.__name__}.pth'
         path = os.path.join(settings.BEST_MODELS_PATH, filename)
-        
+
         torch.save(self.model.state_dict(), path)
 
     def log_metrics(self, loss, acc, mode:str = "train", step: int|None = None, epoch: int|None=None):
 
-    
+
         loss_name = f"{self.model_name}_{self.optimizer_name}_{mode}_loss"
         acc_name = f"{self.model_name}_{self.optimizer_name}_{mode}_acc"
 
         metrics =  {
                 loss_name: loss,
                 acc_name: acc,
-                
+
              }
-        
+
         if epoch is not None:
             self.experiment.log_metrics(metrics, epoch=epoch)
         elif step is not None:
@@ -110,14 +113,15 @@ class Trainer:
 
 
         for epoch in trange(
-            num_epochs, 
-            unit="epoch", 
-            leave=False, 
+            num_epochs,
+            unit="epoch",
+            leave=False,
             desc=f'Training {model.__class__.__name__} with {optimizer.__class__.__name__} optimizer'
             ):
 
-            
+
             model.train()
+            epoch_train_losses, epoch_train_accs = [], []
 
             for batch in tqdm(self.train_dataloader, unit="batch", leave=False):
 
@@ -131,12 +135,19 @@ class Trainer:
 
                 self.log_metrics(loss=loss.item(), acc=acc, mode='train', step=self.global_step)
 
+                epoch_train_losses.append(loss.item())
+                epoch_train_accs.append(acc)
+
                 self.global_step += 1
 
+            train_loss = np.mean(epoch_train_losses)
+            train_acc = np.mean(epoch_train_accs)
+            self.train_table_data.append([epoch + 1, train_loss, train_acc])
+
+            self.log_metrics(loss=train_loss, acc=train_acc, mode="train", epoch=epoch + 1)
 
             model.eval()
-            val_losses = []
-            val_accs = []
+            val_losses, val_accs = [], []
 
             for batch in tqdm(self.val_dataloader):
                 *_, loss, acc = self.compute_all(batch)
@@ -147,10 +158,8 @@ class Trainer:
             val_acc = np.mean(val_accs)
             self.post_val_stage()
 
-       
-
-            self.log_metrics(loss=val_loss, acc=val_acc, mode='val', epoch=epoch)
-
+            self.log_metrics(loss=val_loss, acc=val_acc, mode='val', epoch=epoch + 1)
+            self.val_table_data.append([epoch + 1, val_loss, val_acc])
 
             if val_loss < best_loss:
                 self.save_checkpoint()
@@ -187,14 +196,14 @@ class Trainer:
         return predictions, test_losses, test_accs,
 
 
-  
+
 
     def compute_all(self, batch):  # удобно сделать функцию, в которой вычисляется лосс по пришедшему батчу
         x = batch['image'].to(self.device)
         y = batch['label'].to(self.device)
         logits = self.model(x)
 
-        assert self.criterion is not None 
+        assert self.criterion is not None
 
 
         loss = self.criterion(logits[:, 1], y.float())
@@ -203,11 +212,11 @@ class Trainer:
 
         outputs = logits.argmax(axis=1)
         acc = (outputs == y).float().mean().cpu().numpy()
-        
+
 
 
         return logits, outputs, y, loss, acc
-    
+
 
     def cache_states(self):
         cache_dict = {'model_state': deepcopy(self.model.state_dict()),
@@ -267,7 +276,7 @@ class Trainer:
         optimal_idx = np.argmin(loss_derivatives)
         optimal_lr = logs['lr'][optimal_idx]
 
-            
+
 
         logs.update({key: np.array(val) for key, val in logs.items()})
 
@@ -297,7 +306,7 @@ class Predictor():
 
     def __init__(self, model:nn.Module, device):
 
-        
+
         self.model = model
         self.model.eval()
 
@@ -320,7 +329,7 @@ class Predictor():
 
         predictions = pd.DataFrame(
         np.array([
-            np.array(y_pred), 
+            np.array(y_pred),
             np.array(y_prob)
         ]).T, columns=["y_pred", "y_prob"]).reset_index(drop=True)
 
@@ -329,11 +338,11 @@ class Predictor():
         predictions = pd.concat([predictions, description_frame], axis=1)
         predictions = predictions.set_index("idx")
         predictions.index = predictions.index.astype(int)
-        
-        return predictions
-    
 
-    def compute_all(self, batch): 
+        return predictions
+
+
+    def compute_all(self, batch):
 
         x = batch['image'].to(self.device)
 

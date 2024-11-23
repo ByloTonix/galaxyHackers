@@ -183,7 +183,7 @@ def plot_red_shift(pdf, predictions: pd.DataFrame):
 
 
 def plot_loss_by_model(train_table_data, val_table_data, pdf):
-    fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     fig.suptitle('Loss on train and validation')
 
     train_epochs = [row[0] for row in train_table_data]
@@ -193,23 +193,20 @@ def plot_loss_by_model(train_table_data, val_table_data, pdf):
     val_losses = [row[1] for row in val_table_data]
 
     # available flags for customizing: linestyle="--", linewidth=2, marker,
-    ax1.plot(train_epochs, train_losses, label="train", marker=".", color='blue')
-    ax2.plot(val_epochs, val_losses, label="valid", marker=".", color='green')
+    ax.plot(train_epochs, train_losses, label="Train Loss", marker=".", color="blue")
+    ax.plot(val_epochs, val_losses, label="Validation Loss", marker=".", color="green")
 
-    ax1.set_xlabel("Step")
-    ax1.set_ylabel("Loss")
-    ax1.grid(True, linestyle="--", alpha=0.5)
-
-    ax2.set_xlabel("Epoch")
-    ax2.set_ylabel("Loss")
-    ax2.grid(True, linestyle="--", alpha=0.5)
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Loss")
+    ax.legend()
+    ax.grid(True, linestyle="--", alpha=0.5)
 
     pdf.savefig()
     plt.close()
 
 
 def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
-    fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     fig.suptitle('Accuracy on train and validation')
 
     train_epochs = [row[0] for row in train_table_data]
@@ -218,16 +215,13 @@ def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
     val_epochs = [row[0] for row in val_table_data]
     val_accuracies = [row[2] for row in val_table_data]
 
-    ax1.plot(train_epochs, train_accuracies, label="train", marker=".", color='blue')
-    ax2.plot(val_epochs, val_accuracies, label="valid", marker=".", color='green') 
-    
-    ax1.set_xlabel("Step")
-    ax1.set_ylabel("Accuracy")
-    ax1.grid(True, linestyle="--", alpha=0.5)
+    ax.plot(train_epochs, train_accuracies, label="Train Accuracy", marker=".", color="blue")
+    ax.plot(val_epochs, val_accuracies, label="Validation Accuracy", marker=".", color="green")
 
-    ax2.set_xlabel("Epoch")
-    ax2.set_ylabel("Accuracy")
-    ax2.grid(True, linestyle="--", alpha=0.5)
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Accuracy")
+    ax.legend()
+    ax.grid(True, linestyle="--", alpha=0.5)
 
     pdf.savefig()
     plt.close()

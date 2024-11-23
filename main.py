@@ -1,3 +1,4 @@
+from comet_ml import Experiment
 import argparse
 import torch
 import torch.nn as nn
@@ -22,10 +23,6 @@ from data import DataPart
 from train import Trainer
 import metrics
 import segmentation
-
-
-from comet_ml import Experiment
-
 
 
 all_models = [
@@ -131,7 +128,6 @@ val_results = {}
 
 classes = ('random', 'clusters')
 
-
 for model_name, model in selected_models:
 
     model = model.load_model()
@@ -156,20 +152,34 @@ for model_name, model in selected_models:
         val_dataloader=val_loader,
         experiment=experiment
     )
-    
+
     trainer.find_lr(1e-6, 0.01, 70)
 
     try:
         trainer.train(num_epochs)
 
+        train_table_data = trainer.train_table_data
+        val_table_data = trainer.val_table_data
+
+        experiment.log_table(
+            filename=f"{model_name}_train_metrics.csv",
+            tabular_data=train_table_data,
+            headers=["Step", "Train Loss", "Train Accuracy"],
+        )
+        experiment.log_table(
+            filename=f"{model_name}_val_metrics.csv",
+            tabular_data=val_table_data,
+            headers=["Epoch", "Validation Loss", "Validation Accuracy"],
+        )
+
     finally:
 
         predictions, *_ = trainer.test(test_loader)
-        metrics.modelPerformance(model_name, 
-                             optimizer_name, 
-                             predictions, 
-                             classes, 
-                             train_table_data, 
+        metrics.modelPerformance(model_name,
+                             optimizer_name,
+                             predictions,
+                             classes,
+                             train_table_data,
                              val_table_data
                              )
 

@@ -21,3 +21,7 @@ ACT_MCMF_URL = "https://vizier.cds.unistra.fr/viz-bin/nph-Cat/txt/J/A+A/690/A322
 LAYER = "unwise-neo7"
 # LAYER = "vlass1.2"
 BANDS = "griz"
+
+[comet]
+API_KEY = "api-key"
+WORKSPACE = "workspace-name"
