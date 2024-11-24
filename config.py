@@ -85,8 +85,5 @@ required_paths = [
 for path in required_paths:
     os.makedirs(path, exist_ok=True)
 
-settings.COMET_API_KEY = settings.comet.api_key
-settings.COMET_WORKSPACE = settings.comet.workspace
-
 # `envvar_prefix` = export envvars with `export DYNACONF_FOO=bar`.
 # `settings_files` = Load these files in the order.

@@ -1,5 +1,5 @@
 import argparse
-
+import gc
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -92,6 +92,7 @@ parser.add_argument(
     default="Adam",
     help="Optimizer to use (default: Adam)",
 )
+parser.add_argument("--segment", action="store_true", help="Run segmentation after training")
 
 args = parser.parse_args()
 
@@ -190,9 +191,10 @@ for model_name, model in selected_models:
 
         del model
         torch.cuda.empty_cache()
+        gc.collect()
 
-
-for model_name, model in selected_models:
-    segmentation.create_segmentation_plots(
-        model, model_name, optimizer_name=optimizer_name
-    )
+if args.segment:
+    for model_name, model in selected_models:
+        segmentation.create_segmentation_plots(
+            model, model_name, optimizer_name=optimizer_name
+        )
