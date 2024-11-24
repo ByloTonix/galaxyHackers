@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>galaxy.main &mdash; galaxy  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="galaxy.metrics" href="../metrics/index.html" />
+    <link rel="prev" title="galaxy.grabber" href="../grabber/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            galaxy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Sections:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../topics/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../topics/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../topics/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">galaxy</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../config/index.html">galaxy.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../data/index.html">galaxy.data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../grabber/index.html">galaxy.grabber</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">galaxy.main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metrics/index.html">galaxy.metrics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/index.html">galaxy.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../segmentation/index.html">galaxy.segmentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../train/index.html">galaxy.train</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../util/index.html">galaxy.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">galaxy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">galaxy</a></li>
+      <li class="breadcrumb-item active">galaxy.main</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/galaxy/main/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-galaxy.main">
+<span id="galaxy-main"></span><h1>galaxy.main<a class="headerlink" href="#module-galaxy.main" title="Link to this heading"></a></h1>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.parent_dir" title="galaxy.main.parent_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent_dir</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.all_models" title="galaxy.main.all_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_models</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.all_optimizers" title="galaxy.main.all_optimizers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_optimizers</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.device" title="galaxy.main.device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.train_loader" title="galaxy.main.train_loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_loader</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.val_loader" title="galaxy.main.val_loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">val_loader</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.test_loader" title="galaxy.main.test_loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_loader</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.parser" title="galaxy.main.parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.args" title="galaxy.main.args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">args</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.selected_models" title="galaxy.main.selected_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selected_models</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.num_epochs" title="galaxy.main.num_epochs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_epochs</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.lr" title="galaxy.main.lr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lr</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.momentum" title="galaxy.main.momentum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">momentum</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.optimizer_name" title="galaxy.main.optimizer_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimizer_name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.experiment" title="galaxy.main.experiment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.criterion" title="galaxy.main.criterion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">criterion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.results" title="galaxy.main.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">results</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.val_results" title="galaxy.main.val_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">val_results</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.classes" title="galaxy.main.classes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classes</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.model" title="galaxy.main.model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.parent_dir">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">parent_dir</span></span><a class="headerlink" href="#galaxy.main.parent_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.all_models">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">all_models</span></span><a class="headerlink" href="#galaxy.main.all_models" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.all_optimizers">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">all_optimizers</span></span><a class="headerlink" href="#galaxy.main.all_optimizers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.device">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">device</span></span><a class="headerlink" href="#galaxy.main.device" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.train_loader">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">train_loader</span></span><a class="headerlink" href="#galaxy.main.train_loader" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.val_loader">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">val_loader</span></span><a class="headerlink" href="#galaxy.main.val_loader" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.test_loader">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">test_loader</span></span><a class="headerlink" href="#galaxy.main.test_loader" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.parser">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">parser</span></span><a class="headerlink" href="#galaxy.main.parser" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.args">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#galaxy.main.args" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.selected_models">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">selected_models</span></span><a class="headerlink" href="#galaxy.main.selected_models" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.num_epochs">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">num_epochs</span></span><a class="headerlink" href="#galaxy.main.num_epochs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.lr">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">lr</span></span><a class="headerlink" href="#galaxy.main.lr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.momentum">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">momentum</span></span><a class="headerlink" href="#galaxy.main.momentum" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.optimizer_name">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">optimizer_name</span></span><a class="headerlink" href="#galaxy.main.optimizer_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.experiment">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">experiment</span></span><a class="headerlink" href="#galaxy.main.experiment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.criterion">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">criterion</span></span><a class="headerlink" href="#galaxy.main.criterion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.results">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">results</span></span><a class="headerlink" href="#galaxy.main.results" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.val_results">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">val_results</span></span><a class="headerlink" href="#galaxy.main.val_results" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.classes">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('random',</span> <span class="pre">'clusters')</span></em><a class="headerlink" href="#galaxy.main.classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.main.model">
+<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#galaxy.main.model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../grabber/index.html" class="btn btn-neutral float-left" title="galaxy.grabber" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../metrics/index.html" class="btn btn-neutral float-right" title="galaxy.metrics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

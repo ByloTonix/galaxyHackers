@@ -1,0 +1,140 @@
+galaxy.segmentation
+===================
+
+.. py:module:: galaxy.segmentation
+
+.. autoapi-nested-parse::
+
+   Script to create segmentation maps for models
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   galaxy.segmentation.sample_sizes
+   galaxy.segmentation.plot_radius
+   galaxy.segmentation.sample_soures
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   galaxy.segmentation.SampleName
+   galaxy.segmentation.MapType
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   galaxy.segmentation.load_model
+   galaxy.segmentation.predict_test
+   galaxy.segmentation.create_sample
+   galaxy.segmentation.grab_surrounding
+   galaxy.segmentation.create_map_dataloader
+   galaxy.segmentation.prepare_sample_dataloaders
+   galaxy.segmentation.create_segmentation_plot
+   galaxy.segmentation.create_segmentation_plots
+
+
+Module Contents
+---------------
+
+.. py:function:: load_model(model: torch.nn.Module, optimizer_name, device)
+
+.. py:function:: predict_test(model: torch.nn.Module, optimizer_name)
+
+.. py:class:: SampleName
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   str(object='') -> str
+   str(bytes_or_buffer[, encoding[, errors]]) -> str
+
+   Create a new string object from the given object. If encoding or
+   errors is specified, then the object must expose a data buffer
+   that will be decoded using the given encoding and error handler.
+   Otherwise, returns the result of object.__str__() (if defined)
+   or repr(object).
+   encoding defaults to sys.getdefaultencoding().
+   errors defaults to 'strict'.
+
+
+   .. py:attribute:: CLUSTER_SMALL
+      :value: 'cluster_small'
+
+
+
+   .. py:attribute:: RANDOM_SMALL
+      :value: 'random_small'
+
+
+
+   .. py:attribute:: GAIA_SMALL
+      :value: 'gaia_small'
+
+
+
+   .. py:attribute:: MC_BIG
+      :value: 'mc_big'
+
+
+
+   .. py:attribute:: DR5_BIG
+      :value: 'dr5_big'
+
+
+
+.. py:data:: sample_sizes
+   :type:  dict
+
+.. py:class:: MapType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   str(object='') -> str
+   str(bytes_or_buffer[, encoding[, errors]]) -> str
+
+   Create a new string object from the given object. If encoding or
+   errors is specified, then the object must expose a data buffer
+   that will be decoded using the given encoding and error handler.
+   Otherwise, returns the result of object.__str__() (if defined)
+   or repr(object).
+   encoding defaults to sys.getdefaultencoding().
+   errors defaults to 'strict'.
+
+
+   .. py:attribute:: SMALL
+      :value: 0
+
+
+
+   .. py:attribute:: BIG
+      :value: 1
+
+
+
+.. py:data:: plot_radius
+
+.. py:data:: sample_soures
+
+.. py:function:: create_sample(sample_name, predictor: galaxy.train.Predictor)
+
+.. py:function:: grab_surrounding(points_on_radius)
+
+.. py:function:: create_map_dataloader(map_type: MapType, ra_start: float, dec_start: float, map_dir: pathlib.Path, survey=None, bands=None, imgsize_pix=224)
+
+.. py:function:: prepare_sample_dataloaders(data: pandas.DataFrame, sample_name: SampleName, map_type: MapType)
+
+.. py:function:: create_segmentation_plot(model_name: str, optimizer_name: str, predictor: galaxy.train.Predictor, sample_name: SampleName, n_cols=5)
+
+.. py:function:: create_segmentation_plots(model, model_name, optimizer_name, map_type: MapType = MapType.SMALL)
+

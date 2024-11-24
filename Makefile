@@ -62,12 +62,13 @@ prune_branches:
 
 .PHONY: run
 run:
-	python -m galaxy.main      
+	python -m galaxy.main
 
 
-.PHONY: build_doc
-build_doc:
+.PHONY: build_docs
+build_docs:
 	poetry run make -C docs html
 	touch docs/_build/html/.nojekyll
-	cp docs/_build/html/.nojekyll docs/
-	cp -r docs/_build/html/* docs/
+	mkdir -p docs/html
+	cp -r docs/_build/html/* docs/html
+	rm -rf docs/_build/

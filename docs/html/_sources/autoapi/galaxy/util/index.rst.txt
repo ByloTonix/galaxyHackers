@@ -1,0 +1,40 @@
+galaxy.util
+===========
+
+.. py:module:: galaxy.util
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   galaxy.util.bar_progress
+   galaxy.util.to_hms_format
+   galaxy.util.to_dms_format
+   galaxy.util.divide_chunks
+   galaxy.util.fits_to_rgb_image
+
+
+Module Contents
+---------------
+
+.. py:function:: bar_progress(current, total, width=80)
+
+.. py:function:: to_hms_format(time_str)
+
+.. py:function:: to_dms_format(time_str)
+
+.. py:function:: divide_chunks(l, n)
+
+.. py:function:: fits_to_rgb_image(tensor)
+
+   Converts a 2-channel tensor from the legacy survey to an RGB image tensor.
+
+   Parameters:
+   - tensor (Tensor): Input tensor of shape (2, H, W)
+
+   Returns:
+   - Tensor: RGB image tensor of shape (3, H, W)
+
+

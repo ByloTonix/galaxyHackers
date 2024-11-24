@@ -28,13 +28,13 @@ extensions = [
 
 imgmath_latex = 'latex'
 # To change the image format (png or svg), use:
-imgmath_image_format = 'svg'  
+imgmath_image_format = 'svg'
 
 autoapi_dirs = ["../galaxy"]
 
+
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -45,3 +45,9 @@ html_static_path = ["_static"]
 html_css_files = [
     "css/custom.css",
 ]
+
+# html_theme_options = {
+#     "navigation_depth": 4,
+#     "collapse_navigation": False,
+#     "sticky_navigation": True,
+# }
