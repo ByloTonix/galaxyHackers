@@ -2,7 +2,7 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 from typing import Any
-
+import gc
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -120,6 +120,8 @@ class Trainer:
             leave=False,
             desc=f"Training {model.__class__.__name__} with {optimizer.__class__.__name__} optimizer",
         ):
+            torch.cuda.empty_cache()
+            gc.collect()
             model.train()
             epoch_train_losses, epoch_train_accs = [], []
 
@@ -161,15 +163,15 @@ class Trainer:
 
             with tqdm(self.val_dataloader, unit="batch", leave=False) as pbar:
                 pbar.set_description(f"Validation Epoch {epoch + 1}/{num_epochs}")
+                with torch.no_grad():
+                    for batch in pbar:
+                        *_, loss, acc = self.compute_all(batch)
+                        val_losses.append(loss.item())
+                        val_accs.append(acc)
 
-                for batch in pbar:
-                    *_, loss, acc = self.compute_all(batch)
-                    val_losses.append(loss.item())
-                    val_accs.append(acc)
-
-                    pbar.set_postfix(
-                        val_loss=np.mean(val_losses), val_acc=np.mean(val_accs)
-                    )
+                        pbar.set_postfix(
+                            val_loss=np.mean(val_losses), val_acc=np.mean(val_accs)
+                        )
 
             val_loss = np.mean(val_losses)
             val_acc = np.mean(val_accs)
