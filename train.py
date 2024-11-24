@@ -120,28 +120,33 @@ class Trainer:
             leave=False,
             desc=f"Training {model.__class__.__name__} with {optimizer.__class__.__name__} optimizer",
         ):
-
             model.train()
             epoch_train_losses, epoch_train_accs = [], []
 
-            for batch in tqdm(self.train_dataloader, unit="batch", leave=False):
+            with tqdm(self.train_dataloader, unit="batch", leave=False) as pbar:
+                pbar.set_description(f"Epoch {epoch + 1}/{num_epochs}")
 
-                *_, loss, acc = self.compute_all(batch)
+                for batch in pbar:
+                    *_, loss, acc = self.compute_all(batch)
 
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
 
-                self.post_train_batch()
+                    self.post_train_batch()
 
-                self.log_metrics(
-                    loss=loss.item(), acc=acc, mode="train", step=self.global_step
-                )
+                    self.log_metrics(
+                        loss=loss.item(), acc=acc, mode="train", step=self.global_step
+                    )
 
-                epoch_train_losses.append(loss.item())
-                epoch_train_accs.append(acc)
+                    epoch_train_losses.append(loss.item())
+                    epoch_train_accs.append(acc)
 
-                self.global_step += 1
+                    pbar.set_postfix(
+                        loss=np.mean(epoch_train_losses), acc=np.mean(epoch_train_accs)
+                    )
+
+                    self.global_step += 1
 
             train_loss = np.mean(epoch_train_losses)
             train_acc = np.mean(epoch_train_accs)
@@ -154,10 +159,17 @@ class Trainer:
             model.eval()
             val_losses, val_accs = [], []
 
-            for batch in tqdm(self.val_dataloader):
-                *_, loss, acc = self.compute_all(batch)
-                val_losses.append(loss.item())
-                val_accs.append(acc)
+            with tqdm(self.val_dataloader, unit="batch", leave=False) as pbar:
+                pbar.set_description(f"Validation Epoch {epoch + 1}/{num_epochs}")
+
+                for batch in pbar:
+                    *_, loss, acc = self.compute_all(batch)
+                    val_losses.append(loss.item())
+                    val_accs.append(acc)
+
+                    pbar.set_postfix(
+                        val_loss=np.mean(val_losses), val_acc=np.mean(val_accs)
+                    )
 
             val_loss = np.mean(val_losses)
             val_acc = np.mean(val_accs)
@@ -183,18 +195,25 @@ class Trainer:
         )  # y_true - the real class of object in the dataset
         y_negative_target_probs = []
 
-        for batch in tqdm(test_dataloader):
+        with tqdm(test_dataloader, unit="batch", desc="Testing") as pbar:
+            for batch in pbar:
+                logits, outputs, labels, loss, acc = self.compute_all(batch)
 
-            logits, outputs, labels, loss, acc = self.compute_all(batch)
-            test_losses.append(loss.item())
-            test_accs.append(acc)
+                test_losses.append(loss.item())
+                test_accs.append(acc)
 
-            y_probs.extend(logits[:, 1].data.cpu().numpy().ravel())
-            y_negative_target_probs.extend(logits[:, 0].data.cpu().numpy().ravel())
-            y_pred.extend(outputs.data.cpu().numpy().ravel())
-            y_true.extend(labels.data.cpu().numpy().ravel())
+                y_probs.extend(logits[:, 1].data.cpu().numpy().ravel())
+                y_negative_target_probs.extend(logits[:, 0].data.cpu().numpy().ravel())
+                y_pred.extend(outputs.data.cpu().numpy().ravel())
+                y_true.extend(labels.data.cpu().numpy().ravel())
 
-            descriptions.append(pd.DataFrame(batch["description"]))
+                descriptions.append(pd.DataFrame(batch["description"]))
+
+                # Update progress bar with current loss and accuracy
+                pbar.set_postfix(
+                    loss=np.mean(test_losses),
+                    acc=np.mean(test_accs),
+                )
 
         predictions = pd.concat(descriptions).reset_index(drop=True)
         predictions["y_pred"] = y_pred
