@@ -185,6 +185,8 @@ class Trainer:
                 best_loss = val_loss
 
     def test(self, test_dataloader: DataLoader):
+        torch.cuda.empty_cache()
+        gc.collect()
 
         test_losses = []
         test_accs = []
@@ -198,24 +200,25 @@ class Trainer:
         y_negative_target_probs = []
 
         with tqdm(test_dataloader, unit="batch", desc="Testing") as pbar:
-            for batch in pbar:
-                logits, outputs, labels, loss, acc = self.compute_all(batch)
+            with torch.no_grad():
+                for batch in pbar:
+                    logits, outputs, labels, loss, acc = self.compute_all(batch)
 
-                test_losses.append(loss.item())
-                test_accs.append(acc)
+                    test_losses.append(loss.item())
+                    test_accs.append(acc)
 
-                y_probs.extend(logits[:, 1].data.cpu().numpy().ravel())
-                y_negative_target_probs.extend(logits[:, 0].data.cpu().numpy().ravel())
-                y_pred.extend(outputs.data.cpu().numpy().ravel())
-                y_true.extend(labels.data.cpu().numpy().ravel())
+                    y_probs.extend(logits[:, 1].data.cpu().numpy().ravel())
+                    y_negative_target_probs.extend(logits[:, 0].data.cpu().numpy().ravel())
+                    y_pred.extend(outputs.data.cpu().numpy().ravel())
+                    y_true.extend(labels.data.cpu().numpy().ravel())
 
-                descriptions.append(pd.DataFrame(batch["description"]))
+                    descriptions.append(pd.DataFrame(batch["description"]))
 
-                # Update progress bar with current loss and accuracy
-                pbar.set_postfix(
-                    loss=np.mean(test_losses),
-                    acc=np.mean(test_accs),
-                )
+                    # Update progress bar with current loss and accuracy
+                    pbar.set_postfix(
+                        loss=np.mean(test_losses),
+                        acc=np.mean(test_accs),
+                    )
 
         predictions = pd.concat(descriptions).reset_index(drop=True)
         predictions["y_pred"] = y_pred
