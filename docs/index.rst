@@ -6,38 +6,38 @@ Welcome to Galaxy Hackers' documentation!
    :width: 200px
    :align: center
 
-Galaxy Hackers is a galaxy detection and analysis project using state-of-the-art machine learning and data processing tools.
+The **GalaxyHackers** project focuses on training and evaluating deep learning models for cluster detection in astronomical datasets. It supports multiple model architectures, optimizers, and experiment tracking with **Comet ML**.
 
-Quick Start
------------
+Features
+--------
 
-1. **Clone the repository:**
-   ```
-   git clone https://github.com/pelancha/galaxyHackers.git
-   cd galaxyHackers
-   ```
+- Supports a variety of **deep learning models**: ResNet18, EfficientNet, DenseNet, ViTL16, and more.
+- Integrates with **Comet ML** for tracking training experiments.
+- Includes **automatic segmentation plot generation** after model training.
+- Provides flexibility in choosing optimizers, learning rate schedulers, and hyperparameters.
 
-2. **Install dependencies:**
+Introduction
+============
 
-   ```
-   pip install -r requirements.txt
-   ```
+Galaxy Hackers is a project focused on detecting and analyzing galaxies and clusters.
+It integrates data from various catalogs such as ACT-MCMF and DR5, processes FITS files into images, and uses YOLO for model training and detection.
 
-3. **Run your first script:**
-   ```
-   python process_fits.py --input data/fits/ --output data/images/
-   ```
+Key Features:
+- Fetch and process astronomical data.
+- Annotate and visualize galaxy images dynamically.
+- Train and evaluate YOLO models for galaxy and cluster detection.
+
 
 Contents
 --------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Sections:
+   :caption: Contents:
 
-   topics/introduction
    topics/installation
    topics/usage
+   topics/changelog
    guides/development
    modules/index
 

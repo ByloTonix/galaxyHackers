@@ -71,4 +71,4 @@ build_docs:
 	touch docs/_build/html/.nojekyll
 	mkdir -p docs/html
 	cp -r docs/_build/html/* docs/html
-	rm -rf docs/_build/
+	# rm -rf docs/_build/

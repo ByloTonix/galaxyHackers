@@ -11,7 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project = "galaxy"
+project = "galaxyHackers Project"
 copyright = ""
 author = "Svetlana Voskresenskaia, Nedezda Fomicheva, Arkady P., Matvei Zekhov"
 
@@ -39,12 +39,24 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
+html_theme_options = {
+    "light_css_variables": {
+        "color-brand-primary": "black",
+        "color-brand-content": "#404040",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "white",
+        "color-brand-content": "#d0d0d0",
+    },
+}
+
 html_static_path = ["_static"]
 
 html_css_files = [
     "css/custom.css",
 ]
+
 
 # html_theme_options = {
 #     "navigation_depth": 4,

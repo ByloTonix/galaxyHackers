@@ -1,19 +1,76 @@
 Installation
 ============
 
-To install the project, clone the repository and follow these steps:
+Follow these steps to set up the project:
 
-1. Clone the repository:
-   ```
-   git clone -b feature/sphinx_docs https://github.com/pelancha/galaxyHackers.git
-   cd galaxyHackers
-   ```
+Prerequisites
+-------------
+
+Ensure the following tools are installed on your system:
+
+- **Python**: Version 3.10 or higher
+- **CUDA** (optional): For GPU acceleration
+- **[Poetry](https://python-poetry.org/)**: For dependency management (recommended)
+
+Cloning the Repository
+----------------------
+
+Clone the private repository using:
+
+.. code-block:: bash
+
+   git clone https://github.com/pelancha/galaxyHackers.git
+
+Setting Up the Environment
+--------------------------
+
+Using Poetry (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Navigate to the project directory:
+
+   .. code-block:: bash
+
+      cd galaxyHackers
+
+2. Activate the Poetry environment:
+
+   .. code-block:: bash
+
+      poetry shell
+
+3. Install dependencies:
+
+   .. code-block:: bash
+
+      poetry install
+
+**Fix for MacOS Sonoma: `pixell` Installation**
+
+If you encounter an error during `pixell` installation, manually install it using:
+
+.. code-block:: bash
+
+   pip install pixell
+
+Then re-run:
+
+.. code-block:: bash
+
+   poetry install
+
+Using pip (Alternative)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Create and activate a virtual environment:
+
+   .. code-block:: bash
+
+      python3.10 -m venv venv
+      source ./venv/bin/activate
 
 2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
 
-3. Ensure additional tools like FFmpeg are installed (if needed).
+   .. code-block:: bash
 
-4. Set up the environment variables as described in the configuration guide.
+      pip install torch torchvision timm torch_optimizer tqdm numpy pandas matplotlib scikit-learn Pillow astropy astroquery pixell dynaconf wget comet_ml
