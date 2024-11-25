@@ -69,5 +69,5 @@ run:
 build_docs:
 	poetry run make -C docs html
 	touch docs/_build/html/.nojekyll
-	mkdir -p docs/html
+	cp docs/_build/html/.nojekyll docs/
 	cp -r docs/_build/html/* docs/
