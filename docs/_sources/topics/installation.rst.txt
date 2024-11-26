@@ -1,19 +1,18 @@
 Installation
-============
+------------
 
 Follow these steps to set up the project:
 
-Prerequisites
--------------
+**Prerequisites**
 
 Ensure the following tools are installed on your system:
 
 - **Python**: Version 3.10 or higher
 - **CUDA** (optional): For GPU acceleration
-- **[Poetry](https://python-poetry.org/)**: For dependency management (recommended)
+- **Poetry**: For dependency management (recommended). See `Poetry's website <https://python-poetry.org/>`_.
 
 Cloning the Repository
-----------------------
+======================
 
 Clone the private repository using:
 
@@ -22,7 +21,7 @@ Clone the private repository using:
    git clone https://github.com/pelancha/galaxyHackers.git
 
 Setting Up the Environment
---------------------------
+==========================
 
 Using Poetry (Recommended)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

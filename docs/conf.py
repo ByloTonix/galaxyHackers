@@ -1,43 +1,27 @@
 import os
 import sys
 
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 sys.path.insert(0, os.path.abspath(".."))
 
-project = "galaxyHackers Project"
-copyright = ""
+project = "galaxyHackers"
+copyright = "FreeMakers"
 author = "Svetlana Voskresenskaia, Nedezda Fomicheva, Arkady P., Matvei Zekhov"
-
-# -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx_rtd_theme",
     "autoapi.extension",
-    # "sphinx.ext.mathjax",
-    "sphinx.ext.imgmath"
+    "sphinx.ext.imgmath",
 ]
 
-imgmath_latex = 'latex'
-# To change the image format (png or svg), use:
-imgmath_image_format = 'svg'
+imgmath_latex = "latex"
+imgmath_image_format = "png"
 
 autoapi_dirs = ["../galaxy"]
 
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
 html_theme_options = {
@@ -57,9 +41,4 @@ html_css_files = [
     "css/custom.css",
 ]
 
-
-# html_theme_options = {
-#     "navigation_depth": 4,
-#     "collapse_navigation": False,
-#     "sticky_navigation": True,
-# }
+html_show_sphinx = False
