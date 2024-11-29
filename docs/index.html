@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=46e12f10" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=3526c4ec" />
     
     
 
@@ -186,7 +186,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -213,12 +213,12 @@
 <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="topics/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="topics/changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="topics/usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="guides/development.html">Development</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Extra</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="topics/changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="autoapi/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="autoapi/galaxy/index.html">galaxy</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of galaxy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -279,33 +279,32 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="welcome-to-galaxy-hackers-documentation">
-<h1>Welcome to Galaxy Hackers’ documentation!<a class="headerlink" href="#welcome-to-galaxy-hackers-documentation" title="Link to this heading"></a></h1>
+          <section id="welcome-to-galaxyhackers-documentation">
+<h1>Welcome to galaxyHackers documentation!<a class="headerlink" href="#welcome-to-galaxyhackers-documentation" title="Link to this heading"></a></h1>
 <a class="reference internal image-reference" href="_static/logo.png"><img alt="Galaxy Hackers Logo" class="align-center" src="_static/logo.png" style="width: 200px;" />
 </a>
-<p>Galaxy Hackers is a project focused on detecting and analyzing galaxies and clusters.
-It integrates data from various catalogs such as ACT-MCMF and DR5, processes FITS files into images, and uses YOLO for model training and detection.</p>
-</section>
+<p>GalaxyHackers is an innovative toolkit for astronomical data analysis, with a focus on galaxy cluster detection.
+The project provides utilities for building, training, and evaluating machine learning models specifically tailored to the unique challenges of astrophysical datasets.</p>
 <section id="key-features">
-<h1>Key Features:<a class="headerlink" href="#key-features" title="Link to this heading"></a></h1>
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Fetch and process astronomical data.</p></li>
-<li><p>Annotate and visualize galaxy images dynamically.</p></li>
-<li><p>Train and evaluate YOLO models for galaxy and cluster detection.</p></li>
+<li><p>Fetches and processes astronomical data.</p></li>
+<li><p>Annotates and visualizes galaxy images dynamically.</p></li>
+<li><p>Trains and evaluates YOLO models for galaxy and cluster detection.</p></li>
 </ul>
 </section>
 <section id="features">
-<h1>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h1>
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Supports a variety of <strong>deep learning models</strong>: ResNet18, EfficientNet, DenseNet, ViTL16, and more.</p></li>
-<li><p>Integrates with <strong>Comet ML</strong> for tracking training experiments.</p></li>
-<li><p>Includes <strong>automatic segmentation plot generation</strong> after model training.</p></li>
+<li><p>Supports a variety of deep learning models: ResNet18, EfficientNet, DenseNet, ViTL16, etc.</p></li>
+<li><p>Integrates with Comet ML for tracking training experiments.</p></li>
+<li><p>Includes automatic segmentation plot generation after model training.</p></li>
 <li><p>Provides flexibility in choosing optimizers, learning rate schedulers, and hyperparameters.</p></li>
 </ul>
 <div class="toctree-wrapper compound">
@@ -327,10 +326,6 @@ It integrates data from various catalogs such as ACT-MCMF and DR5, processes FIT
 <li class="toctree-l2"><a class="reference internal" href="topics/installation.html#setting-up-the-environment">Setting Up the Environment</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="topics/changelog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="topics/changelog.html#v0-1-may-7-2024">v0.1 (May 7, 2024)</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="topics/usage.html">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="topics/usage.html#preparing-the-dataset">Preparing the Dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="topics/usage.html#training-models">Training Models</a></li>
@@ -349,6 +344,10 @@ It integrates data from various catalogs such as ACT-MCMF and DR5, processes FIT
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Extra</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="topics/changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="topics/changelog.html#v0-1-may-7-2024">v0.1 (May 7, 2024)</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="autoapi/galaxy/index.html">galaxy</a></li>
@@ -357,6 +356,7 @@ It integrates data from various catalogs such as ACT-MCMF and DR5, processes FIT
 </ul>
 </div>
 <p>GitHub Repository: <a class="reference external" href="https://github.com/pelancha/galaxyHackers">https://github.com/pelancha/galaxyHackers</a></p>
+</section>
 </section>
 
         </article>
@@ -391,8 +391,30 @@ It integrates data from various catalogs such as ACT-MCMF and DR5, processes FIT
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Welcome to galaxyHackers documentation!</a><ul>
+<li><a class="reference internal" href="#key-features">Key Features</a></li>
+<li><a class="reference internal" href="#features">Features</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

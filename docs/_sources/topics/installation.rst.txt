@@ -23,8 +23,7 @@ Clone the private repository using:
 Setting Up the Environment
 ==========================
 
-Using Poetry (Recommended)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Using Poetry (Recommended)**
 
 1. Navigate to the project directory:
 
@@ -58,8 +57,7 @@ Then re-run:
 
    poetry install
 
-Using pip (Alternative)
-~~~~~~~~~~~~~~~~~~~~~~~
+**Using pip (Alternative)**
 
 1. Create and activate a virtual environment:
 

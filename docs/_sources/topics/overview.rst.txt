@@ -61,8 +61,6 @@ Modules include:
 - **Metrics**:
   - Compute evaluation metrics such as accuracy, precision, recall, and segmentation IoU.
 
----
-
 Next Steps
 ----------
 
