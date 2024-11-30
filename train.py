@@ -13,7 +13,7 @@ from scipy.signal import savgol_filter
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
-from tqdm import tqdm, trange
+from tqdm.notebook import tqdm, trange
 
 from config import settings
 

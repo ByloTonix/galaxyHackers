@@ -64,6 +64,7 @@ parser.add_argument(
     "--models",
     nargs="+",
     default=[
+        "Baseline",
         "ResNet18",
         "EfficientNet",
         "DenseNet",
@@ -92,7 +93,9 @@ parser.add_argument(
     default="Adam",
     help="Optimizer to use (default: Adam)",
 )
-parser.add_argument("--segment", action="store_true", help="Run segmentation after training")
+parser.add_argument(
+    "--segment", action="store_true", help="Run segmentation after training"
+)
 
 args = parser.parse_args()
 
@@ -185,13 +188,12 @@ for model_name, model in selected_models:
             val_table_data,
         )
 
-        metrics.combine_metrics(selected_models, optimizer_name)
+metrics.combine_metrics(selected_models, optimizer_name)
+experiment.end()
 
-        experiment.end()
-
-        del model
-        torch.cuda.empty_cache()
-        gc.collect()
+del model
+torch.cuda.empty_cache()
+gc.collect()
 
 if args.segment:
     for model_name, model in selected_models:
