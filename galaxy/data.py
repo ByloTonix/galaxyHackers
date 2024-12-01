@@ -39,11 +39,14 @@ main_transforms = [
 
 class DataSource(str, Enum):
 
+    MAP_ACT = "map_act"
     DR5 = "dr5"
     MC = "mc"
     SGA = "sga"
     TYC2 = "tyc2"
     GAIA = "gaia"
+    CSV = "csv"
+    RANDOM = "rand"
 
 
 class DataPart(str, Enum):
@@ -54,6 +57,11 @@ class DataPart(str, Enum):
     MC = "mc"
     GAIA = "gaia"
 
+
+class IsCluster(int, Enum):
+
+    IS_CLUSTER = 1
+    NOT_CLUSTER = 0
 
 # class SurveyLayer(str, Enum):
 #     UNWISE_NEO7 = "unwise-neo7"
@@ -189,7 +197,7 @@ def download_data():
 # 
 
 
-required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source"])
+required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source", "is_cluster"])
 optional_columns = set(["red_shift", "red_shift_type"])
 
 
@@ -232,6 +240,7 @@ def read_dr5():
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     frame['source'] = DataSource.DR5.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
     return frame
@@ -266,15 +275,15 @@ def read_mc():
         frame["Photz"].notna() & frame["red_shift_type"].isna(), "phot", pd.NA
     )
 
-
-
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
 
     frame['source'] = DataSource.MC.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
     return frame
+
 
 def read_sga(sample_size=10_000):
 
@@ -323,6 +332,7 @@ def read_sga(sample_size=10_000):
     sample.index = np.arange(len(sample))
 
     frame['source'] = DataSource.SGA.value
+    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -350,6 +360,7 @@ def read_tyc2(sample_size=5_000):
     frame = frame.sample(n=sample_size, random_state=settings.SEED)
 
     frame['source'] = DataSource.TYC2.value
+    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -365,14 +376,23 @@ def read_gaia():
         "where random_index between 0 and 1000000 and phot_g_mean_mag < 12 and parallax is not null"
     )
     gaiaResponse = job.get_results().to_pandas()
-    gaia_frame = (
+    frame = (
         gaiaResponse.sample(frac=1, random_state=settings.SEED)
         .reset_index(drop=True)
-        .rename(columns={"DESIGNATION": "name", "ra": "ra_deg", "dec": "dec_deg"})
+        .rename(columns={
+            "DESIGNATION": "name",
+            "ra": "ra_deg", 
+            "dec": "dec_deg"
+            }
+        )
     )
 
-    # TODO привести в соответствие с остальными датасетами (DR5, MC, ...)
-    return gaia_frame
+    frame["source"] = DataSource.GAIA.value
+    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
 
 
 def get_cluster_catalog() -> coord.SkyCoord:
@@ -408,22 +428,6 @@ def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord
 
     return filtered_candidates
 
-# TODO Переключиться на нативную генерацию таблицы из SkyCoord
-# def candidates_to_df(candidates: coord.SkyCoord) -> pd.DataFrame:
-
-#     b_values = candidates.galactic.b.degree
-#     l_values = candidates.galactic.l.degree
-
-#     names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(l_values, b_values)]
-
-#     data = pd.DataFrame(
-#         np.array([names, candidates.ra.deg, candidates.dec.deg]).T,
-#         columns=["name", "ra_deg", "dec_deg"],
-#     )
-
-#     return data
-
-
 def generate_candidates_dr5() -> coord.SkyCoord:
 
     # Needed only for reading metadata and map generation?
@@ -445,8 +449,8 @@ def generate_candidates_dr5() -> coord.SkyCoord:
     return candidates
 
 
-def generate_candidates_mc():
-    """Create sample from MadCows catalogue"""
+def generate_candidates_mc() -> coord.SkyCoord:
+    """Create sample of negative class to compensate MadCows catalogue"""
 
     n_sim = 10_000
 
@@ -469,8 +473,24 @@ def create_negative_class_dr5():
     candidates = generate_candidates_dr5()
 
     filtered_candidates = filter_candiates(candidates, max_len=len(dr5))
+    names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(
+                filtered_candidates.galactic.l.degree, 
+                filtered_candidates.galactic.b.degree
+                )
+            ]
 
-    frame = candidates_to_df(filtered_candidates)
+    frame = pd.DataFrame(
+        np.array([
+            names, 
+            filtered_candidates.ra.deg, 
+            filtered_candidates.dec.deg]).T,
+        columns=["name", "ra_deg", "dec_deg"],
+    )
+
+    frame["source"] = DataSource.RANDOM.value
+    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
+
+    frame = inherit_columns(frame)
 
     return frame
 
@@ -482,18 +502,52 @@ def create_negative_class_mc():
     candidates = generate_candidates_mc()
 
     filtered_candidates = filter_candiates(candidates, max_len=len(mc))
+    names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(
+            filtered_candidates.galactic.l.degree, 
+            filtered_candidates.galactic.b.degree
+            )
+        ]
 
-    frame = candidates_to_df(filtered_candidates)
+    frame = pd.DataFrame(
+        np.array([
+            names, 
+            filtered_candidates.ra.deg, 
+            filtered_candidates.dec.deg]).T,
+        columns=["name", "ra_deg", "dec_deg"],
+    )
+
+    frame["source"] = DataSource.RANDOM.value
+    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
+
+    frame = inherit_columns(frame)
 
     return frame
 
 
+# TODO: уточнить какие датасеты куда относить и как разделять
 def create_data_train():
-    pass
+    dr5 = read_dr5()
+    dr5_negative = create_negative_class_dr5()
+
+    frame = pd.concat([
+        dr5, 
+        dr5_negative,
+        ]
+    ).reset_index(drop=True)
+
+    return frame
+
 
 def create_data_test():
-    pass
+    mc = read_gaia()
+    mc_negative = create_negative_class_mc()
 
+    frame = pd.concat([
+        mc, 
+        mc_negative,
+        ]
+    ).reset_index(drop=True)
+    pass
 
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
