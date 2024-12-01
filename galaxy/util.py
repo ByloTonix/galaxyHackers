@@ -1,5 +1,16 @@
 import sys
 import torch
+from astroquery.vizier import Vizier
+
+
+def read_vizier(catalogue):    
+    catalog_list = Vizier.find_catalogs(catalogue)
+    Vizier.ROW_LIMIT = -1
+
+    catalogs = Vizier.get_catalogs(catalog_list.keys())
+    frame = catalogs[0].to_pandas().reset_index(drop=True)
+    return frame
+
 
 
 def bar_progress(current, total, width=80):

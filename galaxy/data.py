@@ -45,6 +45,14 @@ class DataSource(str, Enum):
     SGA = "sga"
     TYC2 = "tyc2"
     GAIA = "gaia"
+    UPC_SZ = "upc_sz" # UPCluster-SZ catalog, обобщённый планк
+    SPT_SZ = "spt_sz"
+    PSZSPT = "pszspt"
+    CCOMPRASS = "comprass"
+    SPT2500D = "spt2500d"
+    SPTECS = "sptecs"
+    SPT100 = "spt100"
+
     CSV = "csv"
     RANDOM = "rand"
 
@@ -282,6 +290,154 @@ def read_mc():
 
     frame = inherit_columns(frame)
 
+    return frame
+
+
+def read_upc_sz():
+    CATALOGUE = "J/ApJS/272/7/table2"
+    frame = util.read_vizier(CATALOGUE)
+
+    frame = frame.rename(columns={"PSZ2": "name",
+                              "RAJ2000": "ra_deg",
+                              "DEJ2000": "dec_deg",
+                              "z": "red_shift",
+                              "f_z": "red_shift_type"}
+                     )
+    # 'spec', '', 'phot', 'unct' - values in red_shift_type column. unct = uncertainty => skip?
+    frame = frame[
+    frame["red_shift"].notna() & frame["red_shift_type"].notna() & (frame["red_shift_type"] != "unct")
+    ]
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+
+    frame["source"] = DataSource.UPC_SZ.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
+
+def read_spt_sz():
+    CATALOGUE = "J/ApJS/216/27/table4"
+    frame = util.read_vizier(CATALOGUE)
+
+    frame = frame.rename(columns={"SPT-CL": "name",
+                          "RAJ2000": "ra_deg",
+                          "DEJ2000": "dec_deg",
+                          "z": "red_shift",
+                          "f_z": "red_shift_type"}
+                  )
+    
+    # TODO: for red shift lower bounds are considered, adapt for script
+    frame = frame[frame["red_shift"].notna()]
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+    frame["source"] = DataSource.SPT_SZ.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
+
+def read_pszspt():
+    CATALOGUE = "J/A+A/647/A106"
+    frame = util.read_vizier(CATALOGUE)
+
+    # TODO: red shift is not specified in the table, adapt
+    frame = frame.rename(columns={"Name": "name",
+                            "RAJ2000": "ra_deg",
+                            "DEJ2000": "dec_deg",
+                            "z": "red_shift"}
+                    )
+    
+    frame = frame[frame["red_shift"].notna()]
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    frame["source"] = DataSource.PSZSPT.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
+
+def read_comprass():
+    CATALOGUE = "J/A+A/626/A7/comprass"
+    frame = util.read_vizier(CATALOGUE)
+
+    # TODO: red shift is not specified in the table, adapt
+    frame = frame.rename(columns={"Name": "name",
+                            "RAJ2000": "ra_deg",
+                            "DEJ2000": "dec_deg",
+                            "z": "red_shift"}
+                    )
+
+    frame = frame[frame["red_shift"].notna()]
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    frame["source"] = DataSource.CCOMPRASS.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
+
+def read_spt2500d():
+    CATALOGUE = "J/ApJ/878/55/table5"
+    frame = util.read_vizier(CATALOGUE)
+
+    # TODO: red shift is not specified in the table, adapt
+    frame = frame.rename(columns={"SPT-CL": "name",
+                            "RAJ2000": "ra_deg",
+                            "DEJ2000": "dec_deg",
+                            "z": "red_shift"}
+                    )
+
+    frame = frame[frame["red_shift"].notna()]
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    frame["source"] = DataSource.SPT2500D.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
+
+def collect_sptecs(catalogue):
+    frame = util.read_vizier(catalogue)
+
+    frame = frame.rename(columns={"SPT-CL": "name",
+                        "RAJ2000": "ra_deg",
+                        "DEJ2000": "dec_deg",
+                        "z": "red_shift"}
+                )
+
+    # TODO: red shift is not specified in the table, adapt
+    frame = frame[frame["red_shift"].notna()]
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    frame["source"] = DataSource.SPTECS.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
+
+def read_sptecs():
+    frame_certified = collect_sptecs("J/ApJS/247/25/table10")
+    frame_candidates = collect_sptecs("J/ApJS/247/25/cand")
+
+    frame = pd.concat([frame_certified, 
+                       frame_candidates])
     return frame
 
 
