@@ -176,8 +176,7 @@ class ClusterDataset(Dataset):
         return img
 
 
-"""Obtain ACT_DR5, clusters identified there and in MaDCoWS"""
-
+"""Collecting clusters of galaxies for positive class"""
 
 def download_data():
 
@@ -244,7 +243,6 @@ def read_dr5():
             "redshiftType": "red_shift_type",
         }
     )
-
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     frame['source'] = DataSource.DR5.value
@@ -329,8 +327,9 @@ def read_spt_sz():
                           "f_z": "red_shift_type"}
                   )
     
-    # TODO: for red shift lower bounds are considered, adapt for script
-    frame = frame[frame["red_shift"].notna()]
+    frame = frame[frame["red_shift"].notna() & frame["n_z"].str.contains(r'\+', na=False)]
+    frame["red_shift_type"] = "spec"
+
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     frame["source"] = DataSource.SPT_SZ.value
@@ -345,7 +344,6 @@ def read_pszspt():
     CATALOGUE = "J/A+A/647/A106"
     frame = util.read_vizier(CATALOGUE)
 
-    # TODO: red shift is not specified in the table, adapt
     frame = frame.rename(columns={"Name": "name",
                             "RAJ2000": "ra_deg",
                             "DEJ2000": "dec_deg",
@@ -355,6 +353,9 @@ def read_pszspt():
     frame = frame[frame["red_shift"].notna()]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    # данные берутся из psz и spt (предлагается ставить phot)
+    frame["red_shift_type"] = "phot"
 
     frame["source"] = DataSource.PSZSPT.value
     frame["is_cluster"] = IsCluster.IS_CLUSTER.value
@@ -368,7 +369,6 @@ def read_comprass():
     CATALOGUE = "J/A+A/626/A7/comprass"
     frame = util.read_vizier(CATALOGUE)
 
-    # TODO: red shift is not specified in the table, adapt
     frame = frame.rename(columns={"Name": "name",
                             "RAJ2000": "ra_deg",
                             "DEJ2000": "dec_deg",
@@ -378,6 +378,9 @@ def read_comprass():
     frame = frame[frame["red_shift"].notna()]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    # данные берутся из других каталогов (пока что предлагается ставить phot)
+    frame["red_shift_type"] = "phot"
 
     frame["source"] = DataSource.CCOMPRASS.value
     frame["is_cluster"] = IsCluster.IS_CLUSTER.value
@@ -391,17 +394,17 @@ def read_spt2500d():
     CATALOGUE = "J/ApJ/878/55/table5"
     frame = util.read_vizier(CATALOGUE)
 
-    # TODO: red shift is not specified in the table, adapt
     frame = frame.rename(columns={"SPT-CL": "name",
                             "RAJ2000": "ra_deg",
                             "DEJ2000": "dec_deg",
                             "z": "red_shift"}
                     )
 
-    frame = frame[frame["red_shift"].notna()]
+    frame = frame[frame["red_shift"].notna() & frame["n_z"].str.contains(r'\+', na=False)]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
 
+    frame["red_shift_type"] = "spec"
     frame["source"] = DataSource.SPT2500D.value
     frame["is_cluster"] = IsCluster.IS_CLUSTER.value
 
@@ -419,10 +422,11 @@ def collect_sptecs(catalogue):
                         "z": "red_shift"}
                 )
 
-    # TODO: red shift is not specified in the table, adapt
     frame = frame[frame["red_shift"].notna()]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    frame["red_shift_type"] = "phot"
 
     frame["source"] = DataSource.SPTECS.value
     frame["is_cluster"] = IsCluster.IS_CLUSTER.value
@@ -441,6 +445,9 @@ def read_sptecs():
     return frame
 
 
+"""Collecting data for negative class"""
+
+"""Galaxies in short distances"""
 def read_sga(sample_size=10_000):
 
     table: atpy.Table = atpy.Table().read(settings.SGA_PATH)
@@ -495,6 +502,7 @@ def read_sga(sample_size=10_000):
     return frame
 
 
+"""Brigt stars"""
 def read_tyc2(sample_size=5_000):
 
     frame = Vizier(row_limit=-1).get_catalogs(catalog='I/259/tyc2')
@@ -523,9 +531,7 @@ def read_tyc2(sample_size=5_000):
     return frame
 
 
-"""Obtain GAIA stars catalogue"""
-
-
+"""Stars"""
 def read_gaia():
     job = Gaia.launch_job_async(
         "select DESIGNATION, ra, dec from gaiadr3.gaia_source "
@@ -549,6 +555,9 @@ def read_gaia():
     frame = inherit_columns(frame)
 
     return frame
+
+
+"""Combining datasets"""
 
 
 def get_cluster_catalog() -> coord.SkyCoord:
