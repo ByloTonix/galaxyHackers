@@ -257,6 +257,7 @@ def read_spt100():
             }
     )
 
+    frame["name"] = frame["name"].astype(str)
     frame = frame[frame["redshift_unc"] == 0]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]

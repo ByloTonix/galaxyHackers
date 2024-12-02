@@ -45,7 +45,7 @@ class DataPart(str, Enum):
     VALIDATE = "validate"
     TEST = "test"
     MC = "mc"
-    GAIA = "gaia"
+    TEST_SAMPLE = "test_sample"
 
 # class SurveyLayer(str, Enum):
 #     UNWISE_NEO7 = "unwise-neo7"
@@ -258,7 +258,7 @@ def get_non_cluster_catalog() -> coord.SkyCoord:
 
     # The catalog of known found galaxies
     catalog = coord.SkyCoord(
-        ra=non_clusters["ra_deg"] * u.degree, dec=clusnon_clustersters["dec_deg"] * u.degree, unit="deg"
+        ra=non_clusters["ra_deg"] * u.degree, dec=non_clusters["dec_deg"] * u.degree, unit="deg"
     )
 
     return catalog
@@ -387,6 +387,7 @@ def create_negative_class_mc():
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
 
+# TODO: после дудоса
 def expand_positive_class():
     """
     Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений 
@@ -398,7 +399,6 @@ def expand_positive_class():
 
     more_clusters = []
 
-# TODO: нужно ли переименовывать "пошатанные" скопления + сохранять для них тот же red_shit?
     for _, row in clusters.iterrows():
         for _ in range(5):  
             new_ra, new_dec = transform(row["ra_deg"], row["dec_deg"])
@@ -428,32 +428,39 @@ def expand_positive_class():
 def train_val_test_split():
     clusters = get_positive_class()
     non_clusters = get_negative_class()
+    
 
-    # for part in list(DataPart):
-    #     path = os.path.join(settings.DATA_PATH, part.value)
-    #     os.makedirs(path, exist_ok=True)
 
-    # train, validate, test_dr5 = np.split(
-    #     dr5, [int(0.6 * len(dr5)), int(0.8 * len(dr5))]
-    # )
 
-    # validate = validate.reset_index(drop=True)
-    # validate.index.name = "idx"
 
-    # test_dr5 = test_dr5.reset_index(drop=True)
-    # test_dr5.index.name = "idx"
 
-    # gaia = create_data_gaia()
 
-    # pairs = [
-    #     (DataPart.TRAIN, train),
-    #     (DataPart.VALIDATE, validate),
-    #     (DataPart.TEST, test_dr5),
-    #     (DataPart.MC, test_mc),
-    #     (DataPart.GAIA, gaia),
-    # ]
 
-    # return dict(pairs)
+    for part in list(DataPart):
+        path = os.path.join(settings.DATA_PATH, part.value)
+        os.makedirs(path, exist_ok=True)
+
+    train, validate, test_dr5 = np.split(
+        dr5, [int(0.6 * len(dr5)), int(0.8 * len(dr5))]
+    )
+
+    validate = validate.reset_index(drop=True)
+    validate.index.name = "idx"
+
+    test_dr5 = test_dr5.reset_index(drop=True)
+    test_dr5.index.name = "idx"
+
+    gaia = create_data_gaia()
+
+    pairs = [
+        (DataPart.TRAIN, train),
+        (DataPart.VALIDATE, validate),
+        (DataPart.TEST, test_dr5),
+        (DataPart.MC, test_mc),
+        (DataPart.GAIA, gaia),
+    ]
+
+    return dict(pairs)
 
 
 def ddos():

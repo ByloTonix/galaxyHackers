@@ -27,10 +27,8 @@ from galaxy.util import inherit_columns, DataSource, IsCluster
 
 """Galaxies in short distances"""
 def read_sga(sample_size=10_000):
-
     table: atpy.Table = atpy.Table().read(settings.SGA_PATH)
     frame = table.to_pandas().reset_index(drop=True)
-
 
     frame = frame.rename(
         columns={
@@ -44,7 +42,6 @@ def read_sga(sample_size=10_000):
     # Нет точного указания, Светлана сказала скорее всего так.
     frame['red_shift_type'] = 'phot'
 
-
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
 
     # Убираем выбросы слева
@@ -56,7 +53,7 @@ def read_sga(sample_size=10_000):
 
     # Сэмплируем по бинам относительно red_shift. Хочется чтобы объекты в выборке были распределены равномерно
     n_bins = 10
-    seps = np.linspace(0, frame["red_shift"].max(), num=n_bins+1)
+    seps = np.linspace(0, frame["red_shift"].max(), num=n_bins + 1)
     bins = zip(seps[:-1], seps[1:])
 
     # Вычисляем размер бина
@@ -72,12 +69,13 @@ def read_sga(sample_size=10_000):
     sample = pd.concat(sub_samples, axis=0).sort_index()
     sample.index = np.arange(len(sample))
 
-    frame['source'] = DataSource.SGA.value
-    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
+    sample['source'] = DataSource.SGA.value
+    sample["is_cluster"] = IsCluster.NOT_CLUSTER.value
 
-    frame = inherit_columns(frame)
+    sample = inherit_columns(sample)
 
-    return frame
+    return sample
+
 
 
 """Brigt stars"""
