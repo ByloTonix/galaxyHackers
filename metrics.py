@@ -251,7 +251,7 @@ def modelPerformance(
     """
 
     acc = accuracy_score(predictions.y_true, predictions.y_pred)
-    precision = precision_score(predictions.y_true, predictions.y_pred)
+    precision = precision_score(predictions.y_true, predictions.y_pred, zero_division=0)
     recall = recall_score(predictions.y_true, predictions.y_pred)
     f1_measure = f1_score(predictions.y_true, predictions.y_pred)
     fbeta_measure = fbeta_score(predictions.y_true, predictions.y_pred, beta=f_beta)
