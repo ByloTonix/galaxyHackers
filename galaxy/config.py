@@ -19,6 +19,7 @@ settings.PREDICTIONS_PATH = Path(settings.STORAGE_PATH, "predictions/")
 settings.MAP_ACT_PATH = Path(settings.DATA_PATH, settings.MAP_ACT_FILENAME)
 settings.DR5_CLUSTERS_PATH = Path(settings.DATA_PATH, settings.DR5_CLUSTERS_FILENAME)
 settings.SGA_PATH = Path(settings.DATA_PATH, settings.SGA_FILENAME)
+settings.SPT100_PATH = Path(settings.DATA_PATH, settings.SPT100_FILENAME)
 
 settings.SEGMENTATION_PATH = Path(settings.STORAGE_PATH, "segmentation/")
 settings.SEGMENTATION_SAMPLES_PATH = Path(settings.SEGMENTATION_PATH, "samples/")
@@ -56,6 +57,16 @@ settings.SGA_CONFIG = {
     "URL": "https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits",
     # "FALLBACK_URL" : 'https://portal.nersc.gov/project/cosmo/data/sga/2020/SGA-2020.fits',
     "OUTPUT_PATH": str(settings.SGA_PATH),
+}
+
+settings.SPT100_CONFIG = {
+    "RENAME_DICT": {
+        "SOURCE": Path(settings.DATA_PATH, settings.SPT100_ROUTE),
+        "TARGET": settings.SPT100_PATH,
+    },
+    "URL": "https://lambda.gsfc.nasa.gov/data/suborbital/SPT/sptpol100/sptpol100d_catalog_huang19.fits",
+    # "FALLBACK_URL" : 'https://lambda.gsfc.nasa.gov/data/suborbital/SPT/sptpol100/sptpol100d_catalog_huang19.fits',
+    "OUTPUT_PATH": str(settings.SPT100_PATH),
 }
 
 

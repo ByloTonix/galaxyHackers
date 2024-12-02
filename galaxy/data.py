@@ -180,7 +180,11 @@ class ClusterDataset(Dataset):
 
 def download_data():
 
-    for config in [settings.MAP_ACT_CONFIG, settings.DR5_CONFIG, settings.SGA_CONFIG]:
+    for config in [settings.MAP_ACT_CONFIG, 
+                   settings.DR5_CONFIG, 
+                   settings.SGA_CONFIG,
+                   settings.SPT100_CONFIG
+                   ]:
 
         if not os.path.exists(config.OUTPUT_PATH):
             wget.download(
@@ -444,6 +448,33 @@ def read_sptecs():
                        frame_candidates])
     return frame
 
+
+def read_spt100():
+    table: atpy.Table = atpy.Table().read(settings.SPT100_PATH)
+
+    frame = table.to_pandas().reset_index(drop=True)
+
+    frame = frame.rename(
+        columns={
+            "SPT_ID": "name", 
+            "RA": "ra_deg", 
+            "Dec": "dec_deg", 
+            "redshift": "red_shift"
+            }
+    )
+
+    frame = frame[frame["redshift_unc"] == 0]
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    frame["red_shift_type"] = "spec"
+
+    frame["source"] = DataSource.SPT100.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
 
 """Collecting data for negative class"""
 
