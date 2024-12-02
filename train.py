@@ -135,6 +135,10 @@ class Trainer:
                     loss=loss.item(), acc=acc, mode="train", step=self.global_step
                 )
 
+                self.train_table_data.append(
+                    [self.global_step, loss.item(), acc]
+                )
+
                 epoch_train_losses.append(loss.item())
                 epoch_train_accs.append(acc)
 
@@ -151,7 +155,6 @@ class Trainer:
 
             train_loss = np.mean(epoch_train_losses)
             train_acc = np.mean(epoch_train_accs)
-            self.train_table_data.append([epoch + 1, train_loss, train_acc])
 
             self.log_metrics(
                 loss=train_loss, acc=train_acc, mode="train", epoch=epoch + 1
