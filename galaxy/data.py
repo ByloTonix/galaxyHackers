@@ -22,11 +22,10 @@ from pixell import enmap
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-from galaxy import grabber, util
+from galaxy import collect_clusters, collect_not_clusters, grabber, util
 from galaxy.config import settings
 
-import clusters
-import not_clusters
+from galaxy.util import inherit_columns, DataSource, IsCluster
 
 
 np.random.seed(settings.SEED)
@@ -189,11 +188,27 @@ def download_data():
 
 
 def get_cluster_catalog() -> coord.SkyCoord:
+    dr5 = collect_clusters.read_dr5()
+    upc_sz = collect_clusters.read_upc_sz()
+    spt_sz = collect_clusters.read_spt_sz()
+    pszspt = collect_clusters.read_pszspt()
+    comprass = collect_clusters.read_comprass()
+    spt2500d = collect_clusters.read_spt2500d()
+    sptecs = collect_clusters.read_sptecs()
+    spt100 = collect_clusters.read_spt100()
+    test_sample = collect_clusters.read_test_sample()
 
-    mc = read_mc()
-    dr5 = read_dr5()
-
-    clusters = pd.concat([dr5, mc], ignore_index=True)
+    clusters = pd.concat([
+        dr5, 
+        upc_sz,
+        spt_sz,
+        pszspt,
+        comprass,
+        spt2500d,
+        sptecs,
+        spt100,
+        test_sample
+        ], ignore_index=True)
 
     # The catalog of known found galaxies
     catalog = coord.SkyCoord(
@@ -203,10 +218,52 @@ def get_cluster_catalog() -> coord.SkyCoord:
     return catalog
 
 
-def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord:
+def get_non_cluster_catalog() -> coord.SkyCoord:
 
-    # TODO Написать не только относительно скоплений, но и относительно галактик и звёзд
-    catalog = get_cluster_catalog()
+    sga = collect_not_clusters.read_sga()
+    tyc2 = collect_not_clusters.read_tyc2()
+    gaia = collect_not_clusters.read_gaia()
+
+    # The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.
+    catalog_sga = coord.SkyCoord(
+        ra=sga["ra_deg"] * u.degree, dec=sga["dec_deg"] * u.degree, unit="deg"
+    )
+
+    catalog_tyc2 = coord.SkyCoord(
+        ra=tyc2["ra_deg"] * u.degree, dec=tyc2["dec_deg"] * u.degree, unit="deg"
+    )
+
+    catalog_gaia = coord.SkyCoord(
+        ra=gaia["ra_deg"] * u.degree, dec=gaia["dec_deg"] * u.degree, unit="deg"
+    )
+
+    catalog = coord.SkyCoord(
+        ra=np.concatenate([
+            catalog_sga.ra.deg, 
+            catalog_tyc2.ra.deg,
+            catalog_gaia.ra.deg
+            ]) * u.degree,
+        dec=np.concatenate([
+            catalog_sga.dec.deg, 
+            catalog_tyc2.dec.deg,
+            catalog_gaia.dec.deg
+            ]) * u.degree,
+        unit="deg"
+    ) 
+
+    return catalog
+
+
+"""Для отбора участков неба, удалённых от объектов из собранных датасетов"""
+def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord:
+    clusters_catalog = get_cluster_catalog()
+    non_clusters_catalog = get_non_cluster_catalog()
+
+    catalog = coord.SkyCoord(
+        ra=np.concatenate([clusters_catalog.ra.deg, non_clusters_catalog.ra.deg]) * u.degree,
+        dec=np.concatenate([clusters_catalog.dec.deg, non_clusters_catalog.dec.deg]) * u.degree,
+        unit="deg"
+    )
 
     _, d2d, _ = candidates.match_to_catalog_sky(catalog)
 
@@ -220,6 +277,7 @@ def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord
     filtered_candidates = candidates[candidates_filter][:max_len]
 
     return filtered_candidates
+
 
 def generate_candidates_dr5() -> coord.SkyCoord:
 
@@ -243,7 +301,6 @@ def generate_candidates_dr5() -> coord.SkyCoord:
 
 
 def generate_candidates_mc() -> coord.SkyCoord:
-    """Create sample of negative class to compensate MadCows catalogue"""
 
     n_sim = 10_000
 
@@ -261,7 +318,7 @@ def generate_candidates_mc() -> coord.SkyCoord:
 def create_negative_class_dr5():
     """Create sample from dr5 clsuter catalogue"""
 
-    dr5 = read_dr5()
+    dr5 = collect_clusters.read_dr5()
 
     candidates = generate_candidates_dr5()
 
@@ -289,8 +346,9 @@ def create_negative_class_dr5():
 
 
 def create_negative_class_mc():
+    """Create sample of negative class to compensate MadCows catalogue"""
 
-    mc = read_mc()
+    mc =  collect_clusters.read_mc()
 
     candidates = generate_candidates_mc()
 
@@ -315,6 +373,9 @@ def create_negative_class_mc():
     frame = inherit_columns(frame)
 
     return frame
+
+
+"""Split samples into train, validation and tests and get pictures from legacy survey"""
 
 
 # TODO: уточнить какие датасеты куда относить и как разделять
@@ -342,8 +403,6 @@ def create_data_test():
     ).reset_index(drop=True)
     pass
 
-
-"""Split samples into train, validation and tests and get pictures from legacy survey"""
 
 
 def train_val_test_split():

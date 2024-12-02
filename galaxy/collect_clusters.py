@@ -49,6 +49,7 @@ def read_dr5():
     return frame
 
 
+'''Пока что не использовать в обучении модели'''
 def read_mc():
     # the catalogue of MaDCoWS in VizieR
     CATALOGUE = "J/ApJS/240/33/"
