@@ -4,6 +4,7 @@ To create segmentation maps for randomly chosen clusters, random objects and sta
 To create a segmentation map with larger scale for a randomly chosen cluster use function saveBigSegMap()
 '''
 
+import gc
 import os
 from enum import Enum
 from pathlib import Path
@@ -23,6 +24,11 @@ from config import settings
 from data import ClusterDataset, DataPart
 from train import Predictor
 
+def cleanup_memory(*args):
+    for var in args:
+        del var
+    torch.cuda.empty_cache()
+    gc.collect()
 
 def load_model(model: torch.nn.Module, optimizer_name, device):
 
@@ -47,7 +53,7 @@ def predict_test(model: torch.nn.Module, optimizer_name):
 
     dataloaders = data.train_val_test_split()
     for part in [DataPart.TEST_DR5, DataPart.TEST_DR5, DataPart.GAIA]:
-       
+
         predictions = predictor.predict(dataloader=dataloaders[part])
 
         predictions.to_csv(Path(settings.PREDICTIONS_PATH, f"{part}.csv"))
@@ -104,19 +110,19 @@ def create_sample(sample_name, predictor: Predictor):
 
     min_ra, min_dec = -float("inf"), -float("inf")
     max_ra, max_dec = float("inf"), float("inf")
-    
+
 
     match (map_type):
         case MapType.SMALL:
             required_space = 10 / 120 #radius required around clusters for segmentation maps (in minutes)
         case MapType.BIG:
             required_space = 30 / 120 #radius required around cluster (in minutes)
-            
+
     while ((max_ra + required_space) > 360 or
             (max_dec + required_space) > 90 or
             (min_dec - required_space) < -90 or
             (min_ra - required_space) < 0):
-        
+
         sample = description.sample(sample_size, random_state=settings.SEED)
         max_ra = sample['ra_deg'].max()
         max_dec = sample['dec_deg'].max()
@@ -146,8 +152,8 @@ def grab_surrounding(points_on_radius): # step не всегда = 1; поэто
 
 
 def create_map_dataloader(
-        map_type: MapType, 
-        ra_start: float, 
+        map_type: MapType,
+        ra_start: float,
         dec_start: float,
         map_dir: Path): #id: 0 for small segmentation maps, 1 - for a big one
 
@@ -192,14 +198,14 @@ def create_map_dataloader(
     map_data.to_csv(description_path)
 
     legacy_for_img.grab_cutouts(
-        target_file=map_data, 
+        target_file=map_data,
         name_col="name",
         ra_col="ra_deg",
         dec_col="dec_deg",
-        output_dir=map_dir,         
-        survey='unwise-neo7', 
+        output_dir=map_dir,
+        survey='unwise-neo7',
         imgsize_pix = 224 )
-    
+
 
     dataset = ClusterDataset(
         map_dir,
@@ -209,37 +215,37 @@ def create_map_dataloader(
     dataloader = DataLoader(dataset, batch_size=settings.BATCH_SIZE)
 
     return dataloader
-       
+
 
 def prepare_sample_dataloaders(data: pd.DataFrame, sample_name: SampleName, map_type: MapType):
 
     dataloaders = []
-    
+
     for idx, row in data.iterrows():
         directory = Path(settings.SEGMENTATION_SAMPLES_PATH, sample_name.value, str(idx))
         os.makedirs(directory, exist_ok=True)
 
         dataloader = create_map_dataloader(
-            map_type=map_type, 
-            ra_start=row['ra_deg'], 
-            dec_start=row['dec_deg'], 
+            map_type=map_type,
+            ra_start=row['ra_deg'],
+            dec_start=row['dec_deg'],
             map_dir=directory
         )
 
         dataloaders.append((idx, dataloader))
 
 
-    return dataloaders 
-    
+    return dataloaders
+
 
 def create_segmentation_plot(
-        model_name: str, 
+        model_name: str,
         optimizer_name: str,
-        predictor: Predictor, 
+        predictor: Predictor,
         sample_name: SampleName,
         n_cols = 5
         ):
-    
+
     sample, sample_predictions, map_type = create_sample(
         sample_name=sample_name,
         predictor=predictor
@@ -251,7 +257,7 @@ def create_segmentation_plot(
     n_cols = min(n_cols, len(sample))
 
     fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(15, 8))
-    
+
     for i, (idx, dataloader) in enumerate(dataloaders):
 
         cur_col = i % n_cols
@@ -296,19 +302,21 @@ def create_segmentation_plot(
 
     plt.savefig(Path(settings.SEGMENTATION_MAPS_PATH, f"{map_type}_{model_name}_{optimizer_name}_{sample_name.value}.png"))
     plt.close()
-        
+
 
 def create_segmentation_plots(model, model_name, optimizer_name, map_type: MapType=MapType.SMALL):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
- 
+
     model = load_model(model, optimizer_name, device)
 
     predictor = Predictor(model, device=device)
-
-    for sample_name in list(SampleName):
-        create_segmentation_plot(
-            model_name=model_name,
-            optimizer_name=optimizer_name,
-            predictor=predictor,
-            sample_name=sample_name,
-            )
+    try:
+        for sample_name in list(SampleName):
+            create_segmentation_plot(
+                model_name=model_name,
+                optimizer_name=optimizer_name,
+                predictor=predictor,
+                sample_name=sample_name,
+                )
+    finally:
+        cleanup_memory(model, predictor)
