@@ -99,7 +99,8 @@ class ShiftAndMirrorPadTransform:
         shift_x = torch.randint(-self.max_shift_x, self.max_shift_x + 1, (1,)).item()
         shift_y = torch.randint(-self.max_shift_y, self.max_shift_y + 1, (1,)).item()
         return shift_and_mirror_pad(image, shift_x, shift_y)
-    
+
+
 class ClusterDataset(Dataset):
     def __init__(self, images_dir_path: str, description_csv_path: str, transform=None):
         super().__init__()
@@ -186,8 +187,7 @@ def download_data():
 
 """Combining datasets"""
 
-
-def get_cluster_catalog() -> coord.SkyCoord:
+def get_positive_class():
     dr5 = collect_clusters.read_dr5()
     upc_sz = collect_clusters.read_upc_sz()
     spt_sz = collect_clusters.read_spt_sz()
@@ -196,7 +196,6 @@ def get_cluster_catalog() -> coord.SkyCoord:
     spt2500d = collect_clusters.read_spt2500d()
     sptecs = collect_clusters.read_sptecs()
     spt100 = collect_clusters.read_spt100()
-    test_sample = collect_clusters.read_test_sample()
 
     clusters = pd.concat([
         dr5, 
@@ -206,7 +205,18 @@ def get_cluster_catalog() -> coord.SkyCoord:
         comprass,
         spt2500d,
         sptecs,
-        spt100,
+        spt100
+        ], ignore_index=True)
+
+    return clusters
+
+
+def get_cluster_catalog() -> coord.SkyCoord:
+    clusters = get_positive_class()
+    test_sample = collect_clusters.read_test_sample()
+
+    clusters = pd.concat([
+        clusters,
         test_sample
         ], ignore_index=True)
 
@@ -218,38 +228,38 @@ def get_cluster_catalog() -> coord.SkyCoord:
     return catalog
 
 
-def get_non_cluster_catalog() -> coord.SkyCoord:
-
+def get_negative_class():
     sga = collect_not_clusters.read_sga()
     tyc2 = collect_not_clusters.read_tyc2()
     gaia = collect_not_clusters.read_gaia()
 
-    # The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.
-    catalog_sga = coord.SkyCoord(
-        ra=sga["ra_deg"] * u.degree, dec=sga["dec_deg"] * u.degree, unit="deg"
-    )
+# drop columns "red_shift" and "red_shift_type", as tables with NaN columns cannot be concatenated properly(?)
+    columns_to_drop = ["red_shift", "red_shift_type"]
+    sga = sga.drop(
+        columns=[col for col in columns_to_drop if col in sga.columns],
+          errors='ignore'
+          )
+    tyc2 = tyc2.drop(
+        columns=[col for col in columns_to_drop if col in tyc2.columns], 
+        errors='ignore'
+        )
+    gaia = gaia.drop(
+        columns=[col for col in columns_to_drop if col in gaia.columns], 
+        errors='ignore'
+        )
 
-    catalog_tyc2 = coord.SkyCoord(
-        ra=tyc2["ra_deg"] * u.degree, dec=tyc2["dec_deg"] * u.degree, unit="deg"
-    )
+    negative_class = pd.concat([sga, tyc2, gaia], axis=0, ignore_index=True)
+    negative_class = inherit_columns(negative_class)
+    return negative_class
 
-    catalog_gaia = coord.SkyCoord(
-        ra=gaia["ra_deg"] * u.degree, dec=gaia["dec_deg"] * u.degree, unit="deg"
-    )
 
+def get_non_cluster_catalog() -> coord.SkyCoord:
+    non_clusters = get_negative_class()
+
+    # The catalog of known found galaxies
     catalog = coord.SkyCoord(
-        ra=np.concatenate([
-            catalog_sga.ra.deg, 
-            catalog_tyc2.ra.deg,
-            catalog_gaia.ra.deg
-            ]) * u.degree,
-        dec=np.concatenate([
-            catalog_sga.dec.deg, 
-            catalog_tyc2.dec.deg,
-            catalog_gaia.dec.deg
-            ]) * u.degree,
-        unit="deg"
-    ) 
+        ra=non_clusters["ra_deg"] * u.degree, dec=clusnon_clustersters["dec_deg"] * u.degree, unit="deg"
+    )
 
     return catalog
 
@@ -377,63 +387,73 @@ def create_negative_class_mc():
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
 
+def expand_positive_class():
+    """
+    Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений 
+    немного шатаются => выборка увеличивается 
+    """
+    clusters = get_positive_class()
 
-# TODO: уточнить какие датасеты куда относить и как разделять
-def create_data_train():
-    dr5 = read_dr5()
-    dr5_negative = create_negative_class_dr5()
+    transform = ShiftAndMirrorPadTransform()
 
-    frame = pd.concat([
-        dr5, 
-        dr5_negative,
-        ]
-    ).reset_index(drop=True)
+    more_clusters = []
 
-    return frame
+# TODO: нужно ли переименовывать "пошатанные" скопления + сохранять для них тот же red_shit?
+    for _, row in clusters.iterrows():
+        for _ in range(5):  
+            new_ra, new_dec = transform(row["ra_deg"], row["dec_deg"])
+            more_clusters.append({
+                "name": row["name"],
+                "ra_deg": new_ra,
+                "dec_deg": new_dec,
+                "red_shift": row["red_shift"], 
+                "red_shift_type": row["red_shift_type"],
+                "is_cluster": IsCluster.IS_CLUSTER.value,
+                "source": row["source"]
+            })
+
+    more_clusters_df = pd.DataFrame(more_clusters)
+
+    extended_clusters = pd.concat([
+        clusters, 
+        more_clusters_df,
+        ], ignore_index=True)
+
+    print(extended_clusters)
 
 
-def create_data_test():
-    mc = read_gaia()
-    mc_negative = create_negative_class_mc()
-
-    frame = pd.concat([
-        mc, 
-        mc_negative,
-        ]
-    ).reset_index(drop=True)
-    pass
-
-
+# TODO: свалить всё в один датасет, перемешать и нарезать train/val/test в соотношении 60/20/20
+# MadCows пока что при обучении моделей не использовать, не забыть вывести вероятности для test_sample при тесте
 
 def train_val_test_split():
-    dr5 = create_data_dr5()
-    test_mc = create_data_mc()
+    clusters = get_positive_class()
+    non_clusters = get_negative_class()
 
-    for part in list(DataPart):
-        path = os.path.join(settings.DATA_PATH, part.value)
-        os.makedirs(path, exist_ok=True)
+    # for part in list(DataPart):
+    #     path = os.path.join(settings.DATA_PATH, part.value)
+    #     os.makedirs(path, exist_ok=True)
 
-    train, validate, test_dr5 = np.split(
-        dr5, [int(0.6 * len(dr5)), int(0.8 * len(dr5))]
-    )
+    # train, validate, test_dr5 = np.split(
+    #     dr5, [int(0.6 * len(dr5)), int(0.8 * len(dr5))]
+    # )
 
-    validate = validate.reset_index(drop=True)
-    validate.index.name = "idx"
+    # validate = validate.reset_index(drop=True)
+    # validate.index.name = "idx"
 
-    test_dr5 = test_dr5.reset_index(drop=True)
-    test_dr5.index.name = "idx"
+    # test_dr5 = test_dr5.reset_index(drop=True)
+    # test_dr5.index.name = "idx"
 
-    gaia = create_data_gaia()
+    # gaia = create_data_gaia()
 
-    pairs = [
-        (DataPart.TRAIN, train),
-        (DataPart.VALIDATE, validate),
-        (DataPart.TEST, test_dr5),
-        (DataPart.MC, test_mc),
-        (DataPart.GAIA, gaia),
-    ]
+    # pairs = [
+    #     (DataPart.TRAIN, train),
+    #     (DataPart.VALIDATE, validate),
+    #     (DataPart.TEST, test_dr5),
+    #     (DataPart.MC, test_mc),
+    #     (DataPart.GAIA, gaia),
+    # ]
 
-    return dict(pairs)
+    # return dict(pairs)
 
 
 def ddos():
