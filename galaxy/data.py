@@ -53,7 +53,7 @@ class DataSource(str, Enum):
     SPTECS = "sptecs"
     SPT100 = "spt100"
 
-    CSV = "csv"
+    TEST_SAMPLE = "test_sample"
     RANDOM = "rand"
 
 
@@ -475,6 +475,33 @@ def read_spt100():
     frame = inherit_columns(frame)
 
     return frame
+
+'''
+TODO: Для test_sample выдавать при тесте полученные вероятности, можно просто добавлять колонку
+Можно попробовать визуализировать на графике масса - красное смещение с колорбаром в виде вероятностей
+'''
+def read_test_sample():
+    frame = pd.read_csv(settings.TEST_SAMPLE_PATH)
+
+    frame = frame.rename(
+        columns={
+            "RADeg": "ra_deg",
+            "decDeg": "dec_deg",
+            "redshift": "red_shift",
+        }
+    )
+
+    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
+
+    frame["red_shift_type"] = "phot"
+
+    frame["source"] = DataSource.TEST_SAMPLE.value
+    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+
+    frame = inherit_columns(frame)
+
+    return frame
+
 
 """Collecting data for negative class"""
 

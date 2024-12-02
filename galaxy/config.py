@@ -20,6 +20,7 @@ settings.MAP_ACT_PATH = Path(settings.DATA_PATH, settings.MAP_ACT_FILENAME)
 settings.DR5_CLUSTERS_PATH = Path(settings.DATA_PATH, settings.DR5_CLUSTERS_FILENAME)
 settings.SGA_PATH = Path(settings.DATA_PATH, settings.SGA_FILENAME)
 settings.SPT100_PATH = Path(settings.DATA_PATH, settings.SPT100_FILENAME)
+settings.TEST_SAMPLE_PATH = Path(settings.WORKDIR, settings.TEST_SAMPLE_FILENAME)
 
 settings.SEGMENTATION_PATH = Path(settings.STORAGE_PATH, "segmentation/")
 settings.SEGMENTATION_SAMPLES_PATH = Path(settings.SEGMENTATION_PATH, "samples/")

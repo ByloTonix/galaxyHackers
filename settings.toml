@@ -14,6 +14,7 @@ MAP_ACT_FILENAME = "map_act.fits"
 DR5_CLUSTERS_FILENAME = "dr5.fits"
 SGA_FILENAME = "sga.fits"
 SPT100_FILENAME = "spt100.fits"
+TEST_SAMPLE_FILENAME = "test_sample.csv"
 
 [LEGACY_SURVEY]
 LAYER = "unwise-neo7"
