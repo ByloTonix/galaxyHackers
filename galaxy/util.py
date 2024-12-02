@@ -1,6 +1,58 @@
 import sys
 import torch
 from astroquery.vizier import Vizier
+from enum import Enum
+import numpy as np
+import pandas as pd
+
+
+class DataSource(str, Enum):
+
+    MAP_ACT = "map_act"
+    DR5 = "dr5"
+    MC = "mc"
+    SGA = "sga"
+    TYC2 = "tyc2"
+    GAIA = "gaia"
+    UPC_SZ = "upc_sz" # UPCluster-SZ catalog, обобщённый планк
+    SPT_SZ = "spt_sz"
+    PSZSPT = "pszspt"
+    CCOMPRASS = "comprass"
+    SPT2500D = "spt2500d"
+    SPTECS = "sptecs"
+    SPT100 = "spt100"
+
+    TEST_SAMPLE = "test_sample"
+    RANDOM = "rand"
+
+
+class IsCluster(int, Enum):
+
+    IS_CLUSTER = 1
+    NOT_CLUSTER = 0
+
+
+required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source", "is_cluster"])
+optional_columns = set(["red_shift", "red_shift_type"])
+
+
+def inherit_columns(frame: pd.DataFrame):
+
+    frame['idx'] = np.arange(len(frame))
+
+    frame_columns = set(frame.columns)
+
+    assert required_columns.issubset(frame_columns), "Some required columns are missed"
+
+    missed_optional = optional_columns.difference(frame_columns)
+
+    if missed_optional:
+        for col in missed_optional:
+            frame[col] = pd.NA
+
+    frame = frame.reset_index(drop=True)
+
+    return frame
 
 
 def read_vizier(catalogue):    
