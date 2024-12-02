@@ -97,13 +97,13 @@ def plot_red_shift(pdf, predictions: pd.DataFrame):
     )
 
     # Calculate recall for each bin
-    recall_per_bin = red_shift_predictions.groupby("bucket").apply(
+    recall_per_bin = red_shift_predictions.groupby("bucket", observed=False).apply(
         lambda x: recall_score(x["y_true"], x["y_pred"])
     )
 
     # Calculate proportions of red_shift_type within each bin
     proportions = (
-        red_shift_predictions.groupby("bucket")["red_shift_type"]
+        red_shift_predictions.groupby("bucket", observed=False)["red_shift_type"]
         .value_counts(normalize=True)
         .unstack()
         .fillna(0)
