@@ -540,7 +540,7 @@ def train_val_test_split():
         (DataPart.TRAIN, train),
         (DataPart.VALIDATE, validate),
         (DataPart.TEST, test),
-        (DataPart.TEST_SAMPLE, test_sample)
+        (DataPart.TEST_SAMPLE, test_sample),
         (DataPart.BRIGHT_STARS, bright_stars)
     ]
 
