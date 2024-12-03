@@ -325,4 +325,9 @@ def read_act_mcmf():
         np.where(mc_frame["z1C"].notna(), "z1C", "z2C"),
     )
 
+    mc_frame = mc_frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+    mc_frame["source"] = DataSource.ACT_MCMF.value
+    mc_frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    mc_frame = inherit_columns(mc_frame)
+
     return mc_frame
