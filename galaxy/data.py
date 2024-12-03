@@ -261,7 +261,7 @@ def expanded_positive_class():
     transform_positive = ShiftAndMirrorPadTransform()
 
     for _, row in clusters.iterrows():
-        for _ in range(2):  # +16130 новых картинок подтверждённых скоплений
+        for _ in range(1):  # + новых картинок подтверждённых скоплений
             transform_positive()
             new_ra, new_dec = transform_positive.apply_shift(row["ra_deg"], row["dec_deg"])
             more_clusters.append({
@@ -337,7 +337,7 @@ class DatasetsInfo:
     def load_expanded_clusters(self):
         if self._expanded_clusters is None:
             self._expanded_clusters = expanded_positive_class()
-        return self._clusters
+        return self._expanded_clusters
     
     def load_test_sample(self):
         if self._test_sample is None:
@@ -395,11 +395,9 @@ def filter_candidates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoor
     MIN_ANGLE = 10
     MAX_ANGLE = 20
 
-    valid_idx = (d2d.arcmin > MIN_ANGLE) & (-90 <= candidates.galactic.b.degree) & (
-        candidates.galactic.b.degree <= 90
-    )
+    candidates_filter = (d2d.arcmin > MIN_ANGLE) & (candidates.galactic.b.degree > MAX_ANGLE)
 
-    filtered_candidates = candidates[valid_idx][:max_len]
+    filtered_candidates = candidates[candidates_filter][:max_len]
 
     return filtered_candidates
 
@@ -414,8 +412,15 @@ def generate_random_candidates(len=7500) -> coord.SkyCoord:
     ras = np.random.uniform(0, 360, n_sim)
     decs = np.random.uniform(-90, 90, n_sim)
 
+    frame = pd.DataFrame({'ra_deg': ras, 'dec_deg': decs})
+
+    valid_idx = ((0 <= frame['ra_deg']) & (frame['ra_deg'] <= 360) &
+                (-90 <= frame['dec_deg']) & (frame['dec_deg'] <= 90))
+
+    frame = frame[valid_idx].reset_index(drop=True)
+
     # Just points from our sky map
-    candidates = coord.SkyCoord(ra=ras * u.degree, dec=decs * u.degree, unit="deg")
+    candidates = coord.SkyCoord(ra=frame['ra_deg'] * u.degree, dec=frame['dec_deg'] * u.degree, unit="deg")
     filtered_candidates = filter_candidates(candidates, max_len=required_num)
     return filtered_candidates
 
@@ -450,8 +455,15 @@ ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -10
     np.random.shuffle(ras)
     np.random.shuffle(decs)
 
+    frame = pd.DataFrame({'ra_deg': ras, 'dec_deg': decs})
+
+    valid_idx = ((0 <= frame['ra_deg']) & (frame['ra_deg'] <= 360) &
+                (-90 <= frame['dec_deg']) & (frame['dec_deg'] <= 90))
+
+    frame = frame[valid_idx].reset_index(drop=True)
+
     # Just points from our sky map
-    candidates = coord.SkyCoord(ra=ras * u.degree, dec=decs * u.degree, unit="deg")
+    candidates = coord.SkyCoord(ra=frame['ra_deg'] * u.degree, dec=frame['dec_deg'] * u.degree, unit="deg")
     filtered_candidates = filter_candidates(candidates, max_len=required_num // 2)
     return filtered_candidates
 
@@ -532,6 +544,25 @@ def train_val_test_split():
 
     test = test.reset_index(drop=True)
     test.index.name = "idx"
+
+    train_counts = {
+      'is_cluster_1': train[train['is_cluster'] == 1].shape[0],
+      'source_rand': train[train['source'] == 'rand'].shape[0],
+      'source_sga': train[train['source'] == 'sga'].shape[0],
+      'is_cluster_0_rand': train[(train['is_cluster'] == 0) & (train['source'] == 'rand')].shape[0],
+      'is_cluster_0_stars': train[(train['is_cluster'] == 0) & (train['source'] != 'sga') & (train['source'] != 'rand')].shape[0],
+    }
+
+    test_counts = {
+        'is_cluster_1': test[test['is_cluster'] == 1].shape[0],
+        'source_rand': test[test['source'] == 'rand'].shape[0],
+        'source_sga': test[test['source'] == 'sga'].shape[0],
+        'is_cluster_0_rand': test[(test['is_cluster'] == 0) & (test['source'] == 'rand')].shape[0],
+        'is_cluster_0_stars': train[(train['is_cluster'] == 0) & (train['source'] != 'sga') & (train['source'] != 'rand')].shape[0],
+    }
+
+    print("Train Counts:", train_counts)
+    print("Test Counts:", test_counts)
 
     test_sample = datasets_collection.load_test_sample()
     bright_stars = datasets_collection.load_birght_stars()
