@@ -1,0 +1,80 @@
+galaxy.grabber
+==============
+
+.. py:module:: galaxy.grabber
+
+.. autoapi-nested-parse::
+
+   Script to fetch cutouts from the legacy survey
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   galaxy.grabber.Grabber
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   galaxy.grabber.download_url
+
+
+Module Contents
+---------------
+
+.. py:function:: download_url(url: str, outfile: str, max_attempts: int = 100)
+
+.. py:class:: Grabber(survey_layer: str | None = None, bands: str | None = None, imgsize_arcmin: float = 1.5, imgsize_pix: int = 224, extra_processing: Optional[Callable] = None, extra_processing_kwargs: Dict[Any, Any] = dict())
+
+   .. py:attribute:: survey_layer
+
+
+   .. py:attribute:: bands
+
+
+   .. py:attribute:: imgsize_arcmin
+
+
+   .. py:attribute:: imgsize_pix
+
+
+   .. py:attribute:: extra_processing
+
+
+   .. py:attribute:: extra_processing_kwargs
+
+
+   .. py:method:: make_url(ra, dec, s_arcmin=3, s_px=512, format='fits')
+
+
+   .. py:method:: grab_cutout(ra: float, dec: float, output_path: pathlib.Path)
+
+
+   .. py:method:: grab_cutouts(targets: pandas.DataFrame, name_col: str = 'name', ra_col: str = 'ra_deg', dec_col: str = 'dec_deg', output_dir: str = '', suffix: str = '', file_format: str = 'fits') -> None
+
+      Function to download image cutouts from any survey.
+      ​
+          Arguments:
+              target_file {str, pd.DataFrame} -- Input file or DataFrame containing the list of target
+                                              coordinates and names.
+      ​
+          Keyword Arguments:
+              name_col {str} -- The column name in target_file that contains the desired file name
+                              (default: {"Component_name"})
+              ra_col {str} -- RA column name (default: {"RA"})
+              dec_col {str} -- Dec column name (default: {"DEC"})
+              survey {str} -- Survey name to pass to the legacy server (default: {"vlass1.2"})
+              output_dir {str} -- Output path for the image cutouts (default: {""})
+              prefix {str} -- Prefix for the output filename (default {""})
+              suffix {str} -- Suffix for the output filename (default {survey})
+              imgsize_arcmin {float} -- Image angular size in arcminutes (default: {3.0})
+              imgsize_pix {int} -- Image size in pixels (default: {500})
+
+
+

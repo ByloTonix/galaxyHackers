@@ -2,20 +2,21 @@ SEED = 1
 BATCH_SIZE = 64
 
 WORKDIR = "./"
-
-
 MAP_ACT_ROUTE = "act_planck_dr5.01_s08s18_AA_f220_daynight_fullivar.fits"
 DR5_CLUSTERS_ROUTE = "DR5_cluster-catalog_v1.1.fits"
+ARCHIVE_DR5_URL = "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/"
+ACT_MCMF_URL = "https://vizier.cds.unistra.fr/viz-bin/nph-Cat/txt/J/A+A/690/A322/catalog"
+
 SGA_ROUTE = "SGA-2020.fits"
 ACT_MCMF_ROUTE = "act_mcmf_catalog.fits"
+SPT100_ROUTE = "sptpol100d_catalog_huang19.fits"
 
 MAP_ACT_FILENAME = "map_act.fits"
 DR5_CLUSTERS_FILENAME = "dr5.fits"
 SGA_FILENAME = "sga.fits"
+SPT100_FILENAME = "spt100.fits"
+TEST_SAMPLE_FILENAME = "test_sample.csv"
 ACT_MCMF_FILENAME = "act_mcmf.fits"
-
-ARCHIVE_DR5_URL = "https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr5/"
-ACT_MCMF_URL = "https://vizier.cds.unistra.fr/viz-bin/nph-Cat/txt/J/A+A/690/A322/catalog"
 
 [LEGACY_SURVEY]
 LAYER = "unwise-neo7"

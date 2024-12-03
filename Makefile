@@ -1,5 +1,5 @@
-FORMAT_DIRS=./
-LINTER_DIRS=./
+FORMAT_DIRS=galaxy
+LINTER_DIRS=galaxy
 TOML_FILES=poetry.lock pyproject.toml
 POETRY_EXEC=poetry
 PYTHON_EXEC=$(POETRY_EXEC) run python
@@ -56,3 +56,16 @@ pylint:
 .PHONY: prune_branches
 prune_branches:
 	git branch | grep -v "dev" | grep -v "master" | xargs git branch -D
+
+
+.PHONY: run
+run:
+	python -m galaxy.main
+
+
+.PHONY: build_docs
+build_docs:
+	poetry run make -C docs html
+	touch docs/_build/html/.nojekyll
+	cp docs/_build/html/.nojekyll docs/
+	cp -r docs/_build/html/* docs/
