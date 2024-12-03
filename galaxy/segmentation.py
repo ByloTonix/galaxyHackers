@@ -49,7 +49,7 @@ def predict_test(model: torch.nn.Module, optimizer_name):
     predictor = train.Predictor(model=model, device=device)
 
     dataloaders = data.train_val_test_split()
-    for part in [data.DataPart.TEST_DR5, data.DataPart.TEST_DR5, data.DataPart.GAIA]:
+    for part in [data.DataPart.TEST, data.DataPart.BRIGHT_STARS]:
 
         predictions = predictor.predict(dataloader=dataloaders[part])
 
@@ -59,15 +59,15 @@ def predict_test(model: torch.nn.Module, optimizer_name):
 class SampleName(str, Enum):
 
     CLUSTER_SMALL = "cluster_small"
-    RANDOM_SMALL = "random_small"
+    NEGATIVE_SMALL = "random_small"
     TYC2_SMALL = "tyc2_small"
     # MC_BIG = "mc_big"
-    CLUSTER_BIG = "dr5_big"
+    CLUSTER_BIG = "cluster_big"
 
 
 sample_sizes: dict = {
     SampleName.CLUSTER_SMALL: 10,
-    SampleName.RANDOM_SMALL: 5,
+    SampleName.NEGATIVE_SMALL: 5,
     SampleName.TYC2_SMALL: 5,
     SampleName.CLUSTER_BIG: 1,
     # SampleName.MC_BIG: 1,
@@ -87,7 +87,7 @@ plot_radius = {
 # Map type, Data part and target class for each sample
 sample_sources = {
     SampleName.CLUSTER_SMALL: (MapType.SMALL, data.DataPart.TEST, 1),
-    SampleName.RANDOM_SMALL: (MapType.SMALL, data.DataPart.TEST, 0),
+    SampleName.NEGATIVE_SMALL: (MapType.SMALL, data.DataPart.TEST, 0),
     SampleName.TYC2_SMALL: (MapType.SMALL, data.DataPart.BRIGHT_STARS, 0),  # use bright stars
     SampleName.CLUSTER_BIG: (MapType.BIG, data.DataPart.TEST, 1),
     # SampleName.MC_BIG: (MapType.BIG, data.DataPart.MC, 1),
