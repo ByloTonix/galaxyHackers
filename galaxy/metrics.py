@@ -237,8 +237,8 @@ def modelPerformance(
     predictions: pd.DataFrame,
     classes,
     #  num_epochs, # already mentioned in train_table_data and val_table_data
-    train_table_data,
-    val_table_data,
+    train_table_data=None,
+    val_table_data=None,
     f_beta=2,
 ):
     """
@@ -273,11 +273,12 @@ def modelPerformance(
     tn, fp, fn, tp = plot_confusion_matrices(pdf, predictions, classes)
     fpr_measure = fp / (fp + tn)
 
-    # change of loss throughout epochs
-    plot_loss_by_model(train_table_data, val_table_data, pdf)
+    if train_table_data is not None and val_table_data is not None:
+        # change of loss throughout epochs
+        plot_loss_by_model(train_table_data, val_table_data, pdf)
 
-    # change of accuracies througout epochs
-    plot_accuracies_by_model(train_table_data, val_table_data, pdf)
+        # change of accuracies througout epochs
+        plot_accuracies_by_model(train_table_data, val_table_data, pdf)
 
     # recall by red shift
     plot_red_shift(pdf, predictions)
