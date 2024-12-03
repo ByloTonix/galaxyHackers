@@ -2,7 +2,7 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 from typing import Any
-
+import gc
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,7 +13,7 @@ from scipy.signal import savgol_filter
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
-from tqdm import tqdm, trange
+import sys
 
 from galaxy.config import settings
 
@@ -45,6 +45,9 @@ class Trainer:
         self.val_dataloader = val_dataloader
         self.experiment = experiment
         self.batch_size = batch_size
+
+        self.train_table_data = []
+        self.val_table_data = []
 
         self.history = defaultdict(list)
 
@@ -111,17 +114,15 @@ class Trainer:
 
         best_loss = float("inf")  # +inf
 
-        for epoch in trange(
-            num_epochs,
-            unit="epoch",
-            leave=False,
-            desc=f"Training {model.__class__.__name__} with {optimizer.__class__.__name__} optimizer",
-        ):
+        for epoch in range(num_epochs):
+            print(f"\nTraining: Epoch {epoch + 1}/{num_epochs}")
 
+            torch.cuda.empty_cache()
+            gc.collect()
             model.train()
+            epoch_train_losses, epoch_train_accs = [], []
 
-            for batch in tqdm(self.train_dataloader, unit="batch", leave=False):
-
+            for batch_idx, batch in enumerate(self.train_dataloader, start=1):
                 *_, loss, acc = self.compute_all(batch)
 
                 optimizer.zero_grad()
@@ -134,47 +135,100 @@ class Trainer:
                     loss=loss.item(), acc=acc, mode="train", step=self.global_step
                 )
 
+                self.train_table_data.append(
+                    [self.global_step, loss.item(), acc]
+                )
+
+                epoch_train_losses.append(loss.item())
+                epoch_train_accs.append(acc)
+
                 self.global_step += 1
 
-            model.eval()
-            val_losses = []
-            val_accs = []
+                sys.stdout.write(
+                    f"\rBatch {batch_idx}/{len(self.train_dataloader)} | "
+                    f"Loss: {np.mean(epoch_train_losses):.4f} | "
+                    f"Accuracy: {np.mean(epoch_train_accs):.4f}"
+                )
+                sys.stdout.flush()
 
-            for batch in tqdm(self.val_dataloader):
-                *_, loss, acc = self.compute_all(batch)
-                val_losses.append(loss.item())
-                val_accs.append(acc)
+            print()
+
+            train_loss = np.mean(epoch_train_losses)
+            train_acc = np.mean(epoch_train_accs)
+
+            self.log_metrics(
+                loss=train_loss, acc=train_acc, mode="train", epoch=epoch + 1
+            )
+
+            print(f"Validation: Epoch {epoch + 1}/{num_epochs}")
+
+            model.eval()
+            val_losses, val_accs = [], []
+
+            with torch.no_grad():
+                for batch_idx, batch in enumerate(self.val_dataloader, start=1):
+                    *_, loss, acc = self.compute_all(batch)
+                    val_losses.append(loss.item())
+                    val_accs.append(acc)
+
+                    sys.stdout.write(
+                        f"\rBatch {batch_idx}/{len(self.train_dataloader)} | "
+                        f"Loss: {np.mean(epoch_train_losses):.4f} | "
+                        f"Accuracy: {np.mean(epoch_train_accs):.4f}"
+                    )
+                    sys.stdout.flush()
+
+            print()
 
             val_loss = np.mean(val_losses)
             val_acc = np.mean(val_accs)
             self.post_val_stage()
 
-            self.log_metrics(loss=val_loss, acc=val_acc, mode="val", epoch=epoch)
+            self.log_metrics(loss=val_loss, acc=val_acc, mode='val', epoch=epoch)
+
 
             if val_loss < best_loss:
                 self.save_checkpoint()
                 best_loss = val_loss
+                print(f"New best model saved with val_loss={val_loss:.4f}")
 
     def test(self, test_dataloader: DataLoader):
+        torch.cuda.empty_cache()
+        gc.collect()
 
         test_losses = []
         test_accs = []
 
-        y_pred, y_probs, y_true, descriptions = [], [], [], []
+        y_pred, y_probs, y_true, descriptions = (
+            [],
+            [],
+            [],
+            [],
+        )  # y_true - the real class of object in the dataset
         y_negative_target_probs = []
 
-        for batch in tqdm(test_dataloader):
+        print("Testing...")
+        with torch.no_grad():
+            for batch_idx, batch in enumerate(test_dataloader, start=1):
+                logits, outputs, labels, loss, acc = self.compute_all(batch)
 
-            logits, outputs, labels, loss, acc = self.compute_all(batch)
-            test_losses.append(loss.item())
-            test_accs.append(acc)
+                test_losses.append(loss.item())
+                test_accs.append(acc)
 
-            y_probs.extend(logits[:, 1].data.cpu().numpy().ravel())
-            y_negative_target_probs.extend(logits[:, 0].data.cpu().numpy().ravel())
-            y_pred.extend(outputs.data.cpu().numpy().ravel())
-            y_true.extend(labels.data.cpu().numpy().ravel())
+                y_probs.extend(logits[:, 1].data.cpu().numpy().ravel())
+                y_negative_target_probs.extend(logits[:, 0].data.cpu().numpy().ravel())
+                y_pred.extend(outputs.data.cpu().numpy().ravel())
+                y_true.extend(labels.data.cpu().numpy().ravel())
 
-            descriptions.append(pd.DataFrame(batch["description"]))
+                descriptions.append(pd.DataFrame(batch["description"]))
+
+                sys.stdout.write(
+                    f"\rBatch {batch_idx}/{len(test_dataloader)} | "
+                    f"Loss: {np.mean(test_losses):.4f} | "
+                    f"Accuracy: {np.mean(test_accs):.4f}"
+                )
+
+                sys.stdout.flush()
 
         predictions = pd.concat(descriptions).reset_index(drop=True)
         predictions["y_pred"] = y_pred
@@ -232,30 +286,41 @@ class Trainer:
         model, optimizer = self.model, self.optimizer
 
         model.train()
-        for lr, batch in tqdm(
-            zip(lrs, self.train_dataloader), desc="finding LR", total=num_lrs
-        ):
-            # apply new lr
+        print("Finding optimal learning rate...")
+        for idx, (lr, batch) in enumerate(zip(lrs, self.train_dataloader)):
+            if idx >= num_lrs:
+                break  # Stop after num_lrs steps
+
+            # Apply new lr
             for param_group in self.optimizer.param_groups:
                 param_group["lr"] = lr
 
-            # train step
+            # Train step
             *_, loss, _ = self.compute_all(batch)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
             loss = loss.cpu().detach().numpy()
-            # calculate smoothed loss
+
+            # Calculate smoothed loss
             if avg_loss is None:
                 avg_loss = loss
             else:
                 avg_loss = smooth_beta * avg_loss + (1 - smooth_beta) * loss
 
-            # store values into logs
+            # Store values into logs
             logs["lr"].append(lr)
             logs["avg_loss"].append(avg_loss)
             logs["loss"].append(loss)
+
+            # Print progress in one line
+            sys.stdout.write(
+                f"\rStep {idx + 1}/{num_lrs} | LR: {lr:.2E} | Loss: {loss:.4f} | Avg Loss: {avg_loss:.4f}"
+            )
+            sys.stdout.flush()
+
+        print("\nFinished finding learning rate.")
 
         # Compute the logarithm of learning rates
         log_lrs = np.log10(logs["lr"])
@@ -313,13 +378,23 @@ class Predictor:
 
         y_pred, y_prob, descriptions = [], [], []
 
-        for batch in tqdm(dataloader):
+        print("Predicting...")
+        with torch.no_grad():
+            for batch_idx, batch in enumerate(dataloader, start=1):
+                logits, outputs = self.compute_all(batch)
 
-            logits, outputs = self.compute_all(batch)
+                y_pred.extend(outputs.data.cpu().numpy().ravel())
+                y_prob.extend(logits[:, 1].data.cpu().numpy().ravel())
+                descriptions.append(pd.DataFrame(batch["description"]))
 
-            y_pred.extend(outputs.data.cpu().numpy().ravel())
-            y_prob.extend(logits[:, 1].data.cpu().numpy().ravel())
-            descriptions.append(pd.DataFrame(batch["description"]))
+                sys.stdout.write(
+                    f"\rBatch {batch_idx}/{len(dataloader)} | Predictions collected: {len(y_pred)}"
+                )
+                sys.stdout.flush()
+                torch.cuda.empty_cache()
+                gc.collect()
+
+        print("\nPrediction complete.")
 
         predictions = pd.DataFrame(
             np.array([np.array(y_pred), np.array(y_prob)]).T,

@@ -295,3 +295,34 @@ def read_test_sample():
     frame = inherit_columns(frame)
 
     return frame
+
+def read_act_mcmf():
+    """
+    Obtain Vizier ACT_MCMF Catalogue.
+    """
+    CATALOGUE = "J/A+A/690/A322/"
+
+    catalog_list = Vizier.find_catalogs(CATALOGUE)
+    Vizier.ROW_LIMIT = -1
+    catalogs = Vizier.get_catalogs(catalog_list.keys())
+
+    interesting_table: atpy.Table = catalogs[os.path.join(CATALOGUE, "catalog")]
+    mc_frame = interesting_table.to_pandas().reset_index(drop=True)
+
+    mc_frame = mc_frame.rename(
+        columns={"Name": "name", "RAJ2000": "ra_deg", "DEJ2000": "dec_deg"}
+    )
+
+    mc_frame["red_shift"] = np.where(
+        mc_frame["zsp1"].notna(),
+        mc_frame["zsp1"],
+        np.where(mc_frame["z1C"].notna(), mc_frame["z1C"], mc_frame["z2C"]),
+    )
+
+    mc_frame["red_shift_type"] = np.where(
+        mc_frame["zsp1"].notna(),
+        "spec",
+        np.where(mc_frame["z1C"].notna(), "z1C", "z2C"),
+    )
+
+    return mc_frame

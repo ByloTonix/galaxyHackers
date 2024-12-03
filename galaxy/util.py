@@ -21,9 +21,11 @@ class DataSource(str, Enum):
     SPT2500D = "spt2500d"
     SPTECS = "sptecs"
     SPT100 = "spt100"
+    ACT_MCMF = "act_mcmf"
 
     TEST_SAMPLE = "test_sample"
     RANDOM = "rand"
+
 
 
 class IsCluster(int, Enum):
@@ -55,7 +57,7 @@ def inherit_columns(frame: pd.DataFrame):
     return frame
 
 
-def read_vizier(catalogue):    
+def read_vizier(catalogue):
     catalog_list = Vizier.find_catalogs(catalogue)
     Vizier.ROW_LIMIT = -1
 

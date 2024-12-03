@@ -38,7 +38,6 @@ main_transforms = [
     transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD),
 ]
 
-
 class DataPart(str, Enum):
 
     TRAIN = "train"
@@ -124,6 +123,9 @@ class ClusterDataset(Dataset):
         self.description_df = pd.read_csv(
             description_csv_path, index_col=0, dtype={"target": int}
         )
+        if not os.path.exists(description_csv_path):
+            raise FileNotFoundError(f"Description file not found: {description_csv_path}")
+
 
         self.description_df.index = self.description_df.index.astype(str)
         self.description_df.loc[:, "red_shift"] = self.description_df[
@@ -175,7 +177,8 @@ def download_data():
     for config in [settings.MAP_ACT_CONFIG,
                    settings.DR5_CONFIG,
                    settings.SGA_CONFIG,
-                   settings.SPT100_CONFIG
+                   settings.SPT100_CONFIG,
+                   settings.ACT_MCMF_CONFIG,
                    ]:
 
         if not os.path.exists(config.OUTPUT_PATH):
@@ -211,6 +214,7 @@ def get_positive_class():
     spt2500d = collect_clusters.read_spt2500d()
     sptecs = collect_clusters.read_sptecs()
     spt100 = collect_clusters.read_spt100()
+    act_mcmf = collect_clusters.read_act_mcmf()
 
     clusters = pd.concat([
         dr5,
@@ -220,7 +224,8 @@ def get_positive_class():
         comprass,
         spt2500d,
         sptecs,
-        spt100
+        spt100,
+        act_mcmf,
         ], ignore_index=True)
 
     return clusters
@@ -341,7 +346,7 @@ datasets_collection = DatasetsInfo()
 """Generate object that are not present in any of currently included datasets"""
 
 
-def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord:
+def filter_candidates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord:
     clusters_catalog = get_cluster_catalog()
     non_clusters_catalog = get_non_cluster_catalog()
 
@@ -351,16 +356,16 @@ def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord
         unit="deg"
     )
 
-    _, d2d, _ = candidates.match_to_catalog_sky(catalog)
+    idx, d2d, _ = candidates.match_to_catalog_sky(catalog)
 
     MIN_ANGLE = 10
     MAX_ANGLE = 20
 
-    candidates_filter = (d2d.arcmin > MIN_ANGLE) & (
-        candidates.galactic.b.degree > MAX_ANGLE
+    valid_idx = (d2d.arcmin > MIN_ANGLE) & (-90 <= candidates.galactic.b.degree) & (
+        candidates.galactic.b.degree <= 90
     )
 
-    filtered_candidates = candidates[candidates_filter][:max_len]
+    filtered_candidates = candidates[valid_idx][:max_len]
 
     return filtered_candidates
 
@@ -377,7 +382,7 @@ def generate_random_candidates(len=7500) -> coord.SkyCoord:
 
     # Just points from our sky map
     candidates = coord.SkyCoord(ra=ras * u.degree, dec=decs * u.degree, unit="deg")
-    filtered_candidates = filter_candiates(candidates, max_len=required_num)
+    filtered_candidates = filter_candidates(candidates, max_len=required_num)
     return filtered_candidates
 
 def generate_random_based(required_num=7500) -> coord.SkyCoord:
@@ -386,13 +391,13 @@ def generate_random_based(required_num=7500) -> coord.SkyCoord:
     предлагается брать собранные датасеты, брать ra_deg и dec_deg, перемешивать в независимости друг от друга
     и затем в filter_candidates подавать len = required_num - len(<собранного из generate_random_candidates>)
 
-    ТЕХНИЧЕСКИЕ ШОКОЛАДКИ???
-/usr/local/lib/python3.10/dist-packages/astropy/coordinates/angles/core.py in _validate_angles(self, angles)
-    647                     f"<= 90 deg, got {angles.to(u.degree)}"
-    648                 )
---> 649             raise ValueError(
-    650                 "Latitude angle(s) must be within -90 deg <= angle "
-    651                 f"<= 90 deg, got {angles.min().to(u.degree)} <= "
+#     ТЕХНИЧЕСКИЕ ШОКОЛАДКИ???
+# /usr/local/lib/python3.10/dist-packages/astropy/coordinates/angles/core.py in _validate_angles(self, angles)
+#     647                     f"<= 90 deg, got {angles.to(u.degree)}"
+#     648                 )
+# --> 649             raise ValueError(
+#     650                 "Latitude angle(s) must be within -90 deg <= angle "
+#     651                 f"<= 90 deg, got {angles.min().to(u.degree)} <= "
 
 ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -100.8107 deg <= angle <= 106.2399 deg
     """
@@ -413,7 +418,7 @@ ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -10
 
     # Just points from our sky map
     candidates = coord.SkyCoord(ra=ras * u.degree, dec=decs * u.degree, unit="deg")
-    filtered_candidates = filter_candiates(candidates, max_len=required_num // 2)
+    filtered_candidates = filter_candidates(candidates, max_len=required_num // 2)
     return filtered_candidates
 
 
@@ -545,8 +550,11 @@ def create_dataloaders():
     custom_datasets = {}
     dataloaders = {}
     for part in list(DataPart):
+        if part == DataPart.MC:
+            continue
 
         cluster_dataset = ClusterDataset(
+            os.path.join(settings.DATA_PATH, part.value),
             os.path.join(settings.DESCRIPTION_PATH, f"{part.value}.csv"),
         )
 

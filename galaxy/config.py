@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-
 from dynaconf import Dynaconf
 
 
@@ -21,6 +20,7 @@ settings.DR5_CLUSTERS_PATH = Path(settings.DATA_PATH, settings.DR5_CLUSTERS_FILE
 settings.SGA_PATH = Path(settings.DATA_PATH, settings.SGA_FILENAME)
 settings.SPT100_PATH = Path(settings.DATA_PATH, settings.SPT100_FILENAME)
 settings.TEST_SAMPLE_PATH = Path(settings.WORKDIR, settings.TEST_SAMPLE_FILENAME)
+settings.ACT_MCMF_PATH = Path(settings.DATA_PATH, settings.ACT_MCMF_FILENAME)
 
 settings.SEGMENTATION_PATH = Path(settings.STORAGE_PATH, "segmentation/")
 settings.SEGMENTATION_SAMPLES_PATH = Path(settings.SEGMENTATION_PATH, "samples/")
@@ -68,6 +68,16 @@ settings.SPT100_CONFIG = {
     "URL": "https://lambda.gsfc.nasa.gov/data/suborbital/SPT/sptpol100/sptpol100d_catalog_huang19.fits",
     # "FALLBACK_URL" : 'https://lambda.gsfc.nasa.gov/data/suborbital/SPT/sptpol100/sptpol100d_catalog_huang19.fits',
     "OUTPUT_PATH": str(settings.SPT100_PATH),
+}
+
+settings.ACT_MCMF_CONFIG = {
+    "RENAME_DICT": {
+        "SOURCE": Path(settings.DATA_PATH, settings.ACT_MCMF_ROUTE),
+        "TARGET": Path(settings.ACT_MCMF_PATH),
+    },
+    "URL": "https://vizier.cds.unistra.fr/viz-bin/VizieR-3?-source=J/A+A/690/A322/catalog",
+    "FALLBACK_URL": "https://vizier.cds.unistra.fr/viz-bin/VizieR-3?-source=J/A+A/690/A322/catalog",
+    "OUTPUT_PATH": str(Path(settings.ACT_MCMF_PATH)),
 }
 
 

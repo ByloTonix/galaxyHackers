@@ -9,8 +9,6 @@ PYTHON_EXEC=$(POETRY_EXEC) run python
 help:  ## Показать это сообщение
 	@grep -E -h '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-
-
 .PHONY: install
 install:  ## Установить зависимости
 	poetry install --only main

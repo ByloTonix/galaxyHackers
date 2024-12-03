@@ -5,6 +5,7 @@ To create segmentation maps for randomly chosen clusters, random objects and sta
 To create a segmentation map with larger scale for a randomly chosen cluster use function saveBigSegMap()
 """
 
+import gc
 import os
 from enum import Enum
 from pathlib import Path
@@ -21,6 +22,11 @@ from torch.utils.data import DataLoader
 from galaxy import data, grabber, train
 from galaxy.config import settings
 
+def cleanup_memory(*args):
+    for var in args:
+        del var
+    torch.cuda.empty_cache()
+    gc.collect()
 
 def load_model(model: torch.nn.Module, optimizer_name, device):
 
