@@ -89,7 +89,7 @@ def shift_and_mirror_pad(image, shift_x, shift_y):
 
     return shifted_image
 
-# TODO: actually should apply shift_and_mirror_pad() to images to save time on ddos
+# TODO(попозже): actually should apply shift_and_mirror_pad() to images to save time on ddos
 # currently simply shifts coordinates
 class ShiftAndMirrorPadTransform:
     def __init__(self, max_shift_x: int = 20, max_shift_y: int = 20):
@@ -243,6 +243,42 @@ def get_cluster_catalog() -> coord.SkyCoord:
     return catalog
 
 
+def expanded_positive_class():
+    """
+    Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений 
+    немного шатаются => выборка увеличивается 
+    """
+    clusters = get_positive_class()
+
+    more_clusters = []
+
+    # initialized not for loop to avoid adressing __init__ each time and simply generates random shifts
+    transform_positive = ShiftAndMirrorPadTransform()
+
+    for _, row in clusters.iterrows():
+        for _ in range(2):  # +16130 новых картинок подтверждённых скоплений
+            transform_positive() 
+            new_ra, new_dec = transform_positive.apply_shift(row["ra_deg"], row["dec_deg"])
+            more_clusters.append({
+                "name": row["name"],
+                "ra_deg": new_ra,
+                "dec_deg": new_dec,
+                "red_shift": row["red_shift"], 
+                "red_shift_type": row["red_shift_type"],
+                "is_cluster": IsCluster.IS_CLUSTER.value,
+                "source": row["source"]
+            })
+
+    more_clusters_df = pd.DataFrame(more_clusters)
+
+    extended_clusters = pd.concat([
+        clusters, 
+        more_clusters_df,
+        ], ignore_index=True)
+
+    return extended_clusters
+
+
 def get_negative_class():
     sga = collect_not_clusters.read_sga()
     tyc2 = collect_not_clusters.read_tyc2()
@@ -279,7 +315,35 @@ def get_non_cluster_catalog() -> coord.SkyCoord:
     return catalog
 
 
-"""Для отбора участков неба, удалённых от объектов из собранных датасетов"""
+class DatasetsInfo:
+    def __init__(self):
+        self._clusters = None
+        self._expanded_clusters = None
+        self._non_clusters = None
+
+    def load_clusters(self):
+        if self._clusters is None:
+            self._clusters = get_positive_class()
+        return self._clusters
+    
+    def load_expanded_clusters(self):
+        if self._expanded_clusters is None:
+            self._expanded_clusters = expanded_positive_class()
+        return self._clusters
+
+    def load_non_clusters(self):
+        if self._non_clusters is None:
+            self._non_clusters = get_negative_class()
+        return self._non_clusters
+    
+datasets_collection = DatasetsInfo()
+# TODO: ЗАМЕНИТЬ все использования get_positive_class, expanded_positive_class, get_negative_class
+# на обращения к этому датасету, чтобы каждый раз не подгружать их - сэкономит время
+
+
+"""Generate object that are not present in any of currently included datasets"""
+
+
 def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord:
     clusters_catalog = get_cluster_catalog()
     non_clusters_catalog = get_non_cluster_catalog()
@@ -303,31 +367,11 @@ def filter_candiates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoord
 
     return filtered_candidates
 
-
-def generate_candidates_dr5() -> coord.SkyCoord:
-
-    # Needed only for reading metadata and map generation?
-    imap_98 = enmap.read_fits(settings.MAP_ACT_PATH)[0]
-
-    # Generating positions of every pixel of telescope's sky zone
-    positions = np.array(np.rad2deg(imap_98.posmap()))
-
-    ras, decs = positions[1].ravel(), positions[0].ravel()
-
-    # Shuffling candidates, imitating samples
-    np.random.seed(settings.SEED)
-    np.random.shuffle(ras)
-    np.random.shuffle(decs)
-
-    # Just points from our sky map
-    candidates = coord.SkyCoord(ra=ras * u.degree, dec=decs * u.degree, unit="deg")
-
-    return candidates
-
-
-def generate_candidates_mc() -> coord.SkyCoord:
-
-    n_sim = 10_000
+# TODO: ДОРАБОТАТЬ generate_random_sample
+def generate_random_candidates(len=7500) -> coord.SkyCoord:
+    """def to generate random fields using random coords - take as much objects as possible from here"""
+    n_sim = 20_000
+    required_num = 7500
 
     np.random.seed(settings.SEED)
 
@@ -336,48 +380,57 @@ def generate_candidates_mc() -> coord.SkyCoord:
 
     # Just points from our sky map
     candidates = coord.SkyCoord(ra=ras * u.degree, dec=decs * u.degree, unit="deg")
+    filtered_candidates = filter_candiates(candidates, max_len=required_num)
+    return filtered_candidates
 
-    return candidates
+def generate_random_based(len=7500) -> coord.SkyCoord:
+    """
+    опытным путём generate_random_candidates не даёт 7500 даже если n_sim выкрутить до 50к
+    предлагается брать собранные датасеты, брать ra_deg и dec_deg, перемешивать в независимости друг от друга
+    и затем в filter_candidates подавать len = required_num - len(<собранного из generate_random_candidates>)
+
+    ТЕХНИЧЕСКИЕ ШОКОЛАДКИ???
+/usr/local/lib/python3.10/dist-packages/astropy/coordinates/angles/core.py in _validate_angles(self, angles)
+    647                     f"<= 90 deg, got {angles.to(u.degree)}"
+    648                 )
+--> 649             raise ValueError(
+    650                 "Latitude angle(s) must be within -90 deg <= angle "
+    651                 f"<= 90 deg, got {angles.min().to(u.degree)} <= "
+
+ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -100.8107 deg <= angle <= 106.2399 deg
+    """
+    clusters = expanded_positive_class()
+    non_clusters = get_negative_class()
+    frame = pd.concat([
+        clusters, 
+        non_clusters,
+        ], ignore_index=True)
+    
+    ras = list(frame["ra_deg"])
+    decs = list(frame["dec_deg"])
+    
+    # Shuffling candidates, imitating samples
+    np.random.seed(settings.SEED)
+    np.random.shuffle(ras)
+    np.random.shuffle(decs)
+
+    # Just points from our sky map
+    candidates = coord.SkyCoord(ra=ras * u.degree, dec=decs * u.degree, unit="deg")
+    filtered_candidates = filter_candiates(candidates, max_len=required_num // 2)
+    return filtered_candidates
 
 
-def create_negative_class_dr5():
-    """Create sample from dr5 clsuter catalogue"""
+def generate_random_sample():
+    # for example: see def create_negative_class_dr5 and def create_negative_class_mc from last commit
 
-    dr5 = collect_clusters.read_dr5()
+    # 24195 - objects in extended positive class, 16700 - negative class from galaxies and stars
+    required_num = 7500
 
-    candidates = generate_candidates_dr5()
-
-    filtered_candidates = filter_candiates(candidates, max_len=len(dr5))
-    names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(
-                filtered_candidates.galactic.l.degree, 
-                filtered_candidates.galactic.b.degree
-                )
-            ]
-
-    frame = pd.DataFrame(
-        np.array([
-            names, 
-            filtered_candidates.ra.deg, 
-            filtered_candidates.dec.deg]).T,
-        columns=["name", "ra_deg", "dec_deg"],
-    )
-
-    frame["source"] = DataSource.RANDOM.value
-    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
-
-    frame = inherit_columns(frame)
-
-    return frame
+    filtered_candidates1 = generate_random_candidates(required_num)
+    filtered_candidates2 = generate_random_based(required_num - len(filtered_candidates1)) #len might not work
+    # concat them
 
 
-def create_negative_class_mc():
-    """Create sample of negative class to compensate MadCows catalogue"""
-
-    mc =  collect_clusters.read_mc()
-
-    candidates = generate_candidates_mc()
-
-    filtered_candidates = filter_candiates(candidates, max_len=len(mc))
     names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(
             filtered_candidates.galactic.l.degree, 
             filtered_candidates.galactic.b.degree
@@ -402,49 +455,16 @@ def create_negative_class_mc():
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
 
-def expanded_positive_class():
-    """
-    Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений 
-    немного шатаются => выборка увеличивается 
-    """
-    clusters = get_positive_class()
-
-    more_clusters = []
-
-    # initialized not in the function to avoid adressing __init__ each time and simply generates random shifts
-    transform_positive = ShiftAndMirrorPadTransform()
-
-    for _, row in clusters.iterrows():
-        for _ in range(2):  # 16130 новых картинок подтверждённых скоплений
-            transform_positive() 
-            new_ra, new_dec = transform_positive.apply_shift(row["ra_deg"], row["dec_deg"])
-            more_clusters.append({
-                "name": row["name"],
-                "ra_deg": new_ra,
-                "dec_deg": new_dec,
-                "red_shift": row["red_shift"], 
-                "red_shift_type": row["red_shift_type"],
-                "is_cluster": IsCluster.IS_CLUSTER.value,
-                "source": row["source"]
-            })
-
-    more_clusters_df = pd.DataFrame(more_clusters)
-
-    extended_clusters = pd.concat([
-        clusters, 
-        more_clusters_df,
-        ], ignore_index=True)
-
-    return extended_clusters
-
 # MadCows пока что при обучении моделей не использовать, не забыть вывести вероятности для test_sample при тесте
 def train_val_test_split():
     clusters = expanded_positive_class()
     non_clusters = get_negative_class()
+    random = generate_random_sample()
 
     frame = pd.concat([
         clusters, 
         non_clusters,
+        random
         ], ignore_index=True)
     
     frame = frame.sample(frac=1).reset_index(drop=True)
