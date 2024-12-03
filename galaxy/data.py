@@ -178,7 +178,6 @@ def download_data():
                    settings.DR5_CONFIG,
                    settings.SGA_CONFIG,
                    settings.SPT100_CONFIG,
-                   settings.ACT_MCMF_CONFIG,
                    ]:
 
         if not os.path.exists(config.OUTPUT_PATH):
