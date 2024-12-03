@@ -289,8 +289,6 @@ def read_test_sample():
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
 
-    frame["red_shift_type"] = "phot"
-
     frame["source"] = DataSource.TEST_SAMPLE.value
     frame["is_cluster"] = IsCluster.IS_CLUSTER.value
 

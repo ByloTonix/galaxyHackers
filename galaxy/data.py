@@ -44,7 +44,7 @@ class DataPart(str, Enum):
     TRAIN = "train"
     VALIDATE = "validate"
     TEST = "test"
-    MC = "mc"
+    # MC = "mc"
     TEST_SAMPLE = "test_sample"
 
 # class SurveyLayer(str, Enum):
@@ -89,16 +89,31 @@ def shift_and_mirror_pad(image, shift_x, shift_y):
 
     return shifted_image
 
+# TODO: actually should apply shift_and_mirror_pad() to images to save time on ddos
+# currently simply shifts coordinates
 class ShiftAndMirrorPadTransform:
     def __init__(self, max_shift_x: int = 20, max_shift_y: int = 20):
         self.max_shift_x = max_shift_x
         self.max_shift_y = max_shift_y
 
-    def __call__(self, image):
+        self.shift_x = 0
+        self.shift_y = 0
+
+    def __call__(self):
         # Random shift values within the specified range
-        shift_x = torch.randint(-self.max_shift_x, self.max_shift_x + 1, (1,)).item()
-        shift_y = torch.randint(-self.max_shift_y, self.max_shift_y + 1, (1,)).item()
-        return shift_and_mirror_pad(image, shift_x, shift_y)
+        self.shift_x = torch.randint(-self.max_shift_x, self.max_shift_x + 1, (1,)).item()
+        self.shift_y = torch.randint(-self.max_shift_y, self.max_shift_y + 1, (1,)).item()
+
+    def apply_shift(self, ra_deg, dec_deg):
+        ra_deg += self.shift_x
+        dec_deg += self.shift_y
+        return ra_deg, dec_deg
+
+    # def __call__(self, image):
+    #     shift_x = torch.randint(-self.max_shift_x, self.max_shift_x + 1, (1,)).item()
+    #     shift_y = torch.randint(-self.max_shift_y, self.max_shift_y + 1, (1,)).item()
+    #     return shift_and_mirror_pad(image, shift_x, shift_y)
+
 
 
 class ClusterDataset(Dataset):
@@ -387,21 +402,22 @@ def create_negative_class_mc():
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
 
-# TODO: после дудоса
-def expand_positive_class():
+def expanded_positive_class():
     """
     Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений 
     немного шатаются => выборка увеличивается 
     """
     clusters = get_positive_class()
 
-    transform = ShiftAndMirrorPadTransform()
-
     more_clusters = []
 
+    # initialized not in the function to avoid adressing __init__ each time and simply generates random shifts
+    transform_positive = ShiftAndMirrorPadTransform()
+
     for _, row in clusters.iterrows():
-        for _ in range(5):  
-            new_ra, new_dec = transform(row["ra_deg"], row["dec_deg"])
+        for _ in range(2):  # 16130 новых картинок подтверждённых скоплений
+            transform_positive() 
+            new_ra, new_dec = transform_positive.apply_shift(row["ra_deg"], row["dec_deg"])
             more_clusters.append({
                 "name": row["name"],
                 "ra_deg": new_ra,
@@ -419,45 +435,42 @@ def expand_positive_class():
         more_clusters_df,
         ], ignore_index=True)
 
-    print(extended_clusters)
+    return extended_clusters
 
-
-# TODO: свалить всё в один датасет, перемешать и нарезать train/val/test в соотношении 60/20/20
 # MadCows пока что при обучении моделей не использовать, не забыть вывести вероятности для test_sample при тесте
-
 def train_val_test_split():
-    clusters = get_positive_class()
+    clusters = expanded_positive_class()
     non_clusters = get_negative_class()
+
+    frame = pd.concat([
+        clusters, 
+        non_clusters,
+        ], ignore_index=True)
     
-
-
-
-
-
-
-
+    frame = frame.sample(frac=1).reset_index(drop=True)
+    # print(frame)
+    
     for part in list(DataPart):
         path = os.path.join(settings.DATA_PATH, part.value)
         os.makedirs(path, exist_ok=True)
 
-    train, validate, test_dr5 = np.split(
-        dr5, [int(0.6 * len(dr5)), int(0.8 * len(dr5))]
+    train, validate, test = np.split(
+        frame, [int(0.6 * len(frame)), int(0.8 * len(frame))]
     )
 
     validate = validate.reset_index(drop=True)
     validate.index.name = "idx"
 
-    test_dr5 = test_dr5.reset_index(drop=True)
-    test_dr5.index.name = "idx"
+    test = test.reset_index(drop=True)
+    test.index.name = "idx"
 
-    gaia = create_data_gaia()
+    test_sample = collect_clusters.read_test_sample()
 
     pairs = [
         (DataPart.TRAIN, train),
         (DataPart.VALIDATE, validate),
-        (DataPart.TEST, test_dr5),
-        (DataPart.MC, test_mc),
-        (DataPart.GAIA, gaia),
+        (DataPart.TEST, test),
+        (DataPart.TEST_SAMPLE, test_sample)
     ]
 
     return dict(pairs)
