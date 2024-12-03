@@ -79,10 +79,10 @@ plot_radius = {
 }
 
 # Map type, Data part and target class for each sample
-sample_soures = {
+sample_sources = {
     SampleName.CLUSTER_SMALL: (MapType.SMALL, data.DataPart.TEST, 1),
     SampleName.RANDOM_SMALL: (MapType.SMALL, data.DataPart.TEST, 0),
-    SampleName.GAIA_SMALL: (MapType.SMALL, data.DataPart.GAIA, 0),
+    SampleName.GAIA_SMALL: (MapType.SMALL, data.DataPart.TEST, 0),  # use non-clusters
     SampleName.DR5_BIG: (MapType.BIG, data.DataPart.TEST, 1),
     SampleName.MC_BIG: (MapType.BIG, data.DataPart.MC, 1),
 }
@@ -91,7 +91,7 @@ sample_soures = {
 def create_sample(sample_name, predictor: train.Predictor):
 
     sample_size = sample_sizes[sample_name]
-    map_type, source, target_class = sample_soures[sample_name]
+    map_type, source, target_class = sample_sources[sample_name]
 
     description = pd.read_csv(
         Path(settings.DESCRIPTION_PATH, f"{source.value}.csv"), index_col=0

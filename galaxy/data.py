@@ -44,7 +44,7 @@ class DataPart(str, Enum):
     TRAIN = "train"
     VALIDATE = "validate"
     TEST = "test"
-    # MC = "mc"
+    MC = "mc"
     TEST_SAMPLE = "test_sample"
 
 # class SurveyLayer(str, Enum):
@@ -172,8 +172,8 @@ class ClusterDataset(Dataset):
 
 def download_data():
 
-    for config in [settings.MAP_ACT_CONFIG, 
-                   settings.DR5_CONFIG, 
+    for config in [settings.MAP_ACT_CONFIG,
+                   settings.DR5_CONFIG,
                    settings.SGA_CONFIG,
                    settings.SPT100_CONFIG
                    ]:
@@ -197,7 +197,7 @@ def download_data():
 
 
 
-# 
+#
 
 
 """Combining datasets"""
@@ -213,7 +213,7 @@ def get_positive_class():
     spt100 = collect_clusters.read_spt100()
 
     clusters = pd.concat([
-        dr5, 
+        dr5,
         upc_sz,
         spt_sz,
         pszspt,
@@ -227,7 +227,7 @@ def get_positive_class():
 
 
 def get_cluster_catalog() -> coord.SkyCoord:
-    clusters = get_positive_class()
+    clusters = datasets_collection.load_clusters()
     test_sample = collect_clusters.read_test_sample()
 
     clusters = pd.concat([
@@ -245,10 +245,10 @@ def get_cluster_catalog() -> coord.SkyCoord:
 
 def expanded_positive_class():
     """
-    Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений 
-    немного шатаются => выборка увеличивается 
+    Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений
+    немного шатаются => выборка увеличивается
     """
-    clusters = get_positive_class()
+    clusters = datasets_collection.load_clusters()
 
     more_clusters = []
 
@@ -257,13 +257,13 @@ def expanded_positive_class():
 
     for _, row in clusters.iterrows():
         for _ in range(2):  # +16130 новых картинок подтверждённых скоплений
-            transform_positive() 
+            transform_positive()
             new_ra, new_dec = transform_positive.apply_shift(row["ra_deg"], row["dec_deg"])
             more_clusters.append({
                 "name": row["name"],
                 "ra_deg": new_ra,
                 "dec_deg": new_dec,
-                "red_shift": row["red_shift"], 
+                "red_shift": row["red_shift"],
                 "red_shift_type": row["red_shift_type"],
                 "is_cluster": IsCluster.IS_CLUSTER.value,
                 "source": row["source"]
@@ -272,7 +272,7 @@ def expanded_positive_class():
     more_clusters_df = pd.DataFrame(more_clusters)
 
     extended_clusters = pd.concat([
-        clusters, 
+        clusters,
         more_clusters_df,
         ], ignore_index=True)
 
@@ -291,11 +291,11 @@ def get_negative_class():
           errors='ignore'
           )
     tyc2 = tyc2.drop(
-        columns=[col for col in columns_to_drop if col in tyc2.columns], 
+        columns=[col for col in columns_to_drop if col in tyc2.columns],
         errors='ignore'
         )
     gaia = gaia.drop(
-        columns=[col for col in columns_to_drop if col in gaia.columns], 
+        columns=[col for col in columns_to_drop if col in gaia.columns],
         errors='ignore'
         )
 
@@ -305,7 +305,7 @@ def get_negative_class():
 
 
 def get_non_cluster_catalog() -> coord.SkyCoord:
-    non_clusters = get_negative_class()
+    non_clusters = datasets_collection.load_non_clusters()
 
     # The catalog of known found galaxies
     catalog = coord.SkyCoord(
@@ -325,7 +325,7 @@ class DatasetsInfo:
         if self._clusters is None:
             self._clusters = get_positive_class()
         return self._clusters
-    
+
     def load_expanded_clusters(self):
         if self._expanded_clusters is None:
             self._expanded_clusters = expanded_positive_class()
@@ -335,11 +335,8 @@ class DatasetsInfo:
         if self._non_clusters is None:
             self._non_clusters = get_negative_class()
         return self._non_clusters
-    
-datasets_collection = DatasetsInfo()
-# TODO: ЗАМЕНИТЬ все использования get_positive_class, expanded_positive_class, get_negative_class
-# на обращения к этому датасету, чтобы каждый раз не подгружать их - сэкономит время
 
+datasets_collection = DatasetsInfo()
 
 """Generate object that are not present in any of currently included datasets"""
 
@@ -383,7 +380,7 @@ def generate_random_candidates(len=7500) -> coord.SkyCoord:
     filtered_candidates = filter_candiates(candidates, max_len=required_num)
     return filtered_candidates
 
-def generate_random_based(len=7500) -> coord.SkyCoord:
+def generate_random_based(required_num=7500) -> coord.SkyCoord:
     """
     опытным путём generate_random_candidates не даёт 7500 даже если n_sim выкрутить до 50к
     предлагается брать собранные датасеты, брать ra_deg и dec_deg, перемешивать в независимости друг от друга
@@ -399,16 +396,16 @@ def generate_random_based(len=7500) -> coord.SkyCoord:
 
 ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -100.8107 deg <= angle <= 106.2399 deg
     """
-    clusters = expanded_positive_class()
-    non_clusters = get_negative_class()
+    clusters = datasets_collection.load_expanded_clusters()
+    non_clusters = datasets_collection.load_non_clusters()
     frame = pd.concat([
-        clusters, 
+        clusters,
         non_clusters,
         ], ignore_index=True)
-    
-    ras = list(frame["ra_deg"])
-    decs = list(frame["dec_deg"])
-    
+
+    ras = frame["ra_deg"].tolist()
+    decs = frame["dec_deg"].tolist()
+
     # Shuffling candidates, imitating samples
     np.random.seed(settings.SEED)
     np.random.shuffle(ras)
@@ -421,55 +418,68 @@ ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -10
 
 
 def generate_random_sample():
+    """
+    Combines `generate_random_candidates` and `generate_random_based` to ensure
+    the required number of random candidates is generated.
+    """
     # for example: see def create_negative_class_dr5 and def create_negative_class_mc from last commit
 
     # 24195 - objects in extended positive class, 16700 - negative class from galaxies and stars
     required_num = 7500
 
     filtered_candidates1 = generate_random_candidates(required_num)
-    filtered_candidates2 = generate_random_based(required_num - len(filtered_candidates1)) #len might not work
-    # concat them
-
+    filtered_candidates2 = generate_random_based(required_num - len(filtered_candidates1))
+    filtered_candidates = coord.SkyCoord(
+        ra=np.concatenate([filtered_candidates1.ra, filtered_candidates2.ra]),
+        dec=np.concatenate([filtered_candidates1.dec, filtered_candidates2.dec]),
+        unit="deg"
+    )
 
     names = [f"Rand {l:.3f}{b:+.3f}" for l, b in zip(
-            filtered_candidates.galactic.l.degree, 
+            filtered_candidates.galactic.l.degree,
             filtered_candidates.galactic.b.degree
             )
         ]
 
-    frame = pd.DataFrame(
-        np.array([
-            names, 
-            filtered_candidates.ra.deg, 
-            filtered_candidates.dec.deg]).T,
-        columns=["name", "ra_deg", "dec_deg"],
-    )
+    # frame = pd.DataFrame(
+    #     np.array([
+    #         names,
+    #         filtered_candidates.ra.deg,
+    #         filtered_candidates.dec.deg]).T,
+    #     columns=["name", "ra_deg", "dec_deg"],
+    # )
 
-    frame["source"] = DataSource.RANDOM.value
-    frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
+    # frame["source"] = DataSource.RANDOM.value
+    # frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
 
-    frame = inherit_columns(frame)
+    frame = pd.DataFrame({
+        "name": names,
+        "ra_deg": filtered_candidates.ra.deg,
+        "dec_deg": filtered_candidates.dec.deg,
+        "source": DataSource.RANDOM.value,
+        "is_cluster": IsCluster.NOT_CLUSTER.value
+    })
 
-    return frame
+    return inherit_columns(frame)
 
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
 
 # MadCows пока что при обучении моделей не использовать, не забыть вывести вероятности для test_sample при тесте
 def train_val_test_split():
-    clusters = expanded_positive_class()
-    non_clusters = get_negative_class()
+    clusters = datasets_collection.load_expanded_clusters()
+    non_clusters = datasets_collection.load_non_clusters()
     random = generate_random_sample()
 
     frame = pd.concat([
-        clusters, 
+        clusters,
         non_clusters,
         random
         ], ignore_index=True)
-    
+
     frame = frame.sample(frac=1).reset_index(drop=True)
     # print(frame)
-    
+
     for part in list(DataPart):
         path = os.path.join(settings.DATA_PATH, part.value)
         os.makedirs(path, exist_ok=True)

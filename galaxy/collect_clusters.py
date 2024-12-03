@@ -31,7 +31,7 @@ def read_dr5():
     frame = table.to_pandas().reset_index(drop=True)
 
     frame["name"] = frame["name"].astype(str)
-
+    frame["redshiftType"] = frame["redshiftType"].astype(str)
     frame = frame.rename(
         columns={
             "RADeg": "ra_deg",
@@ -124,7 +124,7 @@ def read_spt_sz():
                           "z": "red_shift",
                           "f_z": "red_shift_type"}
                   )
-    
+
     frame = frame[frame["red_shift"].notna() & frame["n_z"].str.contains(r'\+', na=False)]
     frame["red_shift_type"] = "spec"
 
@@ -147,7 +147,7 @@ def read_pszspt():
                             "DEJ2000": "dec_deg",
                             "z": "red_shift"}
                     )
-    
+
     frame = frame[frame["red_shift"].notna()]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
@@ -238,7 +238,7 @@ def read_sptecs():
     frame_certified = collect_sptecs("J/ApJS/247/25/table10")
     frame_candidates = collect_sptecs("J/ApJS/247/25/cand")
 
-    frame = pd.concat([frame_certified, 
+    frame = pd.concat([frame_certified,
                        frame_candidates])
     return frame
 
@@ -250,9 +250,9 @@ def read_spt100():
 
     frame = frame.rename(
         columns={
-            "SPT_ID": "name", 
-            "RA": "ra_deg", 
-            "Dec": "dec_deg", 
+            "SPT_ID": "name",
+            "RA": "ra_deg",
+            "Dec": "dec_deg",
             "redshift": "red_shift"
             }
     )
