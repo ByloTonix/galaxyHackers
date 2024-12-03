@@ -44,6 +44,7 @@ class DataPart(str, Enum):
     VALIDATE = "validate"
     TEST = "test"
     MC = "mc"
+    BRIGHT_STARS = "bright_stars"
     TEST_SAMPLE = "test_sample"
 
 # class SurveyLayer(str, Enum):
@@ -285,7 +286,6 @@ def expanded_positive_class():
 
 def get_negative_class():
     sga = collect_not_clusters.read_sga()
-    tyc2 = collect_not_clusters.read_tyc2()
     gaia = collect_not_clusters.read_gaia()
 
 # drop columns "red_shift" and "red_shift_type", as tables with NaN columns cannot be concatenated properly(?)
@@ -294,16 +294,12 @@ def get_negative_class():
         columns=[col for col in columns_to_drop if col in sga.columns],
           errors='ignore'
           )
-    tyc2 = tyc2.drop(
-        columns=[col for col in columns_to_drop if col in tyc2.columns],
-        errors='ignore'
-        )
     gaia = gaia.drop(
         columns=[col for col in columns_to_drop if col in gaia.columns],
         errors='ignore'
         )
 
-    negative_class = pd.concat([sga, tyc2, gaia], axis=0, ignore_index=True)
+    negative_class = pd.concat([sga, gaia], axis=0, ignore_index=True)
     negative_class = inherit_columns(negative_class)
     return negative_class
 
@@ -319,11 +315,19 @@ def get_non_cluster_catalog() -> coord.SkyCoord:
     return catalog
 
 
+def update_bright_stars(bright_stars):
+    if bright_stars is None:
+        bright_stars = collect_not_clusters.read_tyc2()
+    return bright_stars
+
+
 class DatasetsInfo:
     def __init__(self):
         self._clusters = None
         self._expanded_clusters = None
+        self._bright_stars = None
         self._non_clusters = None
+        self._test_sample = None
 
     def load_clusters(self):
         if self._clusters is None:
@@ -334,10 +338,41 @@ class DatasetsInfo:
         if self._expanded_clusters is None:
             self._expanded_clusters = expanded_positive_class()
         return self._clusters
+    
+    def load_test_sample(self):
+        if self._test_sample is None:
+            self._test_sample = collect_clusters.read_test_sample()
+        return self._test_sample
+    
+    # done separately for segmentation
+    def load_birght_stars(self):
+        return update_bright_stars(self._bright_stars)
 
     def load_non_clusters(self):
         if self._non_clusters is None:
             self._non_clusters = get_negative_class()
+        
+            self._bright_stars = update_bright_stars(self._bright_stars)
+            
+            # drop columns "red_shift" and "red_shift_type", as tables with NaN columns cannot be concatenated properly(?)
+            columns_to_drop = ["red_shift", "red_shift_type"]
+
+            self._bright_stars = self._bright_stars.drop(
+                columns=[col for col in columns_to_drop if col in self._bright_stars.columns],
+                errors='ignore'
+                )
+            self._non_clusters = self._non_clusters.drop(
+                columns=[col for col in columns_to_drop if col in self._non_clusters.columns],
+                errors='ignore'
+                )
+            
+            self._non_clusters = pd.concat([
+                self._bright_stars,
+                self._non_clusters
+                ], ignore_index=True)
+            
+            self._non_clusters = inherit_columns(self._non_clusters)
+        
         return self._non_clusters
 
 datasets_collection = DatasetsInfo()
@@ -498,13 +533,15 @@ def train_val_test_split():
     test = test.reset_index(drop=True)
     test.index.name = "idx"
 
-    test_sample = collect_clusters.read_test_sample()
+    test_sample = datasets_collection.load_test_sample()
+    bright_stars = datasets_collection.load_birght_stars()
 
     pairs = [
         (DataPart.TRAIN, train),
         (DataPart.VALIDATE, validate),
         (DataPart.TEST, test),
         (DataPart.TEST_SAMPLE, test_sample)
+        (DataPart.BRIGHT_STARS, bright_stars)
     ]
 
     return dict(pairs)

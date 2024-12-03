@@ -60,17 +60,17 @@ class SampleName(str, Enum):
 
     CLUSTER_SMALL = "cluster_small"
     RANDOM_SMALL = "random_small"
-    GAIA_SMALL = "gaia_small"
-    MC_BIG = "mc_big"
-    DR5_BIG = "dr5_big"
+    TYC2_SMALL = "tyc2_small"
+    # MC_BIG = "mc_big"
+    CLUSTER_BIG = "dr5_big"
 
 
 sample_sizes: dict = {
     SampleName.CLUSTER_SMALL: 10,
     SampleName.RANDOM_SMALL: 5,
-    SampleName.GAIA_SMALL: 5,
-    SampleName.DR5_BIG: 1,
-    SampleName.MC_BIG: 1,
+    SampleName.TYC2_SMALL: 5,
+    SampleName.CLUSTER_BIG: 1,
+    # SampleName.MC_BIG: 1,
 }
 
 
@@ -88,9 +88,9 @@ plot_radius = {
 sample_sources = {
     SampleName.CLUSTER_SMALL: (MapType.SMALL, data.DataPart.TEST, 1),
     SampleName.RANDOM_SMALL: (MapType.SMALL, data.DataPart.TEST, 0),
-    SampleName.GAIA_SMALL: (MapType.SMALL, data.DataPart.TEST, 0),  # use non-clusters
-    SampleName.DR5_BIG: (MapType.BIG, data.DataPart.TEST, 1),
-    SampleName.MC_BIG: (MapType.BIG, data.DataPart.MC, 1),
+    SampleName.TYC2_SMALL: (MapType.SMALL, data.DataPart.BRIGHT_STARS, 0),  # use bright stars
+    SampleName.CLUSTER_BIG: (MapType.BIG, data.DataPart.TEST, 1),
+    # SampleName.MC_BIG: (MapType.BIG, data.DataPart.MC, 1),
 }
 
 
