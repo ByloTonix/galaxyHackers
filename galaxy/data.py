@@ -270,7 +270,7 @@ def expanded_positive_class():
                 "dec_deg": new_dec,
                 "red_shift": row["red_shift"],
                 "red_shift_type": row["red_shift_type"],
-                "is_cluster": IsCluster.IS_CLUSTER.value,
+                "target": IsCluster.IS_CLUSTER.value,
                 "source": row["source"]
             })
 
@@ -501,14 +501,14 @@ def generate_random_sample():
     # )
 
     # frame["source"] = DataSource.RANDOM.value
-    # frame["is_cluster"] = IsCluster.NOT_CLUSTER.value
+    # frame["target"] = IsCluster.NOT_CLUSTER.value
 
     frame = pd.DataFrame({
         "name": names,
         "ra_deg": filtered_candidates.ra.deg,
         "dec_deg": filtered_candidates.dec.deg,
         "source": DataSource.RANDOM.value,
-        "is_cluster": IsCluster.NOT_CLUSTER.value
+        "target": IsCluster.NOT_CLUSTER.value
     })
 
     return inherit_columns(frame)
@@ -546,19 +546,17 @@ def train_val_test_split():
     test.index.name = "idx"
 
     train_counts = {
-      'is_cluster_1': train[train['is_cluster'] == 1].shape[0],
+      'is_cluster_1': train[train['target'] == 1].shape[0],
       'source_rand': train[train['source'] == 'rand'].shape[0],
       'source_sga': train[train['source'] == 'sga'].shape[0],
-      'is_cluster_0_rand': train[(train['is_cluster'] == 0) & (train['source'] == 'rand')].shape[0],
-      'is_cluster_0_stars': train[(train['is_cluster'] == 0) & (train['source'] != 'sga') & (train['source'] != 'rand')].shape[0],
+      'is_cluster_0_stars': train[(train['target'] == 0) & (train['source'] != 'sga') & (train['source'] != 'rand')].shape[0],
     }
 
     test_counts = {
-        'is_cluster_1': test[test['is_cluster'] == 1].shape[0],
+        'is_cluster_1': test[test['target'] == 1].shape[0],
         'source_rand': test[test['source'] == 'rand'].shape[0],
         'source_sga': test[test['source'] == 'sga'].shape[0],
-        'is_cluster_0_rand': test[(test['is_cluster'] == 0) & (test['source'] == 'rand')].shape[0],
-        'is_cluster_0_stars': train[(train['is_cluster'] == 0) & (train['source'] != 'sga') & (train['source'] != 'rand')].shape[0],
+        'is_cluster_0_stars': train[(train['target'] == 0) & (train['source'] != 'sga') & (train['source'] != 'rand')].shape[0],
     }
 
     print("Train Counts:", train_counts)

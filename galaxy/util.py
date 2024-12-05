@@ -34,7 +34,7 @@ class IsCluster(int, Enum):
     NOT_CLUSTER = 0
 
 
-required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source", "is_cluster"])
+required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source", "target"])
 optional_columns = set(["red_shift", "red_shift_type"])
 
 

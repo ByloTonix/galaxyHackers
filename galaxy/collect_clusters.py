@@ -43,7 +43,7 @@ def read_dr5():
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     frame['source'] = DataSource.DR5.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
     return frame
@@ -82,7 +82,7 @@ def read_mc():
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
 
     frame['source'] = DataSource.MC.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -107,7 +107,7 @@ def read_upc_sz():
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
 
     frame["source"] = DataSource.UPC_SZ.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -131,7 +131,7 @@ def read_spt_sz():
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     frame["source"] = DataSource.SPT_SZ.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -156,7 +156,7 @@ def read_pszspt():
     frame["red_shift_type"] = "phot"
 
     frame["source"] = DataSource.PSZSPT.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -181,7 +181,7 @@ def read_comprass():
     frame["red_shift_type"] = "phot"
 
     frame["source"] = DataSource.CCOMPRASS.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -204,7 +204,7 @@ def read_spt2500d():
 
     frame["red_shift_type"] = "spec"
     frame["source"] = DataSource.SPT2500D.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -227,7 +227,7 @@ def collect_sptecs(catalogue):
     frame["red_shift_type"] = "phot"
 
     frame["source"] = DataSource.SPTECS.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -265,7 +265,7 @@ def read_spt100():
     frame["red_shift_type"] = "spec"
 
     frame["source"] = DataSource.SPT100.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -290,7 +290,7 @@ def read_test_sample():
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
 
     frame["source"] = DataSource.TEST_SAMPLE.value
-    frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -327,7 +327,7 @@ def read_act_mcmf():
 
     mc_frame = mc_frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     mc_frame["source"] = DataSource.ACT_MCMF.value
-    mc_frame["is_cluster"] = IsCluster.IS_CLUSTER.value
+    mc_frame["target"] = IsCluster.IS_CLUSTER.value
     mc_frame = inherit_columns(mc_frame)
 
     return mc_frame
