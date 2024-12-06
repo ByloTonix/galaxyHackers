@@ -93,7 +93,7 @@ def plot_red_shift(pdf, predictions: pd.DataFrame):
     n_bins = 10
     # Create 10 equal-sized buckets based on red_shift
     red_shift_predictions["bucket"] = pd.qcut(
-        red_shift_predictions["red_shift"], n_bins
+        red_shift_predictions["red_shift"], n_bins, duplicates='drop'
     )
 
     # Calculate recall for each bin

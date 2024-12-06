@@ -127,13 +127,14 @@ class ClusterDataset(Dataset):
         if not os.path.exists(description_csv_path):
             raise FileNotFoundError(f"Description file not found: {description_csv_path}")
 
-
         self.description_df.index = self.description_df.index.astype(str)
-        self.description_df.loc[:, "red_shift"] = self.description_df[
-            "red_shift"
-        ].astype(float)
-        self.description_df.index.name = "idx"
 
+        if "red_shift" in self.description_df.columns:
+            self.description_df.loc[:, "red_shift"] = self.description_df[
+                "red_shift"
+            ].astype(float)
+
+        self.description_df.index.name = "idx"
         self.transform = transform
 
     def __len__(self):
@@ -338,12 +339,12 @@ class DatasetsInfo:
         if self._expanded_clusters is None:
             self._expanded_clusters = expanded_positive_class()
         return self._expanded_clusters
-    
+
     def load_test_sample(self):
         if self._test_sample is None:
             self._test_sample = collect_clusters.read_test_sample()
         return self._test_sample
-    
+
     # done separately for segmentation
     def load_birght_stars(self):
         return update_bright_stars(self._bright_stars)
@@ -351,9 +352,9 @@ class DatasetsInfo:
     def load_non_clusters(self):
         if self._non_clusters is None:
             self._non_clusters = get_negative_class()
-        
+
             self._bright_stars = update_bright_stars(self._bright_stars)
-            
+
             # drop columns "red_shift" and "red_shift_type", as tables with NaN columns cannot be concatenated properly(?)
             columns_to_drop = ["red_shift", "red_shift_type"]
 
@@ -365,14 +366,14 @@ class DatasetsInfo:
                 columns=[col for col in columns_to_drop if col in self._non_clusters.columns],
                 errors='ignore'
                 )
-            
+
             self._non_clusters = pd.concat([
                 self._bright_stars,
                 self._non_clusters
                 ], ignore_index=True)
-            
+
             self._non_clusters = inherit_columns(self._non_clusters)
-        
+
         return self._non_clusters
 
 datasets_collection = DatasetsInfo()
