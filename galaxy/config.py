@@ -1,5 +1,8 @@
+"""Configuration and setup script for managing paths and settings."""
+
 import os
 from pathlib import Path
+
 from dynaconf import Dynaconf
 
 

@@ -1,7 +1,10 @@
+"""Script to train and evaluate models with optional segmentation."""
+
 import argparse
-import os
 import gc
+import os
 import sys
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -199,7 +202,10 @@ for model_name, model in selected_models:
                 classes=classes,
             )
             test_sample_predictions.to_csv(
-                os.path.join(settings.PREDICTIONS_PATH, f"test_sample_predictions_{model_name}.csv"),
+                os.path.join(
+                    settings.PREDICTIONS_PATH,
+                    f"test_sample_predictions_{model_name}.csv",
+                ),
                 index=False,
             )
 

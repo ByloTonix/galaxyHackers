@@ -1,10 +1,14 @@
+"""Script for model performance evaluation and metrics visualization."""
+
 import json
 import os
 from pathlib import Path
+from typing import Any, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from config import settings
 from matplotlib.backends.backend_pdf import PdfPages
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
@@ -20,10 +24,17 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-from config import settings
 
+def probabilities_hist(
+    predictions_clusters: np.ndarray, predictions_non_clusters: np.ndarray, pdf: PdfPages
+) -> None:
+    """Plots histogram of prediction probabilities.
 
-def probabilities_hist(predictions_clusters, predictions_non_clusters, pdf):
+    Args:
+        predictions_clusters (np.ndarray): Probabilities for the cluster class.
+        predictions_non_clusters (np.ndarray): Probabilities for the non-cluster class.
+        pdf (PdfPages): PDF file to save the plots.
+    """
     bins = np.arange(0, 1.01, 0.05)
     plt.figure()
     plt.hist(predictions_clusters, bins, color="green", alpha=0.5, label="clusters")
@@ -36,7 +47,13 @@ def probabilities_hist(predictions_clusters, predictions_non_clusters, pdf):
     plt.close()
 
 
-def plot_roc_curve(pdf, predictions: pd.DataFrame):
+def plot_roc_curve(pdf: PdfPages, predictions: pd.DataFrame) -> None:
+    """Plots the ROC curve.
+
+    Args:
+        pdf (PdfPages): PDF file to save the plots.
+        predictions (pd.DataFrame): DataFrame containing true labels and predicted probabilities.
+    """
     fpr, tpr, _ = roc_curve(predictions.y_true, predictions.y_probs)
     plt.figure()
     plt.plot(fpr, tpr, linewidth=2, label="")
@@ -49,7 +66,16 @@ def plot_roc_curve(pdf, predictions: pd.DataFrame):
     plt.close()
 
 
-def plot_pr_curve(pdf, predictions: pd.DataFrame):
+def plot_pr_curve(pdf: PdfPages, predictions: pd.DataFrame) -> float:
+    """Plots the precision-recall curve.
+
+    Args:
+        pdf (PdfPages): PDF file to save the plots.
+        predictions (pd.DataFrame): DataFrame containing true labels and predicted probabilities.
+
+    Returns:
+        float: Area under the precision-recall curve (PR AUC).
+    """
     precisions, recalls, _ = precision_recall_curve(
         predictions.y_true, predictions.y_probs
     )
@@ -66,7 +92,19 @@ def plot_pr_curve(pdf, predictions: pd.DataFrame):
     return pr_auc
 
 
-def plot_confusion_matrices(pdf, predictions: pd.DataFrame, classes):
+def plot_confusion_matrices(
+    pdf: PdfPages, predictions: pd.DataFrame, classes: List[str]
+) -> Tuple[int, int, int, int]:
+    """Plots confusion matrices.
+
+    Args:
+        pdf (PdfPages): PDF file to save the plots.
+        predictions (pd.DataFrame): DataFrame containing true and predicted labels.
+        classes (List[str]): Class labels.
+
+    Returns:
+        Tuple[int, int, int, int]: Counts for TN, FP, FN, TP from the confusion matrix.
+    """
     cm = confusion_matrix(predictions.y_true, predictions.y_pred)
     tn, fp, fn, tp = cm.ravel()
     e_00, e_11 = cm[0, 0] / (cm[0, 0] + cm[0, 1]), cm[1, 1] / (cm[1, 0] + cm[1, 1])
@@ -87,13 +125,14 @@ def plot_confusion_matrices(pdf, predictions: pd.DataFrame, classes):
 
 
 def plot_red_shift(pdf, predictions: pd.DataFrame):
+
     red_shift_predictions = predictions.loc[predictions.red_shift.notna()]
     red_shift_predictions = red_shift_predictions.sort_values(by="red_shift")
 
     n_bins = 10
     # Create 10 equal-sized buckets based on red_shift
     red_shift_predictions["bucket"] = pd.qcut(
-        red_shift_predictions["red_shift"], n_bins, duplicates='drop'
+        red_shift_predictions["red_shift"], n_bins, duplicates="drop"
     )
 
     # Calculate recall for each bin
@@ -181,7 +220,16 @@ def plot_red_shift(pdf, predictions: pd.DataFrame):
     plt.close()
 
 
-def plot_loss_by_model(train_table_data, val_table_data, pdf):
+def plot_loss_by_model(
+    train_table_data: List[Tuple[int, float]], val_table_data: List[Tuple[int, float]], pdf: PdfPages
+) -> None:
+    """Plots loss curves for training and validation.
+
+    Args:
+        train_table_data (List[Tuple[int, float]]): Training loss data.
+        val_table_data (List[Tuple[int, float]]): Validation loss data.
+        pdf (PdfPages): PDF file to save the plots.
+    """
     fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 6))
     fig.suptitle("Loss on train and validation")
 
@@ -191,8 +239,16 @@ def plot_loss_by_model(train_table_data, val_table_data, pdf):
     val_epochs = [row[0] for row in val_table_data]
     val_losses = [row[1] for row in val_table_data]
 
-    ax1.plot(train_steps, train_losses, label="Train Loss (Steps)", marker=".", color="blue")
-    ax2.plot(val_epochs, val_losses, label="Validation Loss (Epochs)", marker=".", color="green")
+    ax1.plot(
+        train_steps, train_losses, label="Train Loss (Steps)", marker=".", color="blue"
+    )
+    ax2.plot(
+        val_epochs,
+        val_losses,
+        label="Validation Loss (Epochs)",
+        marker=".",
+        color="green",
+    )
 
     ax1.set_xlabel("Step")
     ax1.set_ylabel("Accuracy")
@@ -216,8 +272,8 @@ def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
     val_epochs = [row[0] for row in val_table_data]
     val_accuracies = [row[2] for row in val_table_data]
 
-    ax1.plot(train_steps, train_accuracies, label="train", marker=".", color='blue')
-    ax2.plot(val_epochs, val_accuracies, label="valid", marker=".", color='green')
+    ax1.plot(train_steps, train_accuracies, label="train", marker=".", color="blue")
+    ax2.plot(val_epochs, val_accuracies, label="valid", marker=".", color="green")
 
     ax1.set_xlabel("Step")
     ax1.set_ylabel("Accuracy")
@@ -232,19 +288,27 @@ def plot_accuracies_by_model(train_table_data, val_table_data, pdf):
 
 
 def modelPerformance(
-    model_name,
-    optimizer_name,
+    model_name: str,
+    optimizer_name: str,
     predictions: pd.DataFrame,
-    classes,
-    #  num_epochs, # already mentioned in train_table_data and val_table_data
-    train_table_data=None,
-    val_table_data=None,
-    f_beta=2,
-):
+    classes: List[str],
+    train_table_data: Optional[List[Tuple[int, float, float]]] = None,
+    val_table_data: Optional[List[Tuple[int, float, float]]] = None,
+    f_beta: float = 2.0,
+) -> None:
     """
     Plots distributions of probabilities of classes, ROC and Precision-Recall curves, change of loss and accuracy throughout training,
     confusion matrix and its weighted version and saves them in .png files,
     counts accuracy, precision, recall, false positive rate and f1-score and saves them in .txt file
+
+    Args:
+        model_name (str): Name of the model.
+        optimizer_name (str): Name of the optimizer.
+        predictions (pd.DataFrame): DataFrame with true labels, predicted labels, and probabilities.
+        classes (List[str]): Class labels.
+        train_table_data (Optional[List[Tuple[int, float, float]]], optional): Training data for plotting. Defaults to None.
+        val_table_data (Optional[List[Tuple[int, float, float]]], optional): Validation data for plotting. Defaults to None.
+        f_beta (float, optional): Beta value for F-beta score calculation. Defaults to 2.0.
     """
 
     acc = accuracy_score(predictions.y_true, predictions.y_pred)
@@ -301,7 +365,16 @@ def modelPerformance(
         json.dump(metrics, file)
 
 
-def combine_metrics(selected_models: list, optimizer_name):
+def combine_metrics(selected_models: List[Tuple[str, Any]], optimizer_name: str) -> pd.DataFrame:
+    """Combines metrics for all selected models into a single CSV file.
+
+    Args:
+        selected_models (List[Tuple[str, Any]]): List of selected models.
+        optimizer_name (str): Name of the optimizer.
+
+    Returns:
+        pd.DataFrame: Combined metrics DataFrame.
+    """
     for model_name, _ in selected_models:
 
         all_metrics = {}

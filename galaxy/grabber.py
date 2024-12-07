@@ -15,7 +15,17 @@ from galaxy import util
 from galaxy.config import settings
 
 
-def download_url(url: str, outfile: str, max_attempts: int = 100):
+def download_url(url: str, outfile: str, max_attempts: int = 100) -> bool:
+    """Downloads a file from a given URL with retries in case of errors.
+
+    Args:
+        url (str): URL of the file to download.
+        outfile (str): Output file path.
+        max_attempts (int, optional): Maximum number of download attempts. Defaults to 100.
+
+    Returns:
+        bool: True if the download was successful, False otherwise.
+    """
     # Often encounter the following error:
     # urllib.error.HTTPError: HTTP Error 504: Gateway Time-out
     # Repeat the download attempt for up to `max_attempts` tries
@@ -35,6 +45,7 @@ def download_url(url: str, outfile: str, max_attempts: int = 100):
 
 
 class Grabber:
+    """Class for fetching image cutouts from the legacy survey."""
 
     def __init__(
         self,
@@ -45,6 +56,15 @@ class Grabber:
         extra_processing: Optional[Callable] = None,
         extra_processing_kwargs: Dict[Any, Any] = dict(),
     ):
+        """
+        Args:
+            survey_layer (str, optional): Survey layer to use. Defaults to settings.LEGACY_SURVEY.LAYER.
+            bands (str, optional): Bands to include in the cutouts. Defaults to settings.LEGACY_SURVEY.BANDS.
+            imgsize_arcmin (float, optional): Size of the image in arcminutes. Defaults to 1.5.
+            imgsize_pix (int, optional): Size of the image in pixels. Defaults to 224.
+            extra_processing (Callable, optional): Additional processing function for fetched cutouts. Defaults to None.
+            extra_processing_kwargs (Dict[Any, Any], optional): Additional arguments for the processing function. Defaults to None.
+        """
 
         self.survey_layer = survey_layer or settings.LEGACY_SURVEY.LAYER
         self.bands = bands or settings.LEGACY_SURVEY.BANDS
@@ -53,7 +73,21 @@ class Grabber:
         self.extra_processing = extra_processing
         self.extra_processing_kwargs = extra_processing_kwargs
 
-    def make_url(self, ra, dec, s_arcmin=3, s_px=512, format="fits"):
+    def make_url(
+        self, ra: float, dec: float, s_arcmin: float = 3.0, s_px: int = 512, format: str = "fits"
+    ) -> str:
+        """Creates a URL for fetching an image cutout from the legacy survey.
+
+        Args:
+            ra (float): Right ascension in degrees.
+            dec (float): Declination in degrees.
+            s_arcmin (float, optional): Size of the image in arcminutes. Defaults to 3.0.
+            s_px (int, optional): Size of the image in pixels. Defaults to 512.
+            format (str, optional): Format of the output file. Defaults to "fits".
+
+        Returns:
+            str: URL for the cutout.
+        """
 
         # Convert coords to string
         ra, dec = str(np.round(ra, 5)), str(np.round(dec, 5))
@@ -76,8 +110,14 @@ class Grabber:
 
         return url
 
-    def grab_cutout(self, ra: float, dec: float, output_path: Path):
+    def grab_cutout(self, ra: float, dec: float, output_path: Path) -> None:
+        """Fetches a single image cutout.
 
+        Args:
+            ra (float): Right ascension in degrees.
+            dec (float): Declination in degrees.
+            output_path (Path): Output file path.
+        """
         url = self.make_url(ra=ra, dec=dec)
 
         if not os.path.exists(output_path):

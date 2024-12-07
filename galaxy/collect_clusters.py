@@ -1,30 +1,24 @@
 """Script to collect cluster datasets"""
 
 import os
-from collections import defaultdict
-from enum import Enum
-from pathlib import Path
 
-import astropy.coordinates as coord
 import astropy.table as atpy
-import astropy.units as u
 import numpy as np
 import pandas as pd
-import torch
-import wget
 from astropy.coordinates import Angle
-from astropy.io import fits
 from astroquery.vizier import Vizier
-from pixell import enmap
-from torch.utils.data import DataLoader, Dataset
-from torchvision import transforms
 
-from galaxy import grabber, util
+from galaxy import util
 from galaxy.config import settings
-from galaxy.util import inherit_columns, DataSource, IsCluster
+from galaxy.util import DataSource, IsCluster, inherit_columns
 
 
-def read_dr5():
+def read_dr5() -> pd.DataFrame:
+    """Reads the DR5 catalog.
+
+    Returns:
+        pd.DataFrame: DataFrame containing DR5 cluster data.
+    """
 
     table: atpy.Table = atpy.Table().read(settings.DR5_CLUSTERS_PATH)
 
@@ -42,16 +36,23 @@ def read_dr5():
     )
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
-    frame['source'] = DataSource.DR5.value
+    frame["source"] = DataSource.DR5.value
     frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
+
     return frame
 
 
-'''Пока что не использовать в обучении модели'''
-def read_mc():
-    # the catalogue of MaDCoWS in VizieR
+"""Пока что не использовать в обучении модели"""
+
+
+def read_mc() -> pd.DataFrame:
+    """Reads the MaDCoWS catalog from VizieR.
+
+    Returns:
+        pd.DataFrame: DataFrame containing MaDCoWS cluster data.
+    """
     CATALOGUE = "J/ApJS/240/33/"
 
     catalog_list = Vizier.find_catalogs(CATALOGUE)
@@ -81,7 +82,7 @@ def read_mc():
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
 
-    frame['source'] = DataSource.MC.value
+    frame["source"] = DataSource.MC.value
     frame["target"] = IsCluster.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
@@ -89,19 +90,29 @@ def read_mc():
     return frame
 
 
-def read_upc_sz():
+def read_upc_sz() -> pd.DataFrame:
+    """Reads the UPC_SZ catalog from VizieR.
+
+    Returns:
+        pd.DataFrame: DataFrame containing UPC_SZ cluster data.
+    """
     CATALOGUE = "J/ApJS/272/7/table2"
     frame = util.read_vizier(CATALOGUE)
 
-    frame = frame.rename(columns={"PSZ2": "name",
-                              "RAJ2000": "ra_deg",
-                              "DEJ2000": "dec_deg",
-                              "z": "red_shift",
-                              "f_z": "red_shift_type"}
-                     )
+    frame = frame.rename(
+        columns={
+            "PSZ2": "name",
+            "RAJ2000": "ra_deg",
+            "DEJ2000": "dec_deg",
+            "z": "red_shift",
+            "f_z": "red_shift_type",
+        }
+    )
     # 'spec', '', 'phot', 'unct' - values in red_shift_type column. unct = uncertainty => skip?
     frame = frame[
-    frame["red_shift"].notna() & frame["red_shift_type"].notna() & (frame["red_shift_type"] != "unct")
+        frame["red_shift"].notna()
+        & frame["red_shift_type"].notna()
+        & (frame["red_shift_type"] != "unct")
     ]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
@@ -114,20 +125,29 @@ def read_upc_sz():
     return frame
 
 
-def read_spt_sz():
+def read_spt_sz() -> pd.DataFrame:
+    """Reads the SPT_SZ catalog from VizieR.
+
+    Returns:
+        pd.DataFrame: DataFrame containing SPT_SZ cluster data.
+    """
     CATALOGUE = "J/ApJS/216/27/table4"
     frame = util.read_vizier(CATALOGUE)
 
-    frame = frame.rename(columns={"SPT-CL": "name",
-                          "RAJ2000": "ra_deg",
-                          "DEJ2000": "dec_deg",
-                          "z": "red_shift",
-                          "f_z": "red_shift_type"}
-                  )
+    frame = frame.rename(
+        columns={
+            "SPT-CL": "name",
+            "RAJ2000": "ra_deg",
+            "DEJ2000": "dec_deg",
+            "z": "red_shift",
+            "f_z": "red_shift_type",
+        }
+    )
 
-    frame = frame[frame["red_shift"].notna() & frame["n_z"].str.contains(r'\+', na=False)]
+    frame = frame[
+        frame["red_shift"].notna() & frame["n_z"].str.contains(r"\+", na=False)
+    ]
     frame["red_shift_type"] = "spec"
-
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     frame["source"] = DataSource.SPT_SZ.value
@@ -138,15 +158,23 @@ def read_spt_sz():
     return frame
 
 
-def read_pszspt():
+def read_pszspt() -> pd.DataFrame:
+    """Reads the PSZSPT catalog from VizieR.
+
+    Returns:
+        pd.DataFrame: DataFrame containing PSZSPT cluster data.
+    """
     CATALOGUE = "J/A+A/647/A106"
     frame = util.read_vizier(CATALOGUE)
 
-    frame = frame.rename(columns={"Name": "name",
-                            "RAJ2000": "ra_deg",
-                            "DEJ2000": "dec_deg",
-                            "z": "red_shift"}
-                    )
+    frame = frame.rename(
+        columns={
+            "Name": "name",
+            "RAJ2000": "ra_deg",
+            "DEJ2000": "dec_deg",
+            "z": "red_shift",
+        }
+    )
 
     frame = frame[frame["red_shift"].notna()]
 
@@ -163,15 +191,23 @@ def read_pszspt():
     return frame
 
 
-def read_comprass():
+def read_comprass() -> pd.DataFrame:
+    """Reads the COMPRASS catalog from VizieR.
+
+    Returns:
+        pd.DataFrame: DataFrame containing COMPRASS cluster data.
+    """
     CATALOGUE = "J/A+A/626/A7/comprass"
     frame = util.read_vizier(CATALOGUE)
 
-    frame = frame.rename(columns={"Name": "name",
-                            "RAJ2000": "ra_deg",
-                            "DEJ2000": "dec_deg",
-                            "z": "red_shift"}
-                    )
+    frame = frame.rename(
+        columns={
+            "Name": "name",
+            "RAJ2000": "ra_deg",
+            "DEJ2000": "dec_deg",
+            "z": "red_shift",
+        }
+    )
 
     frame = frame[frame["red_shift"].notna()]
 
@@ -188,17 +224,27 @@ def read_comprass():
     return frame
 
 
-def read_spt2500d():
+def read_spt2500d() -> pd.DataFrame:
+    """Reads the SPT2500D catalog from VizieR.
+
+    Returns:
+        pd.DataFrame: DataFrame containing SPT2500D cluster data.
+    """
     CATALOGUE = "J/ApJ/878/55/table5"
     frame = util.read_vizier(CATALOGUE)
 
-    frame = frame.rename(columns={"SPT-CL": "name",
-                            "RAJ2000": "ra_deg",
-                            "DEJ2000": "dec_deg",
-                            "z": "red_shift"}
-                    )
+    frame = frame.rename(
+        columns={
+            "SPT-CL": "name",
+            "RAJ2000": "ra_deg",
+            "DEJ2000": "dec_deg",
+            "z": "red_shift",
+        }
+    )
 
-    frame = frame[frame["red_shift"].notna() & frame["n_z"].str.contains(r'\+', na=False)]
+    frame = frame[
+        frame["red_shift"].notna() & frame["n_z"].str.contains(r"\+", na=False)
+    ]
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
 
@@ -211,14 +257,25 @@ def read_spt2500d():
     return frame
 
 
-def collect_sptecs(catalogue):
+def collect_sptecs(catalogue: str) -> pd.DataFrame:
+    """Reads the SPTECS catalog from VizieR.
+
+    Args:
+        catalogue (str): VizieR catalog identifier.
+
+    Returns:
+        pd.DataFrame: DataFrame containing SPTECS cluster data.
+    """
     frame = util.read_vizier(catalogue)
 
-    frame = frame.rename(columns={"SPT-CL": "name",
-                        "RAJ2000": "ra_deg",
-                        "DEJ2000": "dec_deg",
-                        "z": "red_shift"}
-                )
+    frame = frame.rename(
+        columns={
+            "SPT-CL": "name",
+            "RAJ2000": "ra_deg",
+            "DEJ2000": "dec_deg",
+            "z": "red_shift",
+        }
+    )
 
     frame = frame[frame["red_shift"].notna()]
 
@@ -234,16 +291,26 @@ def collect_sptecs(catalogue):
     return frame
 
 
-def read_sptecs():
+def read_sptecs() -> pd.DataFrame:
+    """Reads certified and candidate SPTECS clusters and combines them.
+
+    Returns:
+        pd.DataFrame: DataFrame containing combined SPTECS cluster data.
+    """
     frame_certified = collect_sptecs("J/ApJS/247/25/table10")
     frame_candidates = collect_sptecs("J/ApJS/247/25/cand")
 
-    frame = pd.concat([frame_certified,
-                       frame_candidates])
+    frame = pd.concat([frame_certified, frame_candidates])
+
     return frame
 
 
-def read_spt100():
+def read_spt100() -> pd.DataFrame:
+    """Reads the SPT100 catalog.
+
+    Returns:
+        pd.DataFrame: DataFrame containing SPT100 cluster data.
+    """
     table: atpy.Table = atpy.Table().read(settings.SPT100_PATH)
 
     frame = table.to_pandas().reset_index(drop=True)
@@ -253,8 +320,8 @@ def read_spt100():
             "SPT_ID": "name",
             "RA": "ra_deg",
             "Dec": "dec_deg",
-            "redshift": "red_shift"
-            }
+            "redshift": "red_shift",
+        }
     )
 
     frame["name"] = frame["name"].astype(str)
@@ -272,11 +339,18 @@ def read_spt100():
     return frame
 
 
-'''
+"""
 TODO: Для test_sample выдавать при тесте полученные вероятности, можно просто добавлять колонку
-Можно попробовать визуализировать на графике масса - красное смещение с колорбаром в виде вероятностей
-'''
-def read_test_sample():
+Можно попробовать визуализировать на графике масса - красное смещение c колорбаром в виде вероятностей
+"""
+
+
+def read_test_sample() -> pd.DataFrame:
+    """Reads the test sample dataset.
+
+    Returns:
+        pd.DataFrame: DataFrame containing test sample cluster data.
+    """
     frame = pd.read_csv(settings.TEST_SAMPLE_PATH)
 
     frame = frame.rename(
@@ -296,9 +370,12 @@ def read_test_sample():
 
     return frame
 
-def read_act_mcmf():
-    """
-    Obtain Vizier ACT_MCMF Catalogue.
+
+def read_act_mcmf() -> pd.DataFrame:
+    """Reads the ACT_MCMF catalog from VizieR.
+
+    Returns:
+        pd.DataFrame: DataFrame containing ACT_MCMF cluster data.
     """
     CATALOGUE = "J/A+A/690/A322/"
 
@@ -325,7 +402,9 @@ def read_act_mcmf():
         np.where(mc_frame["z1C"].notna(), "z1C", "z2C"),
     )
 
-    mc_frame = mc_frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
+    mc_frame = mc_frame.loc[
+        :, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]
+    ]
     mc_frame["source"] = DataSource.ACT_MCMF.value
     mc_frame["target"] = IsCluster.IS_CLUSTER.value
     mc_frame = inherit_columns(mc_frame)

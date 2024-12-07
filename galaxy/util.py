@@ -1,12 +1,17 @@
+"""Utility functions and enumerations for handling datasets and legacy survey data."""
+
 import sys
-import torch
-from astroquery.vizier import Vizier
 from enum import Enum
+from typing import Any, Generator, List
+
 import numpy as np
 import pandas as pd
+import torch
+from astroquery.vizier import Vizier
 
 
 class DataSource(str, Enum):
+    """Enumeration of data sources."""
 
     MAP_ACT = "map_act"
     DR5 = "dr5"
@@ -14,7 +19,7 @@ class DataSource(str, Enum):
     SGA = "sga"
     TYC2 = "tyc2"
     GAIA = "gaia"
-    UPC_SZ = "upc_sz" # UPCluster-SZ catalog, обобщённый планк
+    UPC_SZ = "upc_sz"  # UPCluster-SZ catalog, обобщённый планк
     SPT_SZ = "spt_sz"
     PSZSPT = "pszspt"
     CCOMPRASS = "comprass"
@@ -27,8 +32,8 @@ class DataSource(str, Enum):
     RANDOM = "rand"
 
 
-
 class IsCluster(int, Enum):
+    """Enumeration for cluster classification."""
 
     IS_CLUSTER = 1
     NOT_CLUSTER = 0
@@ -38,9 +43,16 @@ required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source", "target"])
 optional_columns = set(["red_shift", "red_shift_type"])
 
 
-def inherit_columns(frame: pd.DataFrame):
+def inherit_columns(frame: pd.DataFrame) -> pd.DataFrame:
+    """Ensures the DataFrame has required and optional columns.
 
-    frame['idx'] = np.arange(len(frame))
+    Args:
+        frame (pd.DataFrame): Input DataFrame.
+
+    Returns:
+        pd.DataFrame: DataFrame with required and optional columns ensured.
+    """
+    frame["idx"] = np.arange(len(frame))
 
     frame_columns = set(frame.columns)
 
@@ -57,7 +69,15 @@ def inherit_columns(frame: pd.DataFrame):
     return frame
 
 
-def read_vizier(catalogue):
+def read_vizier(catalogue: str) -> pd.DataFrame:
+    """Fetches a catalogue from Vizier and converts it to a pandas DataFrame.
+
+    Args:
+        catalogue (str): Name or identifier of the catalogue.
+
+    Returns:
+        pd.DataFrame: DataFrame containing the catalogue data.
+    """
     catalog_list = Vizier.find_catalogs(catalogue)
     Vizier.ROW_LIMIT = -1
 
@@ -66,8 +86,14 @@ def read_vizier(catalogue):
     return frame
 
 
+def bar_progress(current: int, total: int, width: int = 80) -> None:
+    """Displays a progress bar for downloads.
 
-def bar_progress(current, total, width=80):
+    Args:
+        current (int): Current number of bytes downloaded.
+        total (int): Total number of bytes to download.
+        width (int, optional): Width of the progress bar. Defaults to 80.
+    """
     progress_message = "Downloading: %d%% [%d / %d] bytes" % (
         current / total * 100,
         current,
@@ -78,30 +104,57 @@ def bar_progress(current, total, width=80):
     sys.stdout.flush()
 
 
-def to_hms_format(time_str):
+def to_hms_format(time_str: str) -> str:
+    """Converts a time string to HMS format.
+
+    Args:
+        time_str (str): Time string in space-separated format (e.g., "12 34 56").
+
+    Returns:
+        str: Time string in HMS format (e.g., "12h34m56s").
+    """
     parts = time_str.split()
     return f"{parts[0]}h{parts[1]}m{parts[2]}s"
 
 
-def to_dms_format(time_str):
+def to_dms_format(time_str: str) -> str:
+    """Converts a time string to DMS format.
+
+    Args:
+        time_str (str): Time string in space-separated format (e.g., "12 34 56").
+
+    Returns:
+        str: Time string in DMS format (e.g., "12d34m56s").
+    """
     parts = time_str.split()
     return f"{parts[0]}d{parts[1]}m{parts[2]}s"
 
 
-def divide_chunks(l, n):
+def divide_chunks(data_list: List[Any], chunk_size: int) -> Generator[List[Any], None, None]:
+    """Divides a list into chunks of a specified size.
+
+    Args:
+        data_list (List[Any]): Input list to divide.
+        chunk_size (int): Size of each chunk.
+
+    Yields:
+        Generator[List[Any], None, None]: Generator yielding list chunks.
+    """
     for i in range(0, len(l), n):
         yield l[i : i + n]
 
 
-def fits_to_rgb_image(tensor):
-    """
-    Converts a 2-channel tensor from the legacy survey to an RGB image tensor.
+def fits_to_rgb_image(tensor: torch.Tensor) -> torch.Tensor:
+    """Converts a 2-channel tensor to an RGB image tensor.
 
-    Parameters:
-    - tensor (Tensor): Input tensor of shape (2, H, W)
+    Args:
+        tensor (torch.Tensor): Input tensor of shape (2, H, W).
 
     Returns:
-    - Tensor: RGB image tensor of shape (3, H, W)
+        torch.Tensor: RGB image tensor of shape (3, H, W).
+
+    Raises:
+        ValueError: If the input tensor does not have 2 channels.
     """
     # Ensure the tensor has the correct shape
     if tensor.shape[0] != 2:
@@ -128,4 +181,3 @@ def fits_to_rgb_image(tensor):
     rgb_image = torch.clamp(rgb_image, 0, 1)
 
     return rgb_image
-
