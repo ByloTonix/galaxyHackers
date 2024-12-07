@@ -74,7 +74,12 @@ class Grabber:
         self.extra_processing_kwargs = extra_processing_kwargs
 
     def make_url(
-        self, ra: float, dec: float, s_arcmin: float = 3.0, s_px: int = 512, format: str = "fits"
+        self,
+        ra: float,
+        dec: float,
+        s_arcmin: float = 3.0,
+        s_px: int = 512,
+        format: str = "fits",
     ) -> str:
         """Creates a URL for fetching an image cutout from the legacy survey.
 

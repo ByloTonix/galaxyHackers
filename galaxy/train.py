@@ -95,7 +95,12 @@ class Trainer:
         torch.save(self.model.state_dict(), path)
 
     def log_metrics(
-        self, loss: float, acc: float, mode: str, step: Optional[int] = None, epoch: Optional[int] = None
+        self,
+        loss: float,
+        acc: float,
+        mode: str,
+        step: Optional[int] = None,
+        epoch: Optional[int] = None,
     ) -> None:
         """Logs metrics to Comet.ml.
 
@@ -209,7 +214,9 @@ class Trainer:
                 best_loss = val_loss
                 print(f"New best model saved with val_loss={val_loss:.4f}")
 
-    def test(self, test_dataloader: DataLoader) -> Tuple[pd.DataFrame, List[float], List[float]]:
+    def test(
+        self, test_dataloader: DataLoader
+    ) -> Tuple[pd.DataFrame, List[float], List[float]]:
         """Evaluates the model on a test dataset.
 
         Args:

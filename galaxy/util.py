@@ -130,7 +130,9 @@ def to_dms_format(time_str: str) -> str:
     return f"{parts[0]}d{parts[1]}m{parts[2]}s"
 
 
-def divide_chunks(data_list: List[Any], chunk_size: int) -> Generator[List[Any], None, None]:
+def divide_chunks(
+    data_list: List[Any], chunk_size: int
+) -> Generator[List[Any], None, None]:
     """Divides a list into chunks of a specified size.
 
     Args:
@@ -140,8 +142,8 @@ def divide_chunks(data_list: List[Any], chunk_size: int) -> Generator[List[Any],
     Yields:
         Generator[List[Any], None, None]: Generator yielding list chunks.
     """
-    for i in range(0, len(l), n):
-        yield l[i : i + n]
+    for i in range(0, len(data_list), chunk_size):
+        yield data_list[i : i + chunk_size]
 
 
 def fits_to_rgb_image(tensor: torch.Tensor) -> torch.Tensor:
