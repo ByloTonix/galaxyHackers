@@ -3,6 +3,11 @@ galaxy.metrics
 
 .. py:module:: galaxy.metrics
 
+.. autoapi-nested-parse::
+
+   Script for model performance evaluation and metrics visualization.
+
+
 
 Functions
 ---------
@@ -10,6 +15,10 @@ Functions
 .. autoapisummary::
 
    galaxy.metrics.probabilities_hist
+   galaxy.metrics.plot_roc_curve
+   galaxy.metrics.plot_pr_curve
+   galaxy.metrics.plot_confusion_matrices
+   galaxy.metrics.plot_red_shift
    galaxy.metrics.plot_loss_by_model
    galaxy.metrics.plot_accuracies_by_model
    galaxy.metrics.modelPerformance
@@ -19,18 +28,89 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: probabilities_hist(predictions_clusters, predictions_non_clusters, model_path)
+.. py:function:: probabilities_hist(predictions_clusters: numpy.ndarray, predictions_non_clusters: numpy.ndarray, pdf: matplotlib.backends.backend_pdf.PdfPages) -> None
 
-.. py:function:: plot_loss_by_model(model_name: str, result: dict, val_result: dict, path: str)
+   Plots histogram of prediction probabilities.
 
-.. py:function:: plot_accuracies_by_model(model_name: str, result: dict, val_result: dict, path: str)
+   Args:
+       predictions_clusters (np.ndarray): Probabilities for the cluster class.
+       predictions_non_clusters (np.ndarray): Probabilities for the non-cluster class.
+       pdf (PdfPages): PDF file to save the plots.
 
-.. py:function:: modelPerformance(model_name, optimizer_name, predictions: pandas.DataFrame, classes, f_beta=2)
+
+.. py:function:: plot_roc_curve(pdf: matplotlib.backends.backend_pdf.PdfPages, predictions: pandas.DataFrame) -> None
+
+   Plots the ROC curve.
+
+   Args:
+       pdf (PdfPages): PDF file to save the plots.
+       predictions (pd.DataFrame): DataFrame containing true labels and predicted probabilities.
+
+
+.. py:function:: plot_pr_curve(pdf: matplotlib.backends.backend_pdf.PdfPages, predictions: pandas.DataFrame) -> float
+
+   Plots the precision-recall curve.
+
+   Args:
+       pdf (PdfPages): PDF file to save the plots.
+       predictions (pd.DataFrame): DataFrame containing true labels and predicted probabilities.
+
+   Returns:
+       float: Area under the precision-recall curve (PR AUC).
+
+
+.. py:function:: plot_confusion_matrices(pdf: matplotlib.backends.backend_pdf.PdfPages, predictions: pandas.DataFrame, classes: List[str]) -> Tuple[int, int, int, int]
+
+   Plots confusion matrices.
+
+   Args:
+       pdf (PdfPages): PDF file to save the plots.
+       predictions (pd.DataFrame): DataFrame containing true and predicted labels.
+       classes (List[str]): Class labels.
+
+   Returns:
+       Tuple[int, int, int, int]: Counts for TN, FP, FN, TP from the confusion matrix.
+
+
+.. py:function:: plot_red_shift(pdf, predictions: pandas.DataFrame)
+
+.. py:function:: plot_loss_by_model(train_table_data: List[Tuple[int, float]], val_table_data: List[Tuple[int, float]], pdf: matplotlib.backends.backend_pdf.PdfPages) -> None
+
+   Plots loss curves for training and validation.
+
+   Args:
+       train_table_data (List[Tuple[int, float]]): Training loss data.
+       val_table_data (List[Tuple[int, float]]): Validation loss data.
+       pdf (PdfPages): PDF file to save the plots.
+
+
+.. py:function:: plot_accuracies_by_model(train_table_data, val_table_data, pdf)
+
+.. py:function:: modelPerformance(model_name: str, optimizer_name: str, predictions: pandas.DataFrame, classes: List[str], train_table_data: Optional[List[Tuple[int, float, float]]] = None, val_table_data: Optional[List[Tuple[int, float, float]]] = None, f_beta: float = 2.0) -> None
 
    Plots distributions of probabilities of classes, ROC and Precision-Recall curves, change of loss and accuracy throughout training,
    confusion matrix and its weighted version and saves them in .png files,
    counts accuracy, precision, recall, false positive rate and f1-score and saves them in .txt file
 
+   Args:
+       model_name (str): Name of the model.
+       optimizer_name (str): Name of the optimizer.
+       predictions (pd.DataFrame): DataFrame with true labels, predicted labels, and probabilities.
+       classes (List[str]): Class labels.
+       train_table_data (Optional[List[Tuple[int, float, float]]], optional): Training data for plotting. Defaults to None.
+       val_table_data (Optional[List[Tuple[int, float, float]]], optional): Validation data for plotting. Defaults to None.
+       f_beta (float, optional): Beta value for F-beta score calculation. Defaults to 2.0.
 
-.. py:function:: combine_metrics(selected_models: list, optimizer_name)
+
+.. py:function:: combine_metrics(selected_models: List[Tuple[str, Any]], optimizer_name: str) -> pandas.DataFrame
+
+   Combines metrics for all selected models into a single CSV file.
+
+   Args:
+       selected_models (List[Tuple[str, Any]]): List of selected models.
+       optimizer_name (str): Name of the optimizer.
+
+   Returns:
+       pd.DataFrame: Combined metrics DataFrame.
+
 

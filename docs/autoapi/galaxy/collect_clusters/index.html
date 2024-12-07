@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="galaxy.metrics" href="../metrics/index.html" /><link rel="prev" title="galaxy.grabber" href="../grabber/index.html" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="galaxy.collect_not_clusters" href="../collect_not_clusters/index.html" /><link rel="prev" title="galaxy" href="../index.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>galaxy.main - galaxyHackers documentation</title>
+        <title>galaxy.collect_clusters - galaxyHackers documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a02c27a8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
@@ -222,12 +222,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">galaxy</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of galaxy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../collect_clusters/index.html">galaxy.collect_clusters</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">galaxy.collect_clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../collect_not_clusters/index.html">galaxy.collect_not_clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../config/index.html">galaxy.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/index.html">galaxy.data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../grabber/index.html">galaxy.grabber</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">galaxy.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../main/index.html">galaxy.main</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/index.html">galaxy.metrics</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../models/index.html">galaxy.models</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of galaxy.models</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../models/alexnet_vgg/index.html">galaxy.models.alexnet_vgg</a></li>
@@ -267,7 +267,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../../../_sources/autoapi/galaxy/main/index.rst.txt" title="View this page">
+  <a class="muted-link" href="../../../_sources/autoapi/galaxy/collect_clusters/index.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -287,73 +287,49 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-galaxy.main">
-<span id="galaxy-main"></span><h1>galaxy.main<a class="headerlink" href="#module-galaxy.main" title="Link to this heading"></a></h1>
-<p>Script to train and evaluate models with optional segmentation.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+          <section id="module-galaxy.collect_clusters">
+<span id="galaxy-collect-clusters"></span><h1>galaxy.collect_clusters<a class="headerlink" href="#module-galaxy.collect_clusters" title="Link to this heading"></a></h1>
+<p>Script to collect cluster datasets</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.parent_dir" title="galaxy.main.parent_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent_dir</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_dr5" title="galaxy.collect_clusters.read_dr5"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dr5</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the DR5 catalog.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.all_models" title="galaxy.main.all_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_models</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_mc" title="galaxy.collect_clusters.read_mc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_mc</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the MaDCoWS catalog from VizieR.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.all_optimizers" title="galaxy.main.all_optimizers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_optimizers</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_upc_sz" title="galaxy.collect_clusters.read_upc_sz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_upc_sz</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the UPC_SZ catalog from VizieR.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.device" title="galaxy.main.device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_spt_sz" title="galaxy.collect_clusters.read_spt_sz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spt_sz</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the SPT_SZ catalog from VizieR.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.train_loader" title="galaxy.main.train_loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_loader</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_pszspt" title="galaxy.collect_clusters.read_pszspt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_pszspt</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the PSZSPT catalog from VizieR.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.val_loader" title="galaxy.main.val_loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">val_loader</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_comprass" title="galaxy.collect_clusters.read_comprass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_comprass</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the COMPRASS catalog from VizieR.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.test_loader" title="galaxy.main.test_loader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_loader</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_spt2500d" title="galaxy.collect_clusters.read_spt2500d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spt2500d</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the SPT2500D catalog from VizieR.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.parser" title="galaxy.main.parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.collect_clusters.collect_sptecs" title="galaxy.collect_clusters.collect_sptecs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collect_sptecs</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the SPTECS catalog from VizieR.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.args" title="galaxy.main.args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">args</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_sptecs" title="galaxy.collect_clusters.read_sptecs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_sptecs</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads certified and candidate SPTECS clusters and combines them.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.selected_models" title="galaxy.main.selected_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selected_models</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_spt100" title="galaxy.collect_clusters.read_spt100"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spt100</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the SPT100 catalog.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.num_epochs" title="galaxy.main.num_epochs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_epochs</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_test_sample" title="galaxy.collect_clusters.read_test_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_test_sample</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the test sample dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.lr" title="galaxy.main.lr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lr</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.momentum" title="galaxy.main.momentum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">momentum</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.optimizer_name" title="galaxy.main.optimizer_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimizer_name</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.experiment" title="galaxy.main.experiment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.criterion" title="galaxy.main.criterion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">criterion</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.results" title="galaxy.main.results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">results</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.val_results" title="galaxy.main.val_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">val_results</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.main.classes" title="galaxy.main.classes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classes</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.main.model" title="galaxy.main.model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.collect_clusters.read_act_mcmf" title="galaxy.collect_clusters.read_act_mcmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_act_mcmf</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Reads the ACT_MCMF catalog from VizieR.</p></td>
 </tr>
 </tbody>
 </table>
@@ -361,105 +337,127 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.parent_dir">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">parent_dir</span></span><a class="headerlink" href="#galaxy.main.parent_dir" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_dr5">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_dr5</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_dr5" title="Link to this definition"></a></dt>
+<dd><p>Reads the DR5 catalog.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing DR5 cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.all_models">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">all_models</span></span><a class="headerlink" href="#galaxy.main.all_models" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_mc">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_mc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_mc" title="Link to this definition"></a></dt>
+<dd><p>Reads the MaDCoWS catalog from VizieR.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing MaDCoWS cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.all_optimizers">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">all_optimizers</span></span><a class="headerlink" href="#galaxy.main.all_optimizers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_upc_sz">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_upc_sz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_upc_sz" title="Link to this definition"></a></dt>
+<dd><p>Reads the UPC_SZ catalog from VizieR.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing UPC_SZ cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.device">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">device</span></span><a class="headerlink" href="#galaxy.main.device" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_spt_sz">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_spt_sz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_spt_sz" title="Link to this definition"></a></dt>
+<dd><p>Reads the SPT_SZ catalog from VizieR.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing SPT_SZ cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.train_loader">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">train_loader</span></span><a class="headerlink" href="#galaxy.main.train_loader" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_pszspt">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_pszspt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_pszspt" title="Link to this definition"></a></dt>
+<dd><p>Reads the PSZSPT catalog from VizieR.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing PSZSPT cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.val_loader">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">val_loader</span></span><a class="headerlink" href="#galaxy.main.val_loader" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_comprass">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_comprass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_comprass" title="Link to this definition"></a></dt>
+<dd><p>Reads the COMPRASS catalog from VizieR.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing COMPRASS cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.test_loader">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">test_loader</span></span><a class="headerlink" href="#galaxy.main.test_loader" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_spt2500d">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_spt2500d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_spt2500d" title="Link to this definition"></a></dt>
+<dd><p>Reads the SPT2500D catalog from VizieR.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing SPT2500D cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.parser">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">parser</span></span><a class="headerlink" href="#galaxy.main.parser" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.collect_sptecs">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">collect_sptecs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalogue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.collect_sptecs" title="Link to this definition"></a></dt>
+<dd><p>Reads the SPTECS catalog from VizieR.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>catalogue (str): VizieR catalog identifier.</p>
+</dd>
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing SPTECS cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.args">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#galaxy.main.args" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_sptecs">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_sptecs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_sptecs" title="Link to this definition"></a></dt>
+<dd><p>Reads certified and candidate SPTECS clusters and combines them.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing combined SPTECS cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.selected_models">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">selected_models</span></span><a class="headerlink" href="#galaxy.main.selected_models" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_spt100">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_spt100</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_spt100" title="Link to this definition"></a></dt>
+<dd><p>Reads the SPT100 catalog.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing SPT100 cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.num_epochs">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">num_epochs</span></span><a class="headerlink" href="#galaxy.main.num_epochs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_test_sample">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_test_sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_test_sample" title="Link to this definition"></a></dt>
+<dd><p>Reads the test sample dataset.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing test sample cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.lr">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">lr</span></span><a class="headerlink" href="#galaxy.main.lr" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.momentum">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">momentum</span></span><a class="headerlink" href="#galaxy.main.momentum" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.optimizer_name">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">optimizer_name</span></span><a class="headerlink" href="#galaxy.main.optimizer_name" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.experiment">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">experiment</span></span><a class="headerlink" href="#galaxy.main.experiment" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.criterion">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">criterion</span></span><a class="headerlink" href="#galaxy.main.criterion" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.results">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">results</span></span><a class="headerlink" href="#galaxy.main.results" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.val_results">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">val_results</span></span><a class="headerlink" href="#galaxy.main.val_results" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.classes">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('random',</span> <span class="pre">'clusters')</span></em><a class="headerlink" href="#galaxy.main.classes" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.main.model">
-<span class="sig-prename descclassname"><span class="pre">galaxy.main.</span></span><span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#galaxy.main.model" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.collect_clusters.read_act_mcmf">
+<span class="sig-prename descclassname"><span class="pre">galaxy.collect_clusters.</span></span><span class="sig-name descname"><span class="pre">read_act_mcmf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.collect_clusters.read_act_mcmf" title="Link to this definition"></a></dt>
+<dd><p>Reads the ACT_MCMF catalog from VizieR.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing ACT_MCMF cluster data.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>
@@ -469,23 +467,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../metrics/index.html">
+          <a class="next-page" href="../collect_not_clusters/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">galaxy.metrics</div>
+                <div class="title">galaxy.collect_not_clusters</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../grabber/index.html">
+          <a class="prev-page" href="../index.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">galaxy.grabber</div>
+                <div class="title">galaxy</div>
                 
               </div>
             </a>
@@ -518,29 +516,21 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">galaxy.main</a><ul>
-<li><a class="reference internal" href="#attributes">Attributes</a></li>
+<li><a class="reference internal" href="#">galaxy.collect_clusters</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#galaxy.main.parent_dir"><code class="docutils literal notranslate"><span class="pre">parent_dir</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.all_models"><code class="docutils literal notranslate"><span class="pre">all_models</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.all_optimizers"><code class="docutils literal notranslate"><span class="pre">all_optimizers</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.device"><code class="docutils literal notranslate"><span class="pre">device</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.train_loader"><code class="docutils literal notranslate"><span class="pre">train_loader</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.val_loader"><code class="docutils literal notranslate"><span class="pre">val_loader</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.test_loader"><code class="docutils literal notranslate"><span class="pre">test_loader</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.parser"><code class="docutils literal notranslate"><span class="pre">parser</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.args"><code class="docutils literal notranslate"><span class="pre">args</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.selected_models"><code class="docutils literal notranslate"><span class="pre">selected_models</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.num_epochs"><code class="docutils literal notranslate"><span class="pre">num_epochs</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.lr"><code class="docutils literal notranslate"><span class="pre">lr</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.momentum"><code class="docutils literal notranslate"><span class="pre">momentum</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.optimizer_name"><code class="docutils literal notranslate"><span class="pre">optimizer_name</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.experiment"><code class="docutils literal notranslate"><span class="pre">experiment</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.criterion"><code class="docutils literal notranslate"><span class="pre">criterion</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.results"><code class="docutils literal notranslate"><span class="pre">results</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.val_results"><code class="docutils literal notranslate"><span class="pre">val_results</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.classes"><code class="docutils literal notranslate"><span class="pre">classes</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.main.model"><code class="docutils literal notranslate"><span class="pre">model</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_dr5"><code class="docutils literal notranslate"><span class="pre">read_dr5()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_mc"><code class="docutils literal notranslate"><span class="pre">read_mc()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_upc_sz"><code class="docutils literal notranslate"><span class="pre">read_upc_sz()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_spt_sz"><code class="docutils literal notranslate"><span class="pre">read_spt_sz()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_pszspt"><code class="docutils literal notranslate"><span class="pre">read_pszspt()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_comprass"><code class="docutils literal notranslate"><span class="pre">read_comprass()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_spt2500d"><code class="docutils literal notranslate"><span class="pre">read_spt2500d()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.collect_sptecs"><code class="docutils literal notranslate"><span class="pre">collect_sptecs()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_sptecs"><code class="docutils literal notranslate"><span class="pre">read_sptecs()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_spt100"><code class="docutils literal notranslate"><span class="pre">read_spt100()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_test_sample"><code class="docutils literal notranslate"><span class="pre">read_test_sample()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.collect_clusters.read_act_mcmf"><code class="docutils literal notranslate"><span class="pre">read_act_mcmf()</span></code></a></li>
 </ul>
 </li>
 </ul>

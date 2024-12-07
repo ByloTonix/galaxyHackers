@@ -1,0 +1,132 @@
+galaxy.collect_clusters
+=======================
+
+.. py:module:: galaxy.collect_clusters
+
+.. autoapi-nested-parse::
+
+   Script to collect cluster datasets
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   galaxy.collect_clusters.read_dr5
+   galaxy.collect_clusters.read_mc
+   galaxy.collect_clusters.read_upc_sz
+   galaxy.collect_clusters.read_spt_sz
+   galaxy.collect_clusters.read_pszspt
+   galaxy.collect_clusters.read_comprass
+   galaxy.collect_clusters.read_spt2500d
+   galaxy.collect_clusters.collect_sptecs
+   galaxy.collect_clusters.read_sptecs
+   galaxy.collect_clusters.read_spt100
+   galaxy.collect_clusters.read_test_sample
+   galaxy.collect_clusters.read_act_mcmf
+
+
+Module Contents
+---------------
+
+.. py:function:: read_dr5() -> pandas.DataFrame
+
+   Reads the DR5 catalog.
+
+   Returns:
+       pd.DataFrame: DataFrame containing DR5 cluster data.
+
+
+.. py:function:: read_mc() -> pandas.DataFrame
+
+   Reads the MaDCoWS catalog from VizieR.
+
+   Returns:
+       pd.DataFrame: DataFrame containing MaDCoWS cluster data.
+
+
+.. py:function:: read_upc_sz() -> pandas.DataFrame
+
+   Reads the UPC_SZ catalog from VizieR.
+
+   Returns:
+       pd.DataFrame: DataFrame containing UPC_SZ cluster data.
+
+
+.. py:function:: read_spt_sz() -> pandas.DataFrame
+
+   Reads the SPT_SZ catalog from VizieR.
+
+   Returns:
+       pd.DataFrame: DataFrame containing SPT_SZ cluster data.
+
+
+.. py:function:: read_pszspt() -> pandas.DataFrame
+
+   Reads the PSZSPT catalog from VizieR.
+
+   Returns:
+       pd.DataFrame: DataFrame containing PSZSPT cluster data.
+
+
+.. py:function:: read_comprass() -> pandas.DataFrame
+
+   Reads the COMPRASS catalog from VizieR.
+
+   Returns:
+       pd.DataFrame: DataFrame containing COMPRASS cluster data.
+
+
+.. py:function:: read_spt2500d() -> pandas.DataFrame
+
+   Reads the SPT2500D catalog from VizieR.
+
+   Returns:
+       pd.DataFrame: DataFrame containing SPT2500D cluster data.
+
+
+.. py:function:: collect_sptecs(catalogue: str) -> pandas.DataFrame
+
+   Reads the SPTECS catalog from VizieR.
+
+   Args:
+       catalogue (str): VizieR catalog identifier.
+
+   Returns:
+       pd.DataFrame: DataFrame containing SPTECS cluster data.
+
+
+.. py:function:: read_sptecs() -> pandas.DataFrame
+
+   Reads certified and candidate SPTECS clusters and combines them.
+
+   Returns:
+       pd.DataFrame: DataFrame containing combined SPTECS cluster data.
+
+
+.. py:function:: read_spt100() -> pandas.DataFrame
+
+   Reads the SPT100 catalog.
+
+   Returns:
+       pd.DataFrame: DataFrame containing SPT100 cluster data.
+
+
+.. py:function:: read_test_sample() -> pandas.DataFrame
+
+   Reads the test sample dataset.
+
+   Returns:
+       pd.DataFrame: DataFrame containing test sample cluster data.
+
+
+.. py:function:: read_act_mcmf() -> pandas.DataFrame
+
+   Reads the ACT_MCMF catalog from VizieR.
+
+   Returns:
+       pd.DataFrame: DataFrame containing ACT_MCMF cluster data.
+
+

@@ -3,12 +3,37 @@ galaxy.util
 
 .. py:module:: galaxy.util
 
+.. autoapi-nested-parse::
+
+   Utility functions and enumerations for handling datasets and legacy survey data.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   galaxy.util.required_columns
+   galaxy.util.optional_columns
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   galaxy.util.DataSource
+   galaxy.util.IsCluster
+
 
 Functions
 ---------
 
 .. autoapisummary::
 
+   galaxy.util.inherit_columns
+   galaxy.util.read_vizier
    galaxy.util.bar_progress
    galaxy.util.to_hms_format
    galaxy.util.to_dms_format
@@ -19,22 +44,193 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: bar_progress(current, total, width=80)
+.. py:class:: DataSource
 
-.. py:function:: to_hms_format(time_str)
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
-.. py:function:: to_dms_format(time_str)
 
-.. py:function:: divide_chunks(l, n)
+   Enumeration of data sources.
 
-.. py:function:: fits_to_rgb_image(tensor)
 
-   Converts a 2-channel tensor from the legacy survey to an RGB image tensor.
+   .. py:attribute:: MAP_ACT
+      :value: 'map_act'
 
-   Parameters:
-   - tensor (Tensor): Input tensor of shape (2, H, W)
+
+
+   .. py:attribute:: DR5
+      :value: 'dr5'
+
+
+
+   .. py:attribute:: MC
+      :value: 'mc'
+
+
+
+   .. py:attribute:: SGA
+      :value: 'sga'
+
+
+
+   .. py:attribute:: TYC2
+      :value: 'tyc2'
+
+
+
+   .. py:attribute:: GAIA
+      :value: 'gaia'
+
+
+
+   .. py:attribute:: UPC_SZ
+      :value: 'upc_sz'
+
+
+
+   .. py:attribute:: SPT_SZ
+      :value: 'spt_sz'
+
+
+
+   .. py:attribute:: PSZSPT
+      :value: 'pszspt'
+
+
+
+   .. py:attribute:: CCOMPRASS
+      :value: 'comprass'
+
+
+
+   .. py:attribute:: SPT2500D
+      :value: 'spt2500d'
+
+
+
+   .. py:attribute:: SPTECS
+      :value: 'sptecs'
+
+
+
+   .. py:attribute:: SPT100
+      :value: 'spt100'
+
+
+
+   .. py:attribute:: ACT_MCMF
+      :value: 'act_mcmf'
+
+
+
+   .. py:attribute:: TEST_SAMPLE
+      :value: 'test_sample'
+
+
+
+   .. py:attribute:: RANDOM
+      :value: 'rand'
+
+
+
+.. py:class:: IsCluster
+
+   Bases: :py:obj:`int`, :py:obj:`enum.Enum`
+
+
+   Enumeration for cluster classification.
+
+
+   .. py:attribute:: IS_CLUSTER
+      :value: 1
+
+
+
+   .. py:attribute:: NOT_CLUSTER
+      :value: 0
+
+
+
+.. py:data:: required_columns
+
+.. py:data:: optional_columns
+
+.. py:function:: inherit_columns(frame: pandas.DataFrame) -> pandas.DataFrame
+
+   Ensures the DataFrame has required and optional columns.
+
+   Args:
+       frame (pd.DataFrame): Input DataFrame.
 
    Returns:
-   - Tensor: RGB image tensor of shape (3, H, W)
+       pd.DataFrame: DataFrame with required and optional columns ensured.
+
+
+.. py:function:: read_vizier(catalogue: str) -> pandas.DataFrame
+
+   Fetches a catalogue from Vizier and converts it to a pandas DataFrame.
+
+   Args:
+       catalogue (str): Name or identifier of the catalogue.
+
+   Returns:
+       pd.DataFrame: DataFrame containing the catalogue data.
+
+
+.. py:function:: bar_progress(current: int, total: int, width: int = 80) -> None
+
+   Displays a progress bar for downloads.
+
+   Args:
+       current (int): Current number of bytes downloaded.
+       total (int): Total number of bytes to download.
+       width (int, optional): Width of the progress bar. Defaults to 80.
+
+
+.. py:function:: to_hms_format(time_str: str) -> str
+
+   Converts a time string to HMS format.
+
+   Args:
+       time_str (str): Time string in space-separated format (e.g., "12 34 56").
+
+   Returns:
+       str: Time string in HMS format (e.g., "12h34m56s").
+
+
+.. py:function:: to_dms_format(time_str: str) -> str
+
+   Converts a time string to DMS format.
+
+   Args:
+       time_str (str): Time string in space-separated format (e.g., "12 34 56").
+
+   Returns:
+       str: Time string in DMS format (e.g., "12d34m56s").
+
+
+.. py:function:: divide_chunks(data_list: List[Any], chunk_size: int) -> Generator[List[Any], None, None]
+
+   Divides a list into chunks of a specified size.
+
+   Args:
+       data_list (List[Any]): Input list to divide.
+       chunk_size (int): Size of each chunk.
+
+   Yields:
+       Generator[List[Any], None, None]: Generator yielding list chunks.
+
+
+.. py:function:: fits_to_rgb_image(tensor: torch.Tensor) -> torch.Tensor
+
+   Converts a 2-channel tensor to an RGB image tensor.
+
+   Args:
+       tensor (torch.Tensor): Input tensor of shape (2, H, W).
+
+   Returns:
+       torch.Tensor: RGB image tensor of shape (3, H, W).
+
+   Raises:
+       ValueError: If the input tensor does not have 2 channels.
 
 

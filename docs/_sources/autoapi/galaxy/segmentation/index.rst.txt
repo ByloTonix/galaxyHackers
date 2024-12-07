@@ -5,7 +5,10 @@ galaxy.segmentation
 
 .. autoapi-nested-parse::
 
-   Script to create segmentation maps for models
+   Script to create segmentation maps for models.
+
+   To create segmentation maps for randomly chosen clusters, random objects and stars use function saveSegMaps().
+   To create a segmentation map with larger scale for a randomly chosen cluster use function saveBigSegMap().
 
 
 
@@ -16,7 +19,7 @@ Attributes
 
    galaxy.segmentation.sample_sizes
    galaxy.segmentation.plot_radius
-   galaxy.segmentation.sample_soures
+   galaxy.segmentation.sample_sources
 
 
 Classes
@@ -33,6 +36,7 @@ Functions
 
 .. autoapisummary::
 
+   galaxy.segmentation.cleanup_memory
    galaxy.segmentation.load_model
    galaxy.segmentation.predict_test
    galaxy.segmentation.create_sample
@@ -46,25 +50,42 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: load_model(model: torch.nn.Module, optimizer_name, device)
+.. py:function:: cleanup_memory(*args) -> None
 
-.. py:function:: predict_test(model: torch.nn.Module, optimizer_name)
+   Cleans up memory by deleting variables and freeing GPU memory.
+
+   Args:
+       *args: Variables to be deleted.
+
+
+.. py:function:: load_model(model: torch.nn.Module, optimizer_name: str, device: torch.device) -> torch.nn.Module
+
+   Loads a trained model with specific weights.
+
+   Args:
+       model (torch.nn.Module): The model to be loaded.
+       optimizer_name (str): Name of the optimizer used during training.
+       device (torch.device): Device to load the model on.
+
+   Returns:
+       torch.nn.Module: The loaded model.
+
+
+.. py:function:: predict_test(model: torch.nn.Module, optimizer_name: str) -> None
+
+   Runs predictions on the test and bright stars datasets.
+
+   Args:
+       model (torch.nn.Module): The model to make predictions with.
+       optimizer_name (str): Name of the optimizer used during training.
+
 
 .. py:class:: SampleName
 
    Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
 
-   str(object='') -> str
-   str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-   Create a new string object from the given object. If encoding or
-   errors is specified, then the object must expose a data buffer
-   that will be decoded using the given encoding and error handler.
-   Otherwise, returns the result of object.__str__() (if defined)
-   or repr(object).
-   encoding defaults to sys.getdefaultencoding().
-   errors defaults to 'strict'.
+   Enumeration for sample names.
 
 
    .. py:attribute:: CLUSTER_SMALL
@@ -72,23 +93,13 @@ Module Contents
 
 
 
-   .. py:attribute:: RANDOM_SMALL
+   .. py:attribute:: NEGATIVE_SMALL
       :value: 'random_small'
 
 
 
-   .. py:attribute:: GAIA_SMALL
-      :value: 'gaia_small'
-
-
-
-   .. py:attribute:: MC_BIG
-      :value: 'mc_big'
-
-
-
-   .. py:attribute:: DR5_BIG
-      :value: 'dr5_big'
+   .. py:attribute:: TYC2_SMALL
+      :value: 'tyc2_small'
 
 
 
@@ -100,16 +111,7 @@ Module Contents
    Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
 
-   str(object='') -> str
-   str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-   Create a new string object from the given object. If encoding or
-   errors is specified, then the object must expose a data buffer
-   that will be decoded using the given encoding and error handler.
-   Otherwise, returns the result of object.__str__() (if defined)
-   or repr(object).
-   encoding defaults to sys.getdefaultencoding().
-   errors defaults to 'strict'.
+   Enumeration for map types.
 
 
    .. py:attribute:: SMALL
@@ -124,17 +126,84 @@ Module Contents
 
 .. py:data:: plot_radius
 
-.. py:data:: sample_soures
+.. py:data:: sample_sources
 
-.. py:function:: create_sample(sample_name, predictor: galaxy.train.Predictor)
+.. py:function:: create_sample(sample_name, predictor: galaxy.train.Predictor) -> tuple[pandas.DataFrame, pandas.DataFrame, MapType]
 
-.. py:function:: grab_surrounding(points_on_radius)
+   Creates a sample dataset for segmentation map generation.
 
-.. py:function:: create_map_dataloader(map_type: MapType, ra_start: float, dec_start: float, map_dir: pathlib.Path, survey=None, bands=None, imgsize_pix=224)
+   Args:
+       sample_name (SampleName): Name of the sample.
+       predictor (train.Predictor): Predictor object for making predictions.
 
-.. py:function:: prepare_sample_dataloaders(data: pandas.DataFrame, sample_name: SampleName, map_type: MapType)
+   Returns:
+       tuple: Sample data, sample predictions, and map type.
 
-.. py:function:: create_segmentation_plot(model_name: str, optimizer_name: str, predictor: galaxy.train.Predictor, sample_name: SampleName, n_cols=5)
 
-.. py:function:: create_segmentation_plots(model, model_name, optimizer_name, map_type: MapType = MapType.SMALL)
+.. py:function:: grab_surrounding(points_on_radius: int) -> Generator[tuple[int, int], None, None]
+
+   Generates surrounding grid points for a given radius.
+
+   Args:
+       points_on_radius (int): Radius in grid points.
+
+   Yields:
+       tuple[int, int]: Coordinates of grid points.
+
+
+.. py:function:: create_map_dataloader(map_type: MapType, ra_start: float, dec_start: float, map_dir: pathlib.Path, survey=None, bands=None, imgsize_pix=224) -> torch.utils.data.DataLoader
+
+   Creates a dataloader for a segmentation map.
+
+   Args:
+       map_type (MapType): Type of the map.
+       ra_start (float): Starting RA coordinate.
+       dec_start (float): Starting Dec coordinate.
+       map_dir (Path): Directory to save the map data.
+       survey (str, optional): Survey name. Defaults to None.
+       bands (list, optional): List of bands. Defaults to None.
+       imgsize_pix (int, optional): Image size in pixels. Defaults to 224.
+
+   Returns:
+       DataLoader: Dataloader object for the segmentation map.
+
+
+.. py:function:: prepare_sample_dataloaders(data: pandas.DataFrame, sample_name: SampleName, map_type: MapType) -> list[tuple[int, torch.utils.data.DataLoader]]
+
+   Prepares dataloaders for segmentation map samples.
+
+   Args:
+       data (pd.DataFrame): Data describing the samples.
+       sample_name (SampleName): Name of the sample.
+       map_type (MapType): Type of map to generate.
+
+   Returns:
+       list[tuple[int, DataLoader]]: List of tuples containing index and dataloader.
+
+
+.. py:function:: create_segmentation_plot(model_name: str, optimizer_name: str, predictor: galaxy.train.Predictor, sample_name: SampleName, n_cols: int = 5) -> None
+
+   Creates a segmentation map plot for a given sample.
+
+   Args:
+       model_name (str): Name of the model.
+       optimizer_name (str): Name of the optimizer used during training.
+       predictor (train.Predictor): Predictor for making predictions.
+       sample_name (SampleName): Name of the sample.
+       n_cols (int, optional): Number of columns in the plot. Defaults to 5.
+
+
+.. py:function:: create_segmentation_plots(model: torch.nn.Module, model_name: str, optimizer_name: str, map_type: MapType = MapType.SMALL) -> None
+
+   Creates segmentation maps for all samples.
+
+   Args:
+       model (torch.nn.Module): The model used for predictions.
+       model_name (str): Name of the model.
+       optimizer_name (str): Name of the optimizer used during training.
+       map_type (MapType, optional): Type of map to generate. Defaults to MapType.SMALL.
+
+   Returns:
+       None
+
 

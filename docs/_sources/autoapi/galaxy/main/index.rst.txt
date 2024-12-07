@@ -3,6 +3,11 @@ galaxy.main
 
 .. py:module:: galaxy.main
 
+.. autoapi-nested-parse::
+
+   Script to train and evaluate models with optional segmentation.
+
+
 
 Attributes
 ----------

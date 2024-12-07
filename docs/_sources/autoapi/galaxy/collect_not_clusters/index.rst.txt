@@ -1,0 +1,54 @@
+galaxy.collect_not_clusters
+===========================
+
+.. py:module:: galaxy.collect_not_clusters
+
+.. autoapi-nested-parse::
+
+   Script to collect data for negative class
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   galaxy.collect_not_clusters.read_sga
+   galaxy.collect_not_clusters.read_tyc2
+   galaxy.collect_not_clusters.read_gaia
+
+
+Module Contents
+---------------
+
+.. py:function:: read_sga(sample_size: int = 10000) -> pandas.DataFrame
+
+   Reads the SGA catalog and samples galaxies in short distances.
+
+   Args:
+       sample_size (int, optional): Desired size of the sample. Defaults to 10,000.
+
+   Returns:
+       pd.DataFrame: DataFrame containing SGA galaxy data sampled evenly across redshift bins.
+
+
+.. py:function:: read_tyc2(sample_size: int = 5000) -> pandas.DataFrame
+
+   Reads the TYC2 catalog and samples bright stars.
+
+   Args:
+       sample_size (int, optional): Desired size of the sample. Defaults to 5,000.
+
+   Returns:
+       pd.DataFrame: DataFrame containing TYC2 bright star data.
+
+
+.. py:function:: read_gaia() -> pandas.DataFrame
+
+   Reads the Gaia catalog and samples stars.
+
+   Returns:
+       pd.DataFrame: DataFrame containing Gaia star data.
+
+

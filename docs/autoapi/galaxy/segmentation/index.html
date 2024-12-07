@@ -222,6 +222,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">galaxy</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of galaxy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../collect_clusters/index.html">galaxy.collect_clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collect_not_clusters/index.html">galaxy.collect_not_clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../config/index.html">galaxy.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/index.html">galaxy.data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../grabber/index.html">galaxy.grabber</a></li>
@@ -287,7 +289,9 @@
         <article role="main" id="furo-main-content">
           <section id="module-galaxy.segmentation">
 <span id="galaxy-segmentation"></span><h1>galaxy.segmentation<a class="headerlink" href="#module-galaxy.segmentation" title="Link to this heading"></a></h1>
-<p>Script to create segmentation maps for models</p>
+<p>Script to create segmentation maps for models.</p>
+<p>To create segmentation maps for randomly chosen clusters, random objects and stars use function saveSegMaps().
+To create a segmentation map with larger scale for a randomly chosen cluster use function saveBigSegMap().</p>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -299,7 +303,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.plot_radius" title="galaxy.segmentation.plot_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_radius</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.sample_soures" title="galaxy.segmentation.sample_soures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_soures</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.sample_sources" title="galaxy.segmentation.sample_sources"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_sources</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -312,10 +316,10 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.SampleName" title="galaxy.segmentation.SampleName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SampleName</span></code></a></p></td>
-<td><p>str(object='') -&gt; str</p></td>
+<td><p>Enumeration for sample names.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MapType</span></code></a></p></td>
-<td><p>str(object='') -&gt; str</p></td>
+<td><p>Enumeration for map types.</p></td>
 </tr>
 </tbody>
 </table>
@@ -326,29 +330,32 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.load_model" title="galaxy.segmentation.load_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_model</span></code></a>(model, optimizer_name, device)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.cleanup_memory" title="galaxy.segmentation.cleanup_memory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cleanup_memory</span></code></a>(→ None)</p></td>
+<td><p>Cleans up memory by deleting variables and freeing GPU memory.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.predict_test" title="galaxy.segmentation.predict_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_test</span></code></a>(model, optimizer_name)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.load_model" title="galaxy.segmentation.load_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_model</span></code></a>(→ torch.nn.Module)</p></td>
+<td><p>Loads a trained model with specific weights.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.create_sample" title="galaxy.segmentation.create_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_sample</span></code></a>(sample_name, predictor)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.predict_test" title="galaxy.segmentation.predict_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_test</span></code></a>(→ None)</p></td>
+<td><p>Runs predictions on the test and bright stars datasets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.grab_surrounding" title="galaxy.segmentation.grab_surrounding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grab_surrounding</span></code></a>(points_on_radius)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.create_sample" title="galaxy.segmentation.create_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_sample</span></code></a>(→ tuple[pandas.DataFrame, ...)</p></td>
+<td><p>Creates a sample dataset for segmentation map generation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.create_map_dataloader" title="galaxy.segmentation.create_map_dataloader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_map_dataloader</span></code></a>(map_type, ra_start, dec_start, ...)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.grab_surrounding" title="galaxy.segmentation.grab_surrounding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grab_surrounding</span></code></a>(→ Generator[tuple[int, int], None, None])</p></td>
+<td><p>Generates surrounding grid points for a given radius.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.prepare_sample_dataloaders" title="galaxy.segmentation.prepare_sample_dataloaders"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_sample_dataloaders</span></code></a>(data, sample_name, map_type)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.create_map_dataloader" title="galaxy.segmentation.create_map_dataloader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_map_dataloader</span></code></a>(→ torch.utils.data.DataLoader)</p></td>
+<td><p>Creates a dataloader for a segmentation map.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.create_segmentation_plot" title="galaxy.segmentation.create_segmentation_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_segmentation_plot</span></code></a>(model_name, optimizer_name, ...)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.prepare_sample_dataloaders" title="galaxy.segmentation.prepare_sample_dataloaders"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_sample_dataloaders</span></code></a>(→ list[tuple[int, ...)</p></td>
+<td><p>Prepares dataloaders for segmentation map samples.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.create_segmentation_plots" title="galaxy.segmentation.create_segmentation_plots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_segmentation_plots</span></code></a>(model, model_name, ...[, ...])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.segmentation.create_segmentation_plot" title="galaxy.segmentation.create_segmentation_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_segmentation_plot</span></code></a>(→ None)</p></td>
+<td><p>Creates a segmentation map plot for a given sample.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.segmentation.create_segmentation_plots" title="galaxy.segmentation.create_segmentation_plots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_segmentation_plots</span></code></a>(→ None)</p></td>
+<td><p>Creates segmentation maps for all samples.</p></td>
 </tr>
 </tbody>
 </table>
@@ -357,51 +364,58 @@
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="galaxy.segmentation.cleanup_memory">
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">cleanup_memory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.segmentation.cleanup_memory" title="Link to this definition"></a></dt>
+<dd><p>Cleans up memory by deleting variables and freeing GPU memory.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p><a href="#id1"><span class="problematic" id="id2">*</span></a>args: Variables to be deleted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.load_model">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.load_model" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.device</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.nn.Module</span></span></span><a class="headerlink" href="#galaxy.segmentation.load_model" title="Link to this definition"></a></dt>
+<dd><p>Loads a trained model with specific weights.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>model (torch.nn.Module): The model to be loaded.
+optimizer_name (str): Name of the optimizer used during training.
+device (torch.device): Device to load the model on.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.nn.Module: The loaded model.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.predict_test">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">predict_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.predict_test" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">predict_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.segmentation.predict_test" title="Link to this definition"></a></dt>
+<dd><p>Runs predictions on the test and bright stars datasets.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>model (torch.nn.Module): The model to make predictions with.
+optimizer_name (str): Name of the optimizer used during training.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="galaxy.segmentation.SampleName">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">SampleName</span></span><a class="headerlink" href="#galaxy.segmentation.SampleName" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>str(object=’’) -&gt; str
-str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
-<p>Create a new string object from the given object. If encoding or
-errors is specified, then the object must expose a data buffer
-that will be decoded using the given encoding and error handler.
-Otherwise, returns the result of object.__str__() (if defined)
-or repr(object).
-encoding defaults to sys.getdefaultencoding().
-errors defaults to ‘strict’.</p>
+<p>Enumeration for sample names.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.segmentation.SampleName.CLUSTER_SMALL">
 <span class="sig-name descname"><span class="pre">CLUSTER_SMALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cluster_small'</span></em><a class="headerlink" href="#galaxy.segmentation.SampleName.CLUSTER_SMALL" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.segmentation.SampleName.RANDOM_SMALL">
-<span class="sig-name descname"><span class="pre">RANDOM_SMALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'random_small'</span></em><a class="headerlink" href="#galaxy.segmentation.SampleName.RANDOM_SMALL" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="galaxy.segmentation.SampleName.NEGATIVE_SMALL">
+<span class="sig-name descname"><span class="pre">NEGATIVE_SMALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'random_small'</span></em><a class="headerlink" href="#galaxy.segmentation.SampleName.NEGATIVE_SMALL" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.segmentation.SampleName.GAIA_SMALL">
-<span class="sig-name descname"><span class="pre">GAIA_SMALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gaia_small'</span></em><a class="headerlink" href="#galaxy.segmentation.SampleName.GAIA_SMALL" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.segmentation.SampleName.MC_BIG">
-<span class="sig-name descname"><span class="pre">MC_BIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mc_big'</span></em><a class="headerlink" href="#galaxy.segmentation.SampleName.MC_BIG" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.segmentation.SampleName.DR5_BIG">
-<span class="sig-name descname"><span class="pre">DR5_BIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dr5_big'</span></em><a class="headerlink" href="#galaxy.segmentation.SampleName.DR5_BIG" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="galaxy.segmentation.SampleName.TYC2_SMALL">
+<span class="sig-name descname"><span class="pre">TYC2_SMALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tyc2_small'</span></em><a class="headerlink" href="#galaxy.segmentation.SampleName.TYC2_SMALL" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -415,15 +429,7 @@ errors defaults to ‘strict’.</p>
 <dt class="sig sig-object py" id="galaxy.segmentation.MapType">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">MapType</span></span><a class="headerlink" href="#galaxy.segmentation.MapType" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>str(object=’’) -&gt; str
-str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
-<p>Create a new string object from the given object. If encoding or
-errors is specified, then the object must expose a data buffer
-that will be decoded using the given encoding and error handler.
-Otherwise, returns the result of object.__str__() (if defined)
-or repr(object).
-encoding defaults to sys.getdefaultencoding().
-errors defaults to ‘strict’.</p>
+<p>Enumeration for map types.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.segmentation.MapType.SMALL">
 <span class="sig-name descname"><span class="pre">SMALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#galaxy.segmentation.MapType.SMALL" title="Link to this definition"></a></dt>
@@ -442,39 +448,95 @@ errors defaults to ‘strict’.</p>
 <dd></dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="galaxy.segmentation.sample_soures">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">sample_soures</span></span><a class="headerlink" href="#galaxy.segmentation.sample_soures" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="galaxy.segmentation.sample_sources">
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">sample_sources</span></span><a class="headerlink" href="#galaxy.segmentation.sample_sources" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.create_sample">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../train/index.html#galaxy.train.Predictor" title="galaxy.train.Predictor"><span class="pre">galaxy.train.Predictor</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.create_sample" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../train/index.html#galaxy.train.Predictor" title="galaxy.train.Predictor"><span class="pre">galaxy.train.Predictor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas.DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><span class="pre">MapType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.segmentation.create_sample" title="Link to this definition"></a></dt>
+<dd><p>Creates a sample dataset for segmentation map generation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>sample_name (SampleName): Name of the sample.
+predictor (train.Predictor): Predictor object for making predictions.</p>
+</dd>
+<dt>Returns:</dt><dd><p>tuple: Sample data, sample predictions, and map type.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.grab_surrounding">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">grab_surrounding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points_on_radius</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.grab_surrounding" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">grab_surrounding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points_on_radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.segmentation.grab_surrounding" title="Link to this definition"></a></dt>
+<dd><p>Generates surrounding grid points for a given radius.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>points_on_radius (int): Radius in grid points.</p>
+</dd>
+<dt>Yields:</dt><dd><p>tuple[int, int]: Coordinates of grid points.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.create_map_dataloader">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_map_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><span class="pre">MapType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">survey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgsize_pix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">224</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.create_map_dataloader" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_map_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><span class="pre">MapType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">survey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgsize_pix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">224</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.utils.data.DataLoader</span></span></span><a class="headerlink" href="#galaxy.segmentation.create_map_dataloader" title="Link to this definition"></a></dt>
+<dd><p>Creates a dataloader for a segmentation map.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>map_type (MapType): Type of the map.
+ra_start (float): Starting RA coordinate.
+dec_start (float): Starting Dec coordinate.
+map_dir (Path): Directory to save the map data.
+survey (str, optional): Survey name. Defaults to None.
+bands (list, optional): List of bands. Defaults to None.
+imgsize_pix (int, optional): Image size in pixels. Defaults to 224.</p>
+</dd>
+<dt>Returns:</dt><dd><p>DataLoader: Dataloader object for the segmentation map.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.prepare_sample_dataloaders">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">prepare_sample_dataloaders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.SampleName" title="galaxy.segmentation.SampleName"><span class="pre">SampleName</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><span class="pre">MapType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.prepare_sample_dataloaders" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">prepare_sample_dataloaders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.SampleName" title="galaxy.segmentation.SampleName"><span class="pre">SampleName</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><span class="pre">MapType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.utils.data.DataLoader</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.segmentation.prepare_sample_dataloaders" title="Link to this definition"></a></dt>
+<dd><p>Prepares dataloaders for segmentation map samples.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data (pd.DataFrame): Data describing the samples.
+sample_name (SampleName): Name of the sample.
+map_type (MapType): Type of map to generate.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list[tuple[int, DataLoader]]: List of tuples containing index and dataloader.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.create_segmentation_plot">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_segmentation_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../train/index.html#galaxy.train.Predictor" title="galaxy.train.Predictor"><span class="pre">galaxy.train.Predictor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.SampleName" title="galaxy.segmentation.SampleName"><span class="pre">SampleName</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.create_segmentation_plot" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_segmentation_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../train/index.html#galaxy.train.Predictor" title="galaxy.train.Predictor"><span class="pre">galaxy.train.Predictor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.SampleName" title="galaxy.segmentation.SampleName"><span class="pre">SampleName</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.segmentation.create_segmentation_plot" title="Link to this definition"></a></dt>
+<dd><p>Creates a segmentation map plot for a given sample.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>model_name (str): Name of the model.
+optimizer_name (str): Name of the optimizer used during training.
+predictor (train.Predictor): Predictor for making predictions.
+sample_name (SampleName): Name of the sample.
+n_cols (int, optional): Number of columns in the plot. Defaults to 5.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.segmentation.create_segmentation_plots">
-<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_segmentation_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><span class="pre">MapType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MapType.SMALL</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.segmentation.create_segmentation_plots" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.segmentation.</span></span><span class="sig-name descname"><span class="pre">create_segmentation_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#galaxy.segmentation.MapType" title="galaxy.segmentation.MapType"><span class="pre">MapType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MapType.SMALL</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.segmentation.create_segmentation_plots" title="Link to this definition"></a></dt>
+<dd><p>Creates segmentation maps for all samples.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>model (torch.nn.Module): The model used for predictions.
+model_name (str): Name of the model.
+optimizer_name (str): Name of the optimizer used during training.
+map_type (MapType, optional): Type of map to generate. Defaults to MapType.SMALL.</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>
@@ -538,14 +600,13 @@ errors defaults to ‘strict’.</p>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#galaxy.segmentation.cleanup_memory"><code class="docutils literal notranslate"><span class="pre">cleanup_memory()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.segmentation.load_model"><code class="docutils literal notranslate"><span class="pre">load_model()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.segmentation.predict_test"><code class="docutils literal notranslate"><span class="pre">predict_test()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.segmentation.SampleName"><code class="docutils literal notranslate"><span class="pre">SampleName</span></code></a><ul>
 <li><a class="reference internal" href="#galaxy.segmentation.SampleName.CLUSTER_SMALL"><code class="docutils literal notranslate"><span class="pre">SampleName.CLUSTER_SMALL</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.segmentation.SampleName.RANDOM_SMALL"><code class="docutils literal notranslate"><span class="pre">SampleName.RANDOM_SMALL</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.segmentation.SampleName.GAIA_SMALL"><code class="docutils literal notranslate"><span class="pre">SampleName.GAIA_SMALL</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.segmentation.SampleName.MC_BIG"><code class="docutils literal notranslate"><span class="pre">SampleName.MC_BIG</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.segmentation.SampleName.DR5_BIG"><code class="docutils literal notranslate"><span class="pre">SampleName.DR5_BIG</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.segmentation.SampleName.NEGATIVE_SMALL"><code class="docutils literal notranslate"><span class="pre">SampleName.NEGATIVE_SMALL</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.segmentation.SampleName.TYC2_SMALL"><code class="docutils literal notranslate"><span class="pre">SampleName.TYC2_SMALL</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#galaxy.segmentation.sample_sizes"><code class="docutils literal notranslate"><span class="pre">sample_sizes</span></code></a></li>
@@ -555,7 +616,7 @@ errors defaults to ‘strict’.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#galaxy.segmentation.plot_radius"><code class="docutils literal notranslate"><span class="pre">plot_radius</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.segmentation.sample_soures"><code class="docutils literal notranslate"><span class="pre">sample_soures</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.segmentation.sample_sources"><code class="docutils literal notranslate"><span class="pre">sample_sources</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.segmentation.create_sample"><code class="docutils literal notranslate"><span class="pre">create_sample()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.segmentation.grab_surrounding"><code class="docutils literal notranslate"><span class="pre">grab_surrounding()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.segmentation.create_map_dataloader"><code class="docutils literal notranslate"><span class="pre">create_map_dataloader()</span></code></a></li>

@@ -28,9 +28,23 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: download_url(url: str, outfile: str, max_attempts: int = 100)
+.. py:function:: download_url(url: str, outfile: str, max_attempts: int = 100) -> bool
+
+   Downloads a file from a given URL with retries in case of errors.
+
+   Args:
+       url (str): URL of the file to download.
+       outfile (str): Output file path.
+       max_attempts (int, optional): Maximum number of download attempts. Defaults to 100.
+
+   Returns:
+       bool: True if the download was successful, False otherwise.
+
 
 .. py:class:: Grabber(survey_layer: str | None = None, bands: str | None = None, imgsize_arcmin: float = 1.5, imgsize_pix: int = 224, extra_processing: Optional[Callable] = None, extra_processing_kwargs: Dict[Any, Any] = dict())
+
+   Class for fetching image cutouts from the legacy survey.
+
 
    .. py:attribute:: survey_layer
 
@@ -50,10 +64,31 @@ Module Contents
    .. py:attribute:: extra_processing_kwargs
 
 
-   .. py:method:: make_url(ra, dec, s_arcmin=3, s_px=512, format='fits')
+   .. py:method:: make_url(ra: float, dec: float, s_arcmin: float = 3.0, s_px: int = 512, format: str = 'fits') -> str
+
+      Creates a URL for fetching an image cutout from the legacy survey.
+
+      Args:
+          ra (float): Right ascension in degrees.
+          dec (float): Declination in degrees.
+          s_arcmin (float, optional): Size of the image in arcminutes. Defaults to 3.0.
+          s_px (int, optional): Size of the image in pixels. Defaults to 512.
+          format (str, optional): Format of the output file. Defaults to "fits".
+
+      Returns:
+          str: URL for the cutout.
 
 
-   .. py:method:: grab_cutout(ra: float, dec: float, output_path: pathlib.Path)
+
+   .. py:method:: grab_cutout(ra: float, dec: float, output_path: pathlib.Path) -> None
+
+      Fetches a single image cutout.
+
+      Args:
+          ra (float): Right ascension in degrees.
+          dec (float): Declination in degrees.
+          output_path (Path): Output file path.
+
 
 
    .. py:method:: grab_cutouts(targets: pandas.DataFrame, name_col: str = 'name', ra_col: str = 'ra_deg', dec_col: str = 'dec_deg', output_dir: str = '', suffix: str = '', file_format: str = 'fits') -> None

@@ -222,6 +222,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">galaxy</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of galaxy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../collect_clusters/index.html">galaxy.collect_clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collect_not_clusters/index.html">galaxy.collect_not_clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../config/index.html">galaxy.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/index.html">galaxy.data</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">galaxy.grabber</a></li>
@@ -294,7 +296,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.grabber.Grabber" title="galaxy.grabber.Grabber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Grabber</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Class for fetching image cutouts from the legacy survey.</p></td>
 </tr>
 </tbody>
 </table>
@@ -305,8 +307,8 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.grabber.download_url" title="galaxy.grabber.download_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_url</span></code></a>(url, outfile[, max_attempts])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.grabber.download_url" title="galaxy.grabber.download_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_url</span></code></a>(→ bool)</p></td>
+<td><p>Downloads a file from a given URL with retries in case of errors.</p></td>
 </tr>
 </tbody>
 </table>
@@ -316,13 +318,23 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.grabber.download_url">
-<span class="sig-prename descclassname"><span class="pre">galaxy.grabber.</span></span><span class="sig-name descname"><span class="pre">download_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.grabber.download_url" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.grabber.</span></span><span class="sig-name descname"><span class="pre">download_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#galaxy.grabber.download_url" title="Link to this definition"></a></dt>
+<dd><p>Downloads a file from a given URL with retries in case of errors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>url (str): URL of the file to download.
+outfile (str): Output file path.
+max_attempts (int, optional): Maximum number of download attempts. Defaults to 100.</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if the download was successful, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="galaxy.grabber.Grabber">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.grabber.</span></span><span class="sig-name descname"><span class="pre">Grabber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">survey_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgsize_arcmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgsize_pix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">224</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_processing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_processing_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">dict()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.grabber.Grabber" title="Link to this definition"></a></dt>
-<dd><dl class="py attribute">
+<dd><p>Class for fetching image cutouts from the legacy survey.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.grabber.Grabber.survey_layer">
 <span class="sig-name descname"><span class="pre">survey_layer</span></span><a class="headerlink" href="#galaxy.grabber.Grabber.survey_layer" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -354,13 +366,31 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.grabber.Grabber.make_url">
-<span class="sig-name descname"><span class="pre">make_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_arcmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fits'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.grabber.Grabber.make_url" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">make_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_arcmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_px</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'fits'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#galaxy.grabber.Grabber.make_url" title="Link to this definition"></a></dt>
+<dd><p>Creates a URL for fetching an image cutout from the legacy survey.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ra (float): Right ascension in degrees.
+dec (float): Declination in degrees.
+s_arcmin (float, optional): Size of the image in arcminutes. Defaults to 3.0.
+s_px (int, optional): Size of the image in pixels. Defaults to 512.
+format (str, optional): Format of the output file. Defaults to “fits”.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: URL for the cutout.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.grabber.Grabber.grab_cutout">
-<span class="sig-name descname"><span class="pre">grab_cutout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.grabber.Grabber.grab_cutout" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">grab_cutout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.grabber.Grabber.grab_cutout" title="Link to this definition"></a></dt>
+<dd><p>Fetches a single image cutout.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ra (float): Right ascension in degrees.
+dec (float): Declination in degrees.
+output_path (Path): Output file path.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.grabber.Grabber.grab_cutouts">

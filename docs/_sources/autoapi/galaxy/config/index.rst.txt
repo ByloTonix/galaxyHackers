@@ -3,6 +3,11 @@ galaxy.config
 
 .. py:module:: galaxy.config
 
+.. autoapi-nested-parse::
+
+   Configuration and setup script for managing paths and settings.
+
+
 
 Attributes
 ----------

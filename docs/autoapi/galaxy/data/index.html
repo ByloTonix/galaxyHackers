@@ -222,6 +222,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">galaxy</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of galaxy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../collect_clusters/index.html">galaxy.collect_clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collect_not_clusters/index.html">galaxy.collect_not_clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../config/index.html">galaxy.config</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">galaxy.data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../grabber/index.html">galaxy.grabber</a></li>
@@ -302,11 +304,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.main_transforms" title="galaxy.data.main_transforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main_transforms</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.required_columns" title="galaxy.data.required_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">required_columns</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.optional_columns" title="galaxy.data.optional_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optional_columns</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.datasets_collection" title="galaxy.data.datasets_collection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets_collection</span></code></a></p></td>
+<td><p>Generate object that are not present in any of currently included datasets</p></td>
 </tr>
 </tbody>
 </table>
@@ -317,17 +316,17 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.DataSource" title="galaxy.data.DataSource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataSource</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.DataPart" title="galaxy.data.DataPart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataPart</span></code></a></p></td>
 <td><p>str(object='') -&gt; str</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.DataPart" title="galaxy.data.DataPart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataPart</span></code></a></p></td>
-<td><p>str(object='') -&gt; str</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform" title="galaxy.data.ShiftAndMirrorPadTransform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform</span></code></a></p></td>
+<td><p>Applies random shifts to coordinates for data augmentation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform" title="galaxy.data.ShiftAndMirrorPadTransform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.ClusterDataset" title="galaxy.data.ClusterDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClusterDataset</span></code></a></p></td>
+<td><p>Custom PyTorch Dataset for cluster data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.ClusterDataset" title="galaxy.data.ClusterDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClusterDataset</span></code></a></p></td>
-<td><p>An abstract class representing a <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.DatasetsInfo" title="galaxy.data.DatasetsInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DatasetsInfo</span></code></a></p></td>
+<td><p>Class to manage and cache datasets for training and evaluation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -338,62 +337,50 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.shift_and_mirror_pad" title="galaxy.data.shift_and_mirror_pad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift_and_mirror_pad</span></code></a>(image, shift_x, shift_y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.shift_and_mirror_pad" title="galaxy.data.shift_and_mirror_pad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift_and_mirror_pad</span></code></a>(→ torch.Tensor)</p></td>
 <td><p>Shifts the image by (shift_x, shift_y) and applies mirror-padding.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.download_data" title="galaxy.data.download_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_data</span></code></a>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.download_data" title="galaxy.data.download_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_data</span></code></a>(→ None)</p></td>
+<td><p>Downloads required data files.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.inherit_columns" title="galaxy.data.inherit_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inherit_columns</span></code></a>(frame)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.get_positive_class" title="galaxy.data.get_positive_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_positive_class</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Combines multiple datasets to create the positive class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.read_dr5" title="galaxy.data.read_dr5"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dr5</span></code></a>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.get_cluster_catalog" title="galaxy.data.get_cluster_catalog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cluster_catalog</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
+<td><p>Creates a SkyCoord catalog of known clusters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.read_mc" title="galaxy.data.read_mc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_mc</span></code></a>()</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.expanded_positive_class" title="galaxy.data.expanded_positive_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expanded_positive_class</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Generates an expanded dataset of positive class by applying random shifts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.read_sga" title="galaxy.data.read_sga"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_sga</span></code></a>([sample_size])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.get_negative_class" title="galaxy.data.get_negative_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_negative_class</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Combines datasets to create the negative class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.read_tyc2" title="galaxy.data.read_tyc2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_tyc2</span></code></a>([sample_size])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.get_non_cluster_catalog" title="galaxy.data.get_non_cluster_catalog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_non_cluster_catalog</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
+<td><p>Creates a SkyCoord catalog of non-cluster objects.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.read_gaia" title="galaxy.data.read_gaia"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_gaia</span></code></a>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.update_bright_stars" title="galaxy.data.update_bright_stars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_bright_stars</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Updates or loads the bright stars dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.get_cluster_catalog" title="galaxy.data.get_cluster_catalog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cluster_catalog</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.filter_candidates" title="galaxy.data.filter_candidates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_candidates</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
+<td><p>Filters candidate objects based on angular distance and galactic latitude.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.filter_candiates" title="galaxy.data.filter_candiates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_candiates</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.generate_random_candidates" title="galaxy.data.generate_random_candidates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_random_candidates</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
+<td><p>Generates random sky coordinates for candidates.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.generate_candidates_dr5" title="galaxy.data.generate_candidates_dr5"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_candidates_dr5</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.generate_random_based" title="galaxy.data.generate_random_based"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_random_based</span></code></a>(→ astropy.coordinates.SkyCoord)</p></td>
+<td><p>Generates random candidates based on existing datasets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.generate_candidates_mc" title="galaxy.data.generate_candidates_mc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_candidates_mc</span></code></a>()</p></td>
-<td><p>Create sample from MadCows catalogue</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.generate_random_sample" title="galaxy.data.generate_random_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_random_sample</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Combines random candidates from <cite>generate_random_candidates</cite> and <cite>generate_random_based</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.create_negative_class_dr5" title="galaxy.data.create_negative_class_dr5"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_negative_class_dr5</span></code></a>()</p></td>
-<td><p>Create sample from dr5 clsuter catalogue</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.train_val_test_split" title="galaxy.data.train_val_test_split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_val_test_split</span></code></a>(→ dict[DataPart, pandas.DataFrame])</p></td>
+<td><p>Splits the dataset into training, validation, and test sets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.create_negative_class_mc" title="galaxy.data.create_negative_class_mc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_negative_class_mc</span></code></a>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.ddos" title="galaxy.data.ddos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddos</span></code></a>(→ None)</p></td>
+<td><p>Generates cutouts for all data splits and saves them.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.create_data_train" title="galaxy.data.create_data_train"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_data_train</span></code></a>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.create_data_test" title="galaxy.data.create_data_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_data_test</span></code></a>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.train_val_test_split" title="galaxy.data.train_val_test_split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_val_test_split</span></code></a>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.data.ddos" title="galaxy.data.ddos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddos</span></code></a>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.create_dataloaders" title="galaxy.data.create_dataloaders"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dataloaders</span></code></a>()</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.data.create_dataloaders" title="galaxy.data.create_dataloaders"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dataloaders</span></code></a>(→ tuple[dict[DataPart, ...)</p></td>
+<td><p>Creates datasets and dataloaders for each data part.</p></td>
 </tr>
 </tbody>
 </table>
@@ -415,46 +402,6 @@
 <dt class="sig sig-object py" id="galaxy.data.main_transforms">
 <span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">main_transforms</span></span><a class="headerlink" href="#galaxy.data.main_transforms" title="Link to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="galaxy.data.DataSource">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">DataSource</span></span><a class="headerlink" href="#galaxy.data.DataSource" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>str(object=’’) -&gt; str
-str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
-<p>Create a new string object from the given object. If encoding or
-errors is specified, then the object must expose a data buffer
-that will be decoded using the given encoding and error handler.
-Otherwise, returns the result of object.__str__() (if defined)
-or repr(object).
-encoding defaults to sys.getdefaultencoding().
-errors defaults to ‘strict’.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.data.DataSource.DR5">
-<span class="sig-name descname"><span class="pre">DR5</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dr5'</span></em><a class="headerlink" href="#galaxy.data.DataSource.DR5" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.data.DataSource.MC">
-<span class="sig-name descname"><span class="pre">MC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mc'</span></em><a class="headerlink" href="#galaxy.data.DataSource.MC" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.data.DataSource.SGA">
-<span class="sig-name descname"><span class="pre">SGA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sga'</span></em><a class="headerlink" href="#galaxy.data.DataSource.SGA" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.data.DataSource.TYC2">
-<span class="sig-name descname"><span class="pre">TYC2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tyc2'</span></em><a class="headerlink" href="#galaxy.data.DataSource.TYC2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.data.DataSource.GAIA">
-<span class="sig-name descname"><span class="pre">GAIA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gaia'</span></em><a class="headerlink" href="#galaxy.data.DataSource.GAIA" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="galaxy.data.DataPart">
@@ -490,15 +437,20 @@ errors defaults to ‘strict’.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="galaxy.data.DataPart.GAIA">
-<span class="sig-name descname"><span class="pre">GAIA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gaia'</span></em><a class="headerlink" href="#galaxy.data.DataPart.GAIA" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="galaxy.data.DataPart.BRIGHT_STARS">
+<span class="sig-name descname"><span class="pre">BRIGHT_STARS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'bright_stars'</span></em><a class="headerlink" href="#galaxy.data.DataPart.BRIGHT_STARS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.DataPart.TEST_SAMPLE">
+<span class="sig-name descname"><span class="pre">TEST_SAMPLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'test_sample'</span></em><a class="headerlink" href="#galaxy.data.DataPart.TEST_SAMPLE" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.data.shift_and_mirror_pad">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">shift_and_mirror_pad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.shift_and_mirror_pad" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">shift_and_mirror_pad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#galaxy.data.shift_and_mirror_pad" title="Link to this definition"></a></dt>
 <dd><p>Shifts the image by (shift_x, shift_y) and applies mirror-padding.</p>
 <p>Parameters:
 - image (Tensor): Input tensor of shape (C, H, W)
@@ -511,7 +463,8 @@ errors defaults to ‘strict’.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="galaxy.data.ShiftAndMirrorPadTransform">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">ShiftAndMirrorPadTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_shift_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform" title="Link to this definition"></a></dt>
-<dd><dl class="py attribute">
+<dd><p>Applies random shifts to coordinates for data augmentation.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.data.ShiftAndMirrorPadTransform.max_shift_x">
 <span class="sig-name descname"><span class="pre">max_shift_x</span></span><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform.max_shift_x" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -521,10 +474,34 @@ errors defaults to ‘strict’.</p>
 <span class="sig-name descname"><span class="pre">max_shift_y</span></span><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform.max_shift_y" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.ShiftAndMirrorPadTransform.shift_x">
+<span class="sig-name descname"><span class="pre">shift_x</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform.shift_x" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.ShiftAndMirrorPadTransform.shift_y">
+<span class="sig-name descname"><span class="pre">shift_y</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform.shift_y" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.data.ShiftAndMirrorPadTransform.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform.__call__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform.__call__" title="Link to this definition"></a></dt>
+<dd><p>Generates random shift values within the specified range.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galaxy.data.ShiftAndMirrorPadTransform.apply_shift">
+<span class="sig-name descname"><span class="pre">apply_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.data.ShiftAndMirrorPadTransform.apply_shift" title="Link to this definition"></a></dt>
+<dd><p>Applies the generated shift to given coordinates.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ra_deg (float): Right ascension in degrees.
+dec_deg (float): Declination in degrees.</p>
+</dd>
+<dt>Returns:</dt><dd><p>tuple[float, float]: Shifted coordinates (RA, Dec).</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -532,22 +509,7 @@ errors defaults to ‘strict’.</p>
 <dt class="sig sig-object py" id="galaxy.data.ClusterDataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">ClusterDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ClusterDataset" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></p>
-<p>An abstract class representing a <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p>
-<p>All datasets that represent a map from keys to data samples should subclass
-it. All subclasses should overwrite <a class="reference internal" href="#galaxy.data.ClusterDataset.__getitem__" title="galaxy.data.ClusterDataset.__getitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__getitem__()</span></code></a>, supporting fetching a
-data sample for a given key. Subclasses could also optionally overwrite
-<a class="reference internal" href="#galaxy.data.ClusterDataset.__len__" title="galaxy.data.ClusterDataset.__len__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__len__()</span></code></a>, which is expected to return the size of the dataset by many
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Sampler</span></code> implementations and the default options
-of <code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code>. Subclasses could also
-optionally implement <code class="xref py py-meth docutils literal notranslate"><span class="pre">__getitems__()</span></code>, for speedup batched samples
-loading. This method accepts list of indices of samples of batch and returns
-list of samples.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code> by default constructs an index
-sampler that yields integral indices.  To make it work with a map-style
-dataset with non-integral indices/keys, a custom sampler must be provided.</p>
-</div>
+<p>Custom PyTorch Dataset for cluster data.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.data.ClusterDataset.images_dir_path">
 <span class="sig-name descname"><span class="pre">images_dir_path</span></span><a class="headerlink" href="#galaxy.data.ClusterDataset.images_dir_path" title="Link to this definition"></a></dt>
@@ -565,122 +527,278 @@ dataset with non-integral indices/keys, a custom sampler must be provided.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.data.ClusterDataset.__len__">
-<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ClusterDataset.__len__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#galaxy.data.ClusterDataset.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the total number of samples.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.data.ClusterDataset.__getitem__">
-<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ClusterDataset.__getitem__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#galaxy.data.ClusterDataset.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Gets a single sample by index.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>idx (int): Index of the sample.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Dictionary containing image, label, and metadata.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.data.ClusterDataset._read_img">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_read_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ClusterDataset._read_img" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_read_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#galaxy.data.ClusterDataset._read_img" title="Link to this definition"></a></dt>
+<dd><p>Reads a FITS image from the given path.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>fits_path (Path): Path to the FITS file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Tensor representation of the image.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.data.download_data">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.download_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.data.required_columns">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">required_columns</span></span><a class="headerlink" href="#galaxy.data.required_columns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="galaxy.data.optional_columns">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">optional_columns</span></span><a class="headerlink" href="#galaxy.data.optional_columns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.data.download_data" title="Link to this definition"></a></dt>
+<dd><p>Downloads required data files.</p>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.inherit_columns">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">inherit_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.inherit_columns" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.read_dr5">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">read_dr5</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.read_dr5" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.read_mc">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">read_mc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.read_mc" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.read_sga">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">read_sga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.read_sga" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.read_tyc2">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">read_tyc2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.read_tyc2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.read_gaia">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">read_gaia</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.read_gaia" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="galaxy.data.get_positive_class">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">get_positive_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.get_positive_class" title="Link to this definition"></a></dt>
+<dd><p>Combines multiple datasets to create the positive class.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Combined positive class dataset.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.data.get_cluster_catalog">
 <span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">get_cluster_catalog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">astropy.coordinates.SkyCoord</span></span></span><a class="headerlink" href="#galaxy.data.get_cluster_catalog" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.filter_candiates">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">filter_candiates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">astropy.coordinates.SkyCoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">astropy.coordinates.SkyCoord</span></span></span><a class="headerlink" href="#galaxy.data.filter_candiates" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.generate_candidates_dr5">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">generate_candidates_dr5</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">astropy.coordinates.SkyCoord</span></span></span><a class="headerlink" href="#galaxy.data.generate_candidates_dr5" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.generate_candidates_mc">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">generate_candidates_mc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.generate_candidates_mc" title="Link to this definition"></a></dt>
-<dd><p>Create sample from MadCows catalogue</p>
+<dd><p>Creates a SkyCoord catalog of known clusters.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>coord.SkyCoord: Catalog of clusters as a SkyCoord object.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.create_negative_class_dr5">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">create_negative_class_dr5</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.create_negative_class_dr5" title="Link to this definition"></a></dt>
-<dd><p>Create sample from dr5 clsuter catalogue</p>
+<dt class="sig sig-object py" id="galaxy.data.expanded_positive_class">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">expanded_positive_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.expanded_positive_class" title="Link to this definition"></a></dt>
+<dd><p>Generates an expanded dataset of positive class by applying random shifts.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Expanded dataset of positive class with shifted coordinates.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.create_negative_class_mc">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">create_negative_class_mc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.create_negative_class_mc" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="galaxy.data.get_negative_class">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">get_negative_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.get_negative_class" title="Link to this definition"></a></dt>
+<dd><p>Combines datasets to create the negative class.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Combined dataset of negative class.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.create_data_train">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">create_data_train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.create_data_train" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="galaxy.data.get_non_cluster_catalog">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">get_non_cluster_catalog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">astropy.coordinates.SkyCoord</span></span></span><a class="headerlink" href="#galaxy.data.get_non_cluster_catalog" title="Link to this definition"></a></dt>
+<dd><p>Creates a SkyCoord catalog of non-cluster objects.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>coord.SkyCoord: Catalog of non-cluster objects as a SkyCoord object.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="galaxy.data.create_data_test">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">create_data_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.create_data_test" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="galaxy.data.update_bright_stars">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">update_bright_stars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bright_stars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.update_bright_stars" title="Link to this definition"></a></dt>
+<dd><p>Updates or loads the bright stars dataset.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>bright_stars (pd.DataFrame | None): Existing bright stars dataset or None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>pd.DataFrame: Updated bright stars dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">DatasetsInfo</span></span><a class="headerlink" href="#galaxy.data.DatasetsInfo" title="Link to this definition"></a></dt>
+<dd><p>Class to manage and cache datasets for training and evaluation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo._clusters">
+<span class="sig-name descname"><span class="pre">_clusters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#galaxy.data.DatasetsInfo._clusters" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo._expanded_clusters">
+<span class="sig-name descname"><span class="pre">_expanded_clusters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#galaxy.data.DatasetsInfo._expanded_clusters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo._bright_stars">
+<span class="sig-name descname"><span class="pre">_bright_stars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#galaxy.data.DatasetsInfo._bright_stars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo._non_clusters">
+<span class="sig-name descname"><span class="pre">_non_clusters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#galaxy.data.DatasetsInfo._non_clusters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo._test_sample">
+<span class="sig-name descname"><span class="pre">_test_sample</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#galaxy.data.DatasetsInfo._test_sample" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo.load_clusters">
+<span class="sig-name descname"><span class="pre">load_clusters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.DatasetsInfo.load_clusters" title="Link to this definition"></a></dt>
+<dd><p>Loads the positive class dataset.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Positive class dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo.load_expanded_clusters">
+<span class="sig-name descname"><span class="pre">load_expanded_clusters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.DatasetsInfo.load_expanded_clusters" title="Link to this definition"></a></dt>
+<dd><p>Loads the expanded positive class dataset.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Expanded positive class dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo.load_test_sample">
+<span class="sig-name descname"><span class="pre">load_test_sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.DatasetsInfo.load_test_sample" title="Link to this definition"></a></dt>
+<dd><p>Loads the test sample dataset.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Test sample dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo.load_bright_stars">
+<span class="sig-name descname"><span class="pre">load_bright_stars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.DatasetsInfo.load_bright_stars" title="Link to this definition"></a></dt>
+<dd><p>Loads the bright stars dataset.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Bright stars dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galaxy.data.DatasetsInfo.load_non_clusters">
+<span class="sig-name descname"><span class="pre">load_non_clusters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.DatasetsInfo.load_non_clusters" title="Link to this definition"></a></dt>
+<dd><p>Loads the negative class dataset.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: Negative class dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.data.datasets_collection">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">datasets_collection</span></span><a class="headerlink" href="#galaxy.data.datasets_collection" title="Link to this definition"></a></dt>
+<dd><p>Generate object that are not present in any of currently included datasets</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.data.filter_candidates">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">filter_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">astropy.coordinates.SkyCoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">astropy.coordinates.SkyCoord</span></span></span><a class="headerlink" href="#galaxy.data.filter_candidates" title="Link to this definition"></a></dt>
+<dd><p>Filters candidate objects based on angular distance and galactic latitude.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>candidates (coord.SkyCoord): SkyCoord object containing candidate objects.
+max_len (int): Maximum number of filtered candidates to return.</p>
+</dd>
+<dt>Returns:</dt><dd><p>coord.SkyCoord: Filtered SkyCoord object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.data.generate_random_candidates">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">generate_random_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7500</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">astropy.coordinates.SkyCoord</span></span></span><a class="headerlink" href="#galaxy.data.generate_random_candidates" title="Link to this definition"></a></dt>
+<dd><p>Generates random sky coordinates for candidates.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>len (int, optional): Number of candidates to generate. Defaults to 7500.</p>
+</dd>
+<dt>Returns:</dt><dd><p>coord.SkyCoord: SkyCoord object containing generated candidates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.data.generate_random_based">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">generate_random_based</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">required_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7500</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">astropy.coordinates.SkyCoord</span></span></span><a class="headerlink" href="#galaxy.data.generate_random_based" title="Link to this definition"></a></dt>
+<dd><p>Generates random candidates based on existing datasets.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>required_num (int, optional): Number of candidates to generate. Defaults to 7500.</p>
+</dd>
+<dt>Returns:</dt><dd><p>coord.SkyCoord: SkyCoord object containing generated candidates.</p>
+</dd>
+</dl>
+<p>опытным путём было выяснено, что generate_random_candidates не даёт 7500 даже если n_sim выкрутить до 50к,
+предлагается брать собранные датасеты, брать ra_deg и dec_deg, перемешивать в независимости друг от друга
+и затем в filter_candidates подавать len = required_num - len(&lt;собранного из generate_random_candidates&gt;)</p>
+<p>#     ТЕХНИЧЕСКИЕ ШОКОЛАДКИ???
+# /usr/local/lib/python3.10/dist-packages/astropy/coordinates/angles/core.py in _validate_angles(self, angles)
+#     647                     f”&lt;= 90 deg, got {angles.to(u.degree)}”
+#     648                 )
+# –&gt; 649             raise ValueError(
+#     650                 “Latitude angle(s) must be within -90 deg &lt;= angle ”
+#     651                 f”&lt;= 90 deg, got {angles.min().to(u.degree)} &lt;= “</p>
+<p>ValueError: Latitude angle(s) must be within -90 deg &lt;= angle &lt;= 90 deg, got -100.8107 deg &lt;= angle &lt;= 106.2399 deg</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.data.generate_random_sample">
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">generate_random_sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.data.generate_random_sample" title="Link to this definition"></a></dt>
+<dd><p>Combines random candidates from <cite>generate_random_candidates</cite> and <cite>generate_random_based</cite>.</p>
+<p>Ensures the required number of candidates is generated by combining both methods.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing generated random candidates.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.data.train_val_test_split">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">train_val_test_split</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.train_val_test_split" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">train_val_test_split</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#galaxy.data.DataPart" title="galaxy.data.DataPart"><span class="pre">DataPart</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.data.train_val_test_split" title="Link to this definition"></a></dt>
+<dd><p>Splits the dataset into training, validation, and test sets.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>dict[DataPart, pd.DataFrame]: Dictionary mapping data parts to DataFrames.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.data.ddos">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">ddos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.ddos" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">ddos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.data.ddos" title="Link to this definition"></a></dt>
+<dd><p>Generates cutouts for all data splits and saves them.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.data.create_dataloaders">
-<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">create_dataloaders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.data.create_dataloaders" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.data.</span></span><span class="sig-name descname"><span class="pre">create_dataloaders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#galaxy.data.DataPart" title="galaxy.data.DataPart"><span class="pre">DataPart</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.utils.data.Dataset</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#galaxy.data.DataPart" title="galaxy.data.DataPart"><span class="pre">DataPart</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.utils.data.DataLoader</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.data.create_dataloaders" title="Link to this definition"></a></dt>
+<dd><p>Creates datasets and dataloaders for each data part.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>tuple[dict[DataPart, Dataset], dict[DataPart, DataLoader]]:</dt><dd><p>Dictionary of datasets and corresponding dataloaders.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>
@@ -747,27 +865,23 @@ dataset with non-integral indices/keys, a custom sampler must be provided.</p>
 <li><a class="reference internal" href="#galaxy.data.TORCHVISION_MEAN"><code class="docutils literal notranslate"><span class="pre">TORCHVISION_MEAN</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.TORCHVISION_STD"><code class="docutils literal notranslate"><span class="pre">TORCHVISION_STD</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.main_transforms"><code class="docutils literal notranslate"><span class="pre">main_transforms</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.DataSource"><code class="docutils literal notranslate"><span class="pre">DataSource</span></code></a><ul>
-<li><a class="reference internal" href="#galaxy.data.DataSource.DR5"><code class="docutils literal notranslate"><span class="pre">DataSource.DR5</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.DataSource.MC"><code class="docutils literal notranslate"><span class="pre">DataSource.MC</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.DataSource.SGA"><code class="docutils literal notranslate"><span class="pre">DataSource.SGA</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.DataSource.TYC2"><code class="docutils literal notranslate"><span class="pre">DataSource.TYC2</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.DataSource.GAIA"><code class="docutils literal notranslate"><span class="pre">DataSource.GAIA</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#galaxy.data.DataPart"><code class="docutils literal notranslate"><span class="pre">DataPart</span></code></a><ul>
 <li><a class="reference internal" href="#galaxy.data.DataPart.TRAIN"><code class="docutils literal notranslate"><span class="pre">DataPart.TRAIN</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.DataPart.VALIDATE"><code class="docutils literal notranslate"><span class="pre">DataPart.VALIDATE</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.DataPart.TEST"><code class="docutils literal notranslate"><span class="pre">DataPart.TEST</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.DataPart.MC"><code class="docutils literal notranslate"><span class="pre">DataPart.MC</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.DataPart.GAIA"><code class="docutils literal notranslate"><span class="pre">DataPart.GAIA</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DataPart.BRIGHT_STARS"><code class="docutils literal notranslate"><span class="pre">DataPart.BRIGHT_STARS</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DataPart.TEST_SAMPLE"><code class="docutils literal notranslate"><span class="pre">DataPart.TEST_SAMPLE</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#galaxy.data.shift_and_mirror_pad"><code class="docutils literal notranslate"><span class="pre">shift_and_mirror_pad()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform"><code class="docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform</span></code></a><ul>
 <li><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform.max_shift_x"><code class="docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform.max_shift_x</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform.max_shift_y"><code class="docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform.max_shift_y</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform.shift_x"><code class="docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform.shift_x</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform.shift_y"><code class="docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform.shift_y</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform.__call__"><code class="docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform.__call__()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.ShiftAndMirrorPadTransform.apply_shift"><code class="docutils literal notranslate"><span class="pre">ShiftAndMirrorPadTransform.apply_shift()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#galaxy.data.ClusterDataset"><code class="docutils literal notranslate"><span class="pre">ClusterDataset</span></code></a><ul>
@@ -780,22 +894,30 @@ dataset with non-integral indices/keys, a custom sampler must be provided.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#galaxy.data.download_data"><code class="docutils literal notranslate"><span class="pre">download_data()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.required_columns"><code class="docutils literal notranslate"><span class="pre">required_columns</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.optional_columns"><code class="docutils literal notranslate"><span class="pre">optional_columns</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.inherit_columns"><code class="docutils literal notranslate"><span class="pre">inherit_columns()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.read_dr5"><code class="docutils literal notranslate"><span class="pre">read_dr5()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.read_mc"><code class="docutils literal notranslate"><span class="pre">read_mc()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.read_sga"><code class="docutils literal notranslate"><span class="pre">read_sga()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.read_tyc2"><code class="docutils literal notranslate"><span class="pre">read_tyc2()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.read_gaia"><code class="docutils literal notranslate"><span class="pre">read_gaia()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.get_positive_class"><code class="docutils literal notranslate"><span class="pre">get_positive_class()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.get_cluster_catalog"><code class="docutils literal notranslate"><span class="pre">get_cluster_catalog()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.filter_candiates"><code class="docutils literal notranslate"><span class="pre">filter_candiates()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.generate_candidates_dr5"><code class="docutils literal notranslate"><span class="pre">generate_candidates_dr5()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.generate_candidates_mc"><code class="docutils literal notranslate"><span class="pre">generate_candidates_mc()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.create_negative_class_dr5"><code class="docutils literal notranslate"><span class="pre">create_negative_class_dr5()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.create_negative_class_mc"><code class="docutils literal notranslate"><span class="pre">create_negative_class_mc()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.create_data_train"><code class="docutils literal notranslate"><span class="pre">create_data_train()</span></code></a></li>
-<li><a class="reference internal" href="#galaxy.data.create_data_test"><code class="docutils literal notranslate"><span class="pre">create_data_test()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.expanded_positive_class"><code class="docutils literal notranslate"><span class="pre">expanded_positive_class()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.get_negative_class"><code class="docutils literal notranslate"><span class="pre">get_negative_class()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.get_non_cluster_catalog"><code class="docutils literal notranslate"><span class="pre">get_non_cluster_catalog()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.update_bright_stars"><code class="docutils literal notranslate"><span class="pre">update_bright_stars()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo</span></code></a><ul>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo._clusters"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo._clusters</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo._expanded_clusters"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo._expanded_clusters</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo._bright_stars"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo._bright_stars</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo._non_clusters"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo._non_clusters</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo._test_sample"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo._test_sample</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo.load_clusters"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo.load_clusters()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo.load_expanded_clusters"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo.load_expanded_clusters()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo.load_test_sample"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo.load_test_sample()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo.load_bright_stars"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo.load_bright_stars()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.DatasetsInfo.load_non_clusters"><code class="docutils literal notranslate"><span class="pre">DatasetsInfo.load_non_clusters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#galaxy.data.datasets_collection"><code class="docutils literal notranslate"><span class="pre">datasets_collection</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.filter_candidates"><code class="docutils literal notranslate"><span class="pre">filter_candidates()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.generate_random_candidates"><code class="docutils literal notranslate"><span class="pre">generate_random_candidates()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.generate_random_based"><code class="docutils literal notranslate"><span class="pre">generate_random_based()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.data.generate_random_sample"><code class="docutils literal notranslate"><span class="pre">generate_random_sample()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.train_val_test_split"><code class="docutils literal notranslate"><span class="pre">train_val_test_split()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.ddos"><code class="docutils literal notranslate"><span class="pre">ddos()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.data.create_dataloaders"><code class="docutils literal notranslate"><span class="pre">create_dataloaders()</span></code></a></li>

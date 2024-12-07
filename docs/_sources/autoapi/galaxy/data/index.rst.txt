@@ -17,8 +17,7 @@ Attributes
    galaxy.data.TORCHVISION_MEAN
    galaxy.data.TORCHVISION_STD
    galaxy.data.main_transforms
-   galaxy.data.required_columns
-   galaxy.data.optional_columns
+   galaxy.data.datasets_collection
 
 
 Classes
@@ -26,10 +25,10 @@ Classes
 
 .. autoapisummary::
 
-   galaxy.data.DataSource
    galaxy.data.DataPart
    galaxy.data.ShiftAndMirrorPadTransform
    galaxy.data.ClusterDataset
+   galaxy.data.DatasetsInfo
 
 
 Functions
@@ -39,20 +38,16 @@ Functions
 
    galaxy.data.shift_and_mirror_pad
    galaxy.data.download_data
-   galaxy.data.inherit_columns
-   galaxy.data.read_dr5
-   galaxy.data.read_mc
-   galaxy.data.read_sga
-   galaxy.data.read_tyc2
-   galaxy.data.read_gaia
+   galaxy.data.get_positive_class
    galaxy.data.get_cluster_catalog
-   galaxy.data.filter_candiates
-   galaxy.data.generate_candidates_dr5
-   galaxy.data.generate_candidates_mc
-   galaxy.data.create_negative_class_dr5
-   galaxy.data.create_negative_class_mc
-   galaxy.data.create_data_train
-   galaxy.data.create_data_test
+   galaxy.data.expanded_positive_class
+   galaxy.data.get_negative_class
+   galaxy.data.get_non_cluster_catalog
+   galaxy.data.update_bright_stars
+   galaxy.data.filter_candidates
+   galaxy.data.generate_random_candidates
+   galaxy.data.generate_random_based
+   galaxy.data.generate_random_sample
    galaxy.data.train_val_test_split
    galaxy.data.ddos
    galaxy.data.create_dataloaders
@@ -70,48 +65,6 @@ Module Contents
 
 
 .. py:data:: main_transforms
-
-.. py:class:: DataSource
-
-   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
-
-
-   str(object='') -> str
-   str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-   Create a new string object from the given object. If encoding or
-   errors is specified, then the object must expose a data buffer
-   that will be decoded using the given encoding and error handler.
-   Otherwise, returns the result of object.__str__() (if defined)
-   or repr(object).
-   encoding defaults to sys.getdefaultencoding().
-   errors defaults to 'strict'.
-
-
-   .. py:attribute:: DR5
-      :value: 'dr5'
-
-
-
-   .. py:attribute:: MC
-      :value: 'mc'
-
-
-
-   .. py:attribute:: SGA
-      :value: 'sga'
-
-
-
-   .. py:attribute:: TYC2
-      :value: 'tyc2'
-
-
-
-   .. py:attribute:: GAIA
-      :value: 'gaia'
-
-
 
 .. py:class:: DataPart
 
@@ -150,12 +103,17 @@ Module Contents
 
 
 
-   .. py:attribute:: GAIA
-      :value: 'gaia'
+   .. py:attribute:: BRIGHT_STARS
+      :value: 'bright_stars'
 
 
 
-.. py:function:: shift_and_mirror_pad(image, shift_x, shift_y)
+   .. py:attribute:: TEST_SAMPLE
+      :value: 'test_sample'
+
+
+
+.. py:function:: shift_and_mirror_pad(image: torch.Tensor, shift_x: int, shift_y: int) -> torch.Tensor
 
    Shifts the image by (shift_x, shift_y) and applies mirror-padding.
 
@@ -170,13 +128,42 @@ Module Contents
 
 .. py:class:: ShiftAndMirrorPadTransform(max_shift_x: int = 20, max_shift_y: int = 20)
 
+   Applies random shifts to coordinates for data augmentation.
+
+
    .. py:attribute:: max_shift_x
 
 
    .. py:attribute:: max_shift_y
 
 
-   .. py:method:: __call__(image)
+   .. py:attribute:: shift_x
+      :value: 0
+
+
+
+   .. py:attribute:: shift_y
+      :value: 0
+
+
+
+   .. py:method:: __call__()
+
+      Generates random shift values within the specified range.
+
+
+
+   .. py:method:: apply_shift(ra_deg: float, dec_deg: float) -> tuple[float, float]
+
+      Applies the generated shift to given coordinates.
+
+      Args:
+          ra_deg (float): Right ascension in degrees.
+          dec_deg (float): Declination in degrees.
+
+      Returns:
+          tuple[float, float]: Shifted coordinates (RA, Dec).
+
 
 
 .. py:class:: ClusterDataset(images_dir_path: str, description_csv_path: str, transform=None)
@@ -184,22 +171,7 @@ Module Contents
    Bases: :py:obj:`torch.utils.data.Dataset`
 
 
-   An abstract class representing a :class:`Dataset`.
-
-   All datasets that represent a map from keys to data samples should subclass
-   it. All subclasses should overwrite :meth:`__getitem__`, supporting fetching a
-   data sample for a given key. Subclasses could also optionally overwrite
-   :meth:`__len__`, which is expected to return the size of the dataset by many
-   :class:`~torch.utils.data.Sampler` implementations and the default options
-   of :class:`~torch.utils.data.DataLoader`. Subclasses could also
-   optionally implement :meth:`__getitems__`, for speedup batched samples
-   loading. This method accepts list of indices of samples of batch and returns
-   list of samples.
-
-   .. note::
-     :class:`~torch.utils.data.DataLoader` by default constructs an index
-     sampler that yields integral indices.  To make it work with a map-style
-     dataset with non-integral indices/keys, a custom sampler must be provided.
+   Custom PyTorch Dataset for cluster data.
 
 
    .. py:attribute:: images_dir_path
@@ -211,60 +183,251 @@ Module Contents
    .. py:attribute:: transform
 
 
-   .. py:method:: __len__()
+   .. py:method:: __len__() -> int
+
+      Returns the total number of samples.
 
 
-   .. py:method:: __getitem__(idx)
+
+   .. py:method:: __getitem__(idx: int) -> dict
+
+      Gets a single sample by index.
+
+      Args:
+          idx (int): Index of the sample.
+
+      Returns:
+          dict: Dictionary containing image, label, and metadata.
 
 
-   .. py:method:: _read_img(fits_path: pathlib.Path)
+
+   .. py:method:: _read_img(fits_path: pathlib.Path) -> torch.Tensor
       :staticmethod:
 
 
+      Reads a FITS image from the given path.
 
-.. py:function:: download_data()
+      Args:
+          fits_path (Path): Path to the FITS file.
 
-.. py:data:: required_columns
+      Returns:
+          torch.Tensor: Tensor representation of the image.
 
-.. py:data:: optional_columns
 
-.. py:function:: inherit_columns(frame: pandas.DataFrame)
 
-.. py:function:: read_dr5()
+.. py:function:: download_data() -> None
 
-.. py:function:: read_mc()
+   Downloads required data files.
 
-.. py:function:: read_sga(sample_size=10000)
 
-.. py:function:: read_tyc2(sample_size=5000)
+.. py:function:: get_positive_class() -> pandas.DataFrame
 
-.. py:function:: read_gaia()
+   Combines multiple datasets to create the positive class.
+
+   Returns:
+       pd.DataFrame: Combined positive class dataset.
+
 
 .. py:function:: get_cluster_catalog() -> astropy.coordinates.SkyCoord
 
-.. py:function:: filter_candiates(candidates: astropy.coordinates.SkyCoord, max_len: int) -> astropy.coordinates.SkyCoord
+   Creates a SkyCoord catalog of known clusters.
 
-.. py:function:: generate_candidates_dr5() -> astropy.coordinates.SkyCoord
-
-.. py:function:: generate_candidates_mc()
-
-   Create sample from MadCows catalogue
+   Returns:
+       coord.SkyCoord: Catalog of clusters as a SkyCoord object.
 
 
-.. py:function:: create_negative_class_dr5()
+.. py:function:: expanded_positive_class() -> pandas.DataFrame
 
-   Create sample from dr5 clsuter catalogue
+   Generates an expanded dataset of positive class by applying random shifts.
+
+   Returns:
+       pd.DataFrame: Expanded dataset of positive class with shifted coordinates.
 
 
-.. py:function:: create_negative_class_mc()
+.. py:function:: get_negative_class() -> pandas.DataFrame
 
-.. py:function:: create_data_train()
+   Combines datasets to create the negative class.
 
-.. py:function:: create_data_test()
+   Returns:
+       pd.DataFrame: Combined dataset of negative class.
 
-.. py:function:: train_val_test_split()
 
-.. py:function:: ddos()
+.. py:function:: get_non_cluster_catalog() -> astropy.coordinates.SkyCoord
 
-.. py:function:: create_dataloaders()
+   Creates a SkyCoord catalog of non-cluster objects.
+
+   Returns:
+       coord.SkyCoord: Catalog of non-cluster objects as a SkyCoord object.
+
+
+.. py:function:: update_bright_stars(bright_stars: pandas.DataFrame | None) -> pandas.DataFrame
+
+   Updates or loads the bright stars dataset.
+
+   Args:
+       bright_stars (pd.DataFrame | None): Existing bright stars dataset or None.
+
+   Returns:
+       pd.DataFrame: Updated bright stars dataset.
+
+
+.. py:class:: DatasetsInfo
+
+   Class to manage and cache datasets for training and evaluation.
+
+
+   .. py:attribute:: _clusters
+      :value: None
+
+
+
+   .. py:attribute:: _expanded_clusters
+      :value: None
+
+
+
+   .. py:attribute:: _bright_stars
+      :value: None
+
+
+
+   .. py:attribute:: _non_clusters
+      :value: None
+
+
+
+   .. py:attribute:: _test_sample
+      :value: None
+
+
+
+   .. py:method:: load_clusters() -> pandas.DataFrame
+
+      Loads the positive class dataset.
+
+      Returns:
+          pd.DataFrame: Positive class dataset.
+
+
+
+   .. py:method:: load_expanded_clusters() -> pandas.DataFrame
+
+      Loads the expanded positive class dataset.
+
+      Returns:
+          pd.DataFrame: Expanded positive class dataset.
+
+
+
+   .. py:method:: load_test_sample() -> pandas.DataFrame
+
+      Loads the test sample dataset.
+
+      Returns:
+          pd.DataFrame: Test sample dataset.
+
+
+
+   .. py:method:: load_bright_stars() -> pandas.DataFrame
+
+      Loads the bright stars dataset.
+
+      Returns:
+          pd.DataFrame: Bright stars dataset.
+
+
+
+   .. py:method:: load_non_clusters() -> pandas.DataFrame
+
+      Loads the negative class dataset.
+
+      Returns:
+          pd.DataFrame: Negative class dataset.
+
+
+
+.. py:data:: datasets_collection
+
+   Generate object that are not present in any of currently included datasets
+
+
+.. py:function:: filter_candidates(candidates: astropy.coordinates.SkyCoord, max_len: int) -> astropy.coordinates.SkyCoord
+
+   Filters candidate objects based on angular distance and galactic latitude.
+
+   Args:
+       candidates (coord.SkyCoord): SkyCoord object containing candidate objects.
+       max_len (int): Maximum number of filtered candidates to return.
+
+   Returns:
+       coord.SkyCoord: Filtered SkyCoord object.
+
+
+.. py:function:: generate_random_candidates(len: int = 7500) -> astropy.coordinates.SkyCoord
+
+   Generates random sky coordinates for candidates.
+
+   Args:
+       len (int, optional): Number of candidates to generate. Defaults to 7500.
+
+   Returns:
+       coord.SkyCoord: SkyCoord object containing generated candidates.
+
+
+.. py:function:: generate_random_based(required_num: int = 7500) -> astropy.coordinates.SkyCoord
+
+   Generates random candidates based on existing datasets.
+
+   Args:
+       required_num (int, optional): Number of candidates to generate. Defaults to 7500.
+
+   Returns:
+       coord.SkyCoord: SkyCoord object containing generated candidates.
+
+   опытным путём было выяснено, что generate_random_candidates не даёт 7500 даже если n_sim выкрутить до 50к,
+   предлагается брать собранные датасеты, брать ra_deg и dec_deg, перемешивать в независимости друг от друга
+   и затем в filter_candidates подавать len = required_num - len(<собранного из generate_random_candidates>)
+
+   #     ТЕХНИЧЕСКИЕ ШОКОЛАДКИ???
+   # /usr/local/lib/python3.10/dist-packages/astropy/coordinates/angles/core.py in _validate_angles(self, angles)
+   #     647                     f"<= 90 deg, got {angles.to(u.degree)}"
+   #     648                 )
+   # --> 649             raise ValueError(
+   #     650                 "Latitude angle(s) must be within -90 deg <= angle "
+   #     651                 f"<= 90 deg, got {angles.min().to(u.degree)} <= "
+
+   ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -100.8107 deg <= angle <= 106.2399 deg
+
+
+.. py:function:: generate_random_sample() -> pandas.DataFrame
+
+   Combines random candidates from `generate_random_candidates` and `generate_random_based`.
+
+   Ensures the required number of candidates is generated by combining both methods.
+
+   Returns:
+       pd.DataFrame: DataFrame containing generated random candidates.
+
+
+.. py:function:: train_val_test_split() -> dict[DataPart, pandas.DataFrame]
+
+   Splits the dataset into training, validation, and test sets.
+
+   Returns:
+       dict[DataPart, pd.DataFrame]: Dictionary mapping data parts to DataFrames.
+
+
+.. py:function:: ddos() -> None
+
+   Generates cutouts for all data splits and saves them.
+
+
+.. py:function:: create_dataloaders() -> tuple[dict[DataPart, torch.utils.data.Dataset], dict[DataPart, torch.utils.data.DataLoader]]
+
+   Creates datasets and dataloaders for each data part.
+
+   Returns:
+       tuple[dict[DataPart, Dataset], dict[DataPart, DataLoader]]:
+           Dictionary of datasets and corresponding dataloaders.
+
 

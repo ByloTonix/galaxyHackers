@@ -222,6 +222,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">galaxy</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of galaxy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../collect_clusters/index.html">galaxy.collect_clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collect_not_clusters/index.html">galaxy.collect_not_clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../config/index.html">galaxy.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/index.html">galaxy.data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../grabber/index.html">galaxy.grabber</a></li>
@@ -293,10 +295,10 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.train.Trainer" title="galaxy.train.Trainer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Trainer class for managing model training, validation, and testing.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#galaxy.train.Predictor" title="galaxy.train.Predictor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Predictor</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Predictor class for evaluating models on test data.</p></td>
 </tr>
 </tbody>
 </table>
@@ -306,8 +308,9 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="galaxy.train.Trainer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.train.</span></span><span class="sig-name descname"><span class="pre">Trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.optim.Optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">comet_ml.Experiment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.optim.lr_scheduler.LRScheduler</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'per_epoch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer" title="Link to this definition"></a></dt>
-<dd><dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.train.</span></span><span class="sig-name descname"><span class="pre">Trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.optim.Optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">comet_ml.Experiment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.optim.lr_scheduler.LRScheduler</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'per_epoch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">128</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer" title="Link to this definition"></a></dt>
+<dd><p>Trainer class for managing model training, validation, and testing.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.model_name">
 <span class="sig-name descname"><span class="pre">model_name</span></span><a class="headerlink" href="#galaxy.train.Trainer.model_name" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -363,13 +366,23 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.train.Trainer.train_table_data">
+<span class="sig-name descname"><span class="pre">train_table_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#galaxy.train.Trainer.train_table_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.train.Trainer.val_table_data">
+<span class="sig-name descname"><span class="pre">val_table_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#galaxy.train.Trainer.val_table_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.history">
 <span class="sig-name descname"><span class="pre">history</span></span><a class="headerlink" href="#galaxy.train.Trainer.history" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.device">
-<span class="sig-name descname"><span class="pre">device</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cpu'</span></em><a class="headerlink" href="#galaxy.train.Trainer.device" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">device</span></span><a class="headerlink" href="#galaxy.train.Trainer.device" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -384,8 +397,9 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.post_train_batch">
-<span class="sig-name descname"><span class="pre">post_train_batch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer.post_train_batch" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">post_train_batch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.post_train_batch" title="Link to this definition"></a></dt>
+<dd><p>Post-processing after each training batch.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.post_val_batch">
@@ -409,45 +423,98 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.log_metrics">
-<span class="sig-name descname"><span class="pre">log_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer.log_metrics" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">log_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.log_metrics" title="Link to this definition"></a></dt>
+<dd><p>Logs metrics to Comet.ml.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>loss (float): Loss value.
+acc (float): Accuracy value.
+mode (str): Mode (‘train’ or ‘val’).
+step (Optional[int]): Step number. Defaults to None.
+epoch (Optional[int]): Epoch number. Defaults to None.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.train">
-<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_epochs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer.train" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_epochs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.train" title="Link to this definition"></a></dt>
+<dd><p>Trains the model for a specified number of epochs.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num_epochs (int): Number of epochs to train.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.test">
-<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer.test" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas.DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.train.Trainer.test" title="Link to this definition"></a></dt>
+<dd><p>Evaluates the model on a test dataset.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>test_dataloader (DataLoader): DataLoader containing the test dataset.</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>Tuple[pd.DataFrame, List[float], List[float]]:</dt><dd><ul class="simple">
+<li><p>Predictions DataFrame with columns for true labels, predicted labels, probabilities, and metadata.</p></li>
+<li><p>List of loss values for each batch.</p></li>
+<li><p>List of accuracy values for each batch.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.compute_all">
-<span class="sig-name descname"><span class="pre">compute_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer.compute_all" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">compute_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.compute_all" title="Link to this definition"></a></dt>
+<dd><p>Computes logits, loss, and accuracy for a batch.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>batch (dict): Input batch containing images and labels.</p>
+</dd>
+<dt>Returns:</dt><dd><p>tuple: Logits, outputs, labels, loss, and accuracy.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.cache_states">
-<span class="sig-name descname"><span class="pre">cache_states</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer.cache_states" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">cache_states</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.cache_states" title="Link to this definition"></a></dt>
+<dd><p>Caches the current states of the model and optimizer.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>dict: Dictionary containing model and optimizer states.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.rollback_states">
-<span class="sig-name descname"><span class="pre">rollback_states</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Trainer.rollback_states" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">rollback_states</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.rollback_states" title="Link to this definition"></a></dt>
+<dd><p>Rolls back the model and optimizer to the cached states.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Trainer.find_lr">
-<span class="sig-name descname"><span class="pre">find_lr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_lrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.find_lr" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">find_lr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_lr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_lrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing_window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#galaxy.train.Trainer.find_lr" title="Link to this definition"></a></dt>
+<dd><p>Finds the optimal learning rate using a range test.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>min_lr (float, optional): Minimum learning rate. Defaults to 1e-6.
+max_lr (float, optional): Maximum learning rate. Defaults to 1e-1.
+num_lrs (int, optional): Number of learning rates to test. Defaults to 20.
+smoothing_window (int, optional): Window size for smoothing. Defaults to 30.
+smooth_beta (float, optional): Beta value for loss smoothing. Defaults to 0.8.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Optimal learning rate.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="galaxy.train.Predictor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.train.</span></span><span class="sig-name descname"><span class="pre">Predictor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Predictor" title="Link to this definition"></a></dt>
-<dd><dl class="py attribute">
+<dd><p>Predictor class for evaluating models on test data.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="galaxy.train.Predictor.model">
 <span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#galaxy.train.Predictor.model" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -459,13 +526,27 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Predictor.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Predictor.predict" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.utils.data.DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.train.Predictor.predict" title="Link to this definition"></a></dt>
+<dd><p>Generates predictions for the given DataLoader.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dataloader (DataLoader): DataLoader containing test data.</p>
+</dd>
+<dt>Returns:</dt><dd><p>pd.DataFrame: Predictions with true labels and additional metadata.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galaxy.train.Predictor.compute_all">
-<span class="sig-name descname"><span class="pre">compute_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.train.Predictor.compute_all" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">compute_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#galaxy.train.Predictor.compute_all" title="Link to this definition"></a></dt>
+<dd><p>Computes logits and outputs for a batch.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>batch (dict): Input batch.</p>
+</dd>
+<dt>Returns:</dt><dd><p>tuple: Logits and outputs.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -541,6 +622,8 @@
 <li><a class="reference internal" href="#galaxy.train.Trainer.val_dataloader"><code class="docutils literal notranslate"><span class="pre">Trainer.val_dataloader</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.train.Trainer.experiment"><code class="docutils literal notranslate"><span class="pre">Trainer.experiment</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.train.Trainer.batch_size"><code class="docutils literal notranslate"><span class="pre">Trainer.batch_size</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.train.Trainer.train_table_data"><code class="docutils literal notranslate"><span class="pre">Trainer.train_table_data</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.train.Trainer.val_table_data"><code class="docutils literal notranslate"><span class="pre">Trainer.val_table_data</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.train.Trainer.history"><code class="docutils literal notranslate"><span class="pre">Trainer.history</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.train.Trainer.device"><code class="docutils literal notranslate"><span class="pre">Trainer.device</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.train.Trainer.global_step"><code class="docutils literal notranslate"><span class="pre">Trainer.global_step</span></code></a></li>

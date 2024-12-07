@@ -222,6 +222,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../modules/index.html">Modules Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">galaxy</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of galaxy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../collect_clusters/index.html">galaxy.collect_clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collect_not_clusters/index.html">galaxy.collect_not_clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../config/index.html">galaxy.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/index.html">galaxy.data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../grabber/index.html">galaxy.grabber</a></li>
@@ -287,25 +289,62 @@
         <article role="main" id="furo-main-content">
           <section id="module-galaxy.util">
 <span id="galaxy-util"></span><h1>galaxy.util<a class="headerlink" href="#module-galaxy.util" title="Link to this heading"></a></h1>
+<p>Utility functions and enumerations for handling datasets and legacy survey data.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.required_columns" title="galaxy.util.required_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">required_columns</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.util.optional_columns" title="galaxy.util.optional_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optional_columns</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.DataSource" title="galaxy.util.DataSource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataSource</span></code></a></p></td>
+<td><p>Enumeration of data sources.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.util.IsCluster" title="galaxy.util.IsCluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IsCluster</span></code></a></p></td>
+<td><p>Enumeration for cluster classification.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.bar_progress" title="galaxy.util.bar_progress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bar_progress</span></code></a>(current, total[, width])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.inherit_columns" title="galaxy.util.inherit_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inherit_columns</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Ensures the DataFrame has required and optional columns.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.util.to_hms_format" title="galaxy.util.to_hms_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_hms_format</span></code></a>(time_str)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.util.read_vizier" title="galaxy.util.read_vizier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_vizier</span></code></a>(→ pandas.DataFrame)</p></td>
+<td><p>Fetches a catalogue from Vizier and converts it to a pandas DataFrame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.to_dms_format" title="galaxy.util.to_dms_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dms_format</span></code></a>(time_str)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.bar_progress" title="galaxy.util.bar_progress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bar_progress</span></code></a>(→ None)</p></td>
+<td><p>Displays a progress bar for downloads.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.util.divide_chunks" title="galaxy.util.divide_chunks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divide_chunks</span></code></a>(l, n)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.util.to_hms_format" title="galaxy.util.to_hms_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_hms_format</span></code></a>(→ str)</p></td>
+<td><p>Converts a time string to HMS format.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.fits_to_rgb_image" title="galaxy.util.fits_to_rgb_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fits_to_rgb_image</span></code></a>(tensor)</p></td>
-<td><p>Converts a 2-channel tensor from the legacy survey to an RGB image tensor.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.to_dms_format" title="galaxy.util.to_dms_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dms_format</span></code></a>(→ str)</p></td>
+<td><p>Converts a time string to DMS format.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#galaxy.util.divide_chunks" title="galaxy.util.divide_chunks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divide_chunks</span></code></a>(→ Generator[List[Any], None, None])</p></td>
+<td><p>Divides a list into chunks of a specified size.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#galaxy.util.fits_to_rgb_image" title="galaxy.util.fits_to_rgb_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fits_to_rgb_image</span></code></a>(→ torch.Tensor)</p></td>
+<td><p>Converts a 2-channel tensor to an RGB image tensor.</p></td>
 </tr>
 </tbody>
 </table>
@@ -313,34 +352,205 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="galaxy.util.DataSource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">DataSource</span></span><a class="headerlink" href="#galaxy.util.DataSource" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Enumeration of data sources.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.MAP_ACT">
+<span class="sig-name descname"><span class="pre">MAP_ACT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'map_act'</span></em><a class="headerlink" href="#galaxy.util.DataSource.MAP_ACT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.DR5">
+<span class="sig-name descname"><span class="pre">DR5</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dr5'</span></em><a class="headerlink" href="#galaxy.util.DataSource.DR5" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.MC">
+<span class="sig-name descname"><span class="pre">MC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mc'</span></em><a class="headerlink" href="#galaxy.util.DataSource.MC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.SGA">
+<span class="sig-name descname"><span class="pre">SGA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sga'</span></em><a class="headerlink" href="#galaxy.util.DataSource.SGA" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.TYC2">
+<span class="sig-name descname"><span class="pre">TYC2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tyc2'</span></em><a class="headerlink" href="#galaxy.util.DataSource.TYC2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.GAIA">
+<span class="sig-name descname"><span class="pre">GAIA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gaia'</span></em><a class="headerlink" href="#galaxy.util.DataSource.GAIA" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.UPC_SZ">
+<span class="sig-name descname"><span class="pre">UPC_SZ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'upc_sz'</span></em><a class="headerlink" href="#galaxy.util.DataSource.UPC_SZ" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.SPT_SZ">
+<span class="sig-name descname"><span class="pre">SPT_SZ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'spt_sz'</span></em><a class="headerlink" href="#galaxy.util.DataSource.SPT_SZ" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.PSZSPT">
+<span class="sig-name descname"><span class="pre">PSZSPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pszspt'</span></em><a class="headerlink" href="#galaxy.util.DataSource.PSZSPT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.CCOMPRASS">
+<span class="sig-name descname"><span class="pre">CCOMPRASS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'comprass'</span></em><a class="headerlink" href="#galaxy.util.DataSource.CCOMPRASS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.SPT2500D">
+<span class="sig-name descname"><span class="pre">SPT2500D</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'spt2500d'</span></em><a class="headerlink" href="#galaxy.util.DataSource.SPT2500D" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.SPTECS">
+<span class="sig-name descname"><span class="pre">SPTECS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sptecs'</span></em><a class="headerlink" href="#galaxy.util.DataSource.SPTECS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.SPT100">
+<span class="sig-name descname"><span class="pre">SPT100</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'spt100'</span></em><a class="headerlink" href="#galaxy.util.DataSource.SPT100" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.ACT_MCMF">
+<span class="sig-name descname"><span class="pre">ACT_MCMF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'act_mcmf'</span></em><a class="headerlink" href="#galaxy.util.DataSource.ACT_MCMF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.TEST_SAMPLE">
+<span class="sig-name descname"><span class="pre">TEST_SAMPLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'test_sample'</span></em><a class="headerlink" href="#galaxy.util.DataSource.TEST_SAMPLE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.DataSource.RANDOM">
+<span class="sig-name descname"><span class="pre">RANDOM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rand'</span></em><a class="headerlink" href="#galaxy.util.DataSource.RANDOM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="galaxy.util.IsCluster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">IsCluster</span></span><a class="headerlink" href="#galaxy.util.IsCluster" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Enumeration for cluster classification.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.IsCluster.IS_CLUSTER">
+<span class="sig-name descname"><span class="pre">IS_CLUSTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#galaxy.util.IsCluster.IS_CLUSTER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="galaxy.util.IsCluster.NOT_CLUSTER">
+<span class="sig-name descname"><span class="pre">NOT_CLUSTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#galaxy.util.IsCluster.NOT_CLUSTER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.util.required_columns">
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">required_columns</span></span><a class="headerlink" href="#galaxy.util.required_columns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="galaxy.util.optional_columns">
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">optional_columns</span></span><a class="headerlink" href="#galaxy.util.optional_columns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.util.inherit_columns">
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">inherit_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.util.inherit_columns" title="Link to this definition"></a></dt>
+<dd><p>Ensures the DataFrame has required and optional columns.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>frame (pd.DataFrame): Input DataFrame.</p>
+</dd>
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame with required and optional columns ensured.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galaxy.util.read_vizier">
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">read_vizier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalogue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#galaxy.util.read_vizier" title="Link to this definition"></a></dt>
+<dd><p>Fetches a catalogue from Vizier and converts it to a pandas DataFrame.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>catalogue (str): Name or identifier of the catalogue.</p>
+</dd>
+<dt>Returns:</dt><dd><p>pd.DataFrame: DataFrame containing the catalogue data.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.util.bar_progress">
-<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">bar_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.util.bar_progress" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">bar_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">80</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galaxy.util.bar_progress" title="Link to this definition"></a></dt>
+<dd><p>Displays a progress bar for downloads.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>current (int): Current number of bytes downloaded.
+total (int): Total number of bytes to download.
+width (int, optional): Width of the progress bar. Defaults to 80.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.util.to_hms_format">
-<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">to_hms_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.util.to_hms_format" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">to_hms_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#galaxy.util.to_hms_format" title="Link to this definition"></a></dt>
+<dd><p>Converts a time string to HMS format.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>time_str (str): Time string in space-separated format (e.g., “12 34 56”).</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Time string in HMS format (e.g., “12h34m56s”).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.util.to_dms_format">
-<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">to_dms_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.util.to_dms_format" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">to_dms_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#galaxy.util.to_dms_format" title="Link to this definition"></a></dt>
+<dd><p>Converts a time string to DMS format.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>time_str (str): Time string in space-separated format (e.g., “12 34 56”).</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Time string in DMS format (e.g., “12d34m56s”).</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.util.divide_chunks">
-<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">divide_chunks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.util.divide_chunks" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">divide_chunks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#galaxy.util.divide_chunks" title="Link to this definition"></a></dt>
+<dd><p>Divides a list into chunks of a specified size.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data_list (List[Any]): Input list to divide.
+chunk_size (int): Size of each chunk.</p>
+</dd>
+<dt>Yields:</dt><dd><p>Generator[List[Any], None, None]: Generator yielding list chunks.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="galaxy.util.fits_to_rgb_image">
-<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">fits_to_rgb_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galaxy.util.fits_to_rgb_image" title="Link to this definition"></a></dt>
-<dd><p>Converts a 2-channel tensor from the legacy survey to an RGB image tensor.</p>
-<p>Parameters:
-- tensor (Tensor): Input tensor of shape (2, H, W)</p>
-<p>Returns:
-- Tensor: RGB image tensor of shape (3, H, W)</p>
+<span class="sig-prename descclassname"><span class="pre">galaxy.util.</span></span><span class="sig-name descname"><span class="pre">fits_to_rgb_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#galaxy.util.fits_to_rgb_image" title="Link to this definition"></a></dt>
+<dd><p>Converts a 2-channel tensor to an RGB image tensor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tensor (torch.Tensor): Input tensor of shape (2, H, W).</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: RGB image tensor of shape (3, H, W).</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If the input tensor does not have 2 channels.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -393,8 +603,38 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">galaxy.util</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
+<li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#galaxy.util.DataSource"><code class="docutils literal notranslate"><span class="pre">DataSource</span></code></a><ul>
+<li><a class="reference internal" href="#galaxy.util.DataSource.MAP_ACT"><code class="docutils literal notranslate"><span class="pre">DataSource.MAP_ACT</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.DR5"><code class="docutils literal notranslate"><span class="pre">DataSource.DR5</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.MC"><code class="docutils literal notranslate"><span class="pre">DataSource.MC</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.SGA"><code class="docutils literal notranslate"><span class="pre">DataSource.SGA</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.TYC2"><code class="docutils literal notranslate"><span class="pre">DataSource.TYC2</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.GAIA"><code class="docutils literal notranslate"><span class="pre">DataSource.GAIA</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.UPC_SZ"><code class="docutils literal notranslate"><span class="pre">DataSource.UPC_SZ</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.SPT_SZ"><code class="docutils literal notranslate"><span class="pre">DataSource.SPT_SZ</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.PSZSPT"><code class="docutils literal notranslate"><span class="pre">DataSource.PSZSPT</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.CCOMPRASS"><code class="docutils literal notranslate"><span class="pre">DataSource.CCOMPRASS</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.SPT2500D"><code class="docutils literal notranslate"><span class="pre">DataSource.SPT2500D</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.SPTECS"><code class="docutils literal notranslate"><span class="pre">DataSource.SPTECS</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.SPT100"><code class="docutils literal notranslate"><span class="pre">DataSource.SPT100</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.ACT_MCMF"><code class="docutils literal notranslate"><span class="pre">DataSource.ACT_MCMF</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.TEST_SAMPLE"><code class="docutils literal notranslate"><span class="pre">DataSource.TEST_SAMPLE</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.DataSource.RANDOM"><code class="docutils literal notranslate"><span class="pre">DataSource.RANDOM</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#galaxy.util.IsCluster"><code class="docutils literal notranslate"><span class="pre">IsCluster</span></code></a><ul>
+<li><a class="reference internal" href="#galaxy.util.IsCluster.IS_CLUSTER"><code class="docutils literal notranslate"><span class="pre">IsCluster.IS_CLUSTER</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.IsCluster.NOT_CLUSTER"><code class="docutils literal notranslate"><span class="pre">IsCluster.NOT_CLUSTER</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#galaxy.util.required_columns"><code class="docutils literal notranslate"><span class="pre">required_columns</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.optional_columns"><code class="docutils literal notranslate"><span class="pre">optional_columns</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.inherit_columns"><code class="docutils literal notranslate"><span class="pre">inherit_columns()</span></code></a></li>
+<li><a class="reference internal" href="#galaxy.util.read_vizier"><code class="docutils literal notranslate"><span class="pre">read_vizier()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.util.bar_progress"><code class="docutils literal notranslate"><span class="pre">bar_progress()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.util.to_hms_format"><code class="docutils literal notranslate"><span class="pre">to_hms_format()</span></code></a></li>
 <li><a class="reference internal" href="#galaxy.util.to_dms_format"><code class="docutils literal notranslate"><span class="pre">to_dms_format()</span></code></a></li>
