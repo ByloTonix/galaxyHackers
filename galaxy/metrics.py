@@ -41,6 +41,7 @@ def probabilities_hist(
     plt.hist(
         predictions_non_clusters, bins, color="red", alpha=0.5, label="non-clusters"
     )
+    plt.yscale("log")
     plt.legend(loc="upper right")
     plt.title("Class prediction")
     pdf.savefig()

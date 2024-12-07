@@ -82,7 +82,7 @@ class SampleName(str, Enum):
     CLUSTER_SMALL = "cluster_small"
     NEGATIVE_SMALL = "random_small"
     TYC2_SMALL = "tyc2_small"
-    CLUSTER_BIG = "cluster_big"
+    # CLUSTER_BIG = "cluster_big"
     # MC_BIG = "mc_big"
 
 
@@ -90,7 +90,7 @@ sample_sizes: dict = {
     SampleName.CLUSTER_SMALL: 10,
     SampleName.NEGATIVE_SMALL: 5,
     SampleName.TYC2_SMALL: 5,
-    SampleName.CLUSTER_BIG: 1,
+    # SampleName.CLUSTER_BIG: 1,
     # SampleName.MC_BIG: 1,
 }
 
@@ -116,7 +116,7 @@ sample_sources = {
         data.DataPart.BRIGHT_STARS,
         0,
     ),  # use bright stars
-    SampleName.CLUSTER_BIG: (MapType.BIG, data.DataPart.TEST, 1),
+    # SampleName.CLUSTER_BIG: (MapType.BIG, data.DataPart.TEST, 1),
     # SampleName.MC_BIG: (MapType.BIG, data.DataPart.MC, 1),
 }
 

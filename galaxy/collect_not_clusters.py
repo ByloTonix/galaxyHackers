@@ -22,7 +22,7 @@ def read_sga(sample_size: int = 10_000) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing SGA galaxy data sampled evenly across redshift bins.
     """
-    table: atpy.Table = atpy.Table().read(settings.SGA_PATH)
+    table: atpy.Table = atpy.Table().read(settings.SGA_PATH, hdu=1)
     frame = table.to_pandas().reset_index(drop=True)
 
     frame = frame.rename(

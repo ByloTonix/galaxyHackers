@@ -61,7 +61,7 @@ datasets, dataloaders = data.create_dataloaders()
 train_loader = dataloaders[data.DataPart.TRAIN]
 val_loader = dataloaders[data.DataPart.VALIDATE]
 test_loader = dataloaders[data.DataPart.TEST]
-test_sample_loader = dataloaders[data.DataPart.TEST_SAMPLE]
+#test_sample_loader = dataloaders[data.DataPart.TEST_SAMPLE]
 
 
 parser = argparse.ArgumentParser(description="Model training")
@@ -193,21 +193,21 @@ for model_name, model in selected_models:
             val_table_data,
         )
 
-        if test_sample_loader:
-            test_sample_predictions, *_ = trainer.test(test_sample_loader)
-            metrics.modelPerformance(
-                model_name=model_name,
-                optimizer_name=optimizer_name,
-                predictions=test_sample_predictions,
-                classes=classes,
-            )
-            test_sample_predictions.to_csv(
-                os.path.join(
-                    settings.PREDICTIONS_PATH,
-                    f"test_sample_predictions_{model_name}.csv",
-                ),
-                index=False,
-            )
+        # if test_sample_loader:
+        #     test_sample_predictions, *_ = trainer.test(test_sample_loader)
+        #     metrics.modelPerformance(
+        #         model_name=model_name,
+        #         optimizer_name=optimizer_name,
+        #         predictions=test_sample_predictions,
+        #         classes=classes,
+        #     )
+        #     test_sample_predictions.to_csv(
+        #         os.path.join(
+        #             settings.PREDICTIONS_PATH,
+        #             f"test_sample_predictions_{model_name}.csv",
+        #         ),
+        #         index=False,
+        #     )
 
 
 metrics.combine_metrics(selected_models, optimizer_name)

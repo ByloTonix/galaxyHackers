@@ -792,7 +792,7 @@ def create_dataloaders() -> tuple[dict[DataPart, Dataset], dict[DataPart, DataLo
     custom_datasets = {}
     dataloaders = {}
     for part in list(DataPart):
-        if part == DataPart.MC:
+        if part == DataPart.MC or part == DataPart.TEST_SAMPLE:
             continue
 
         cluster_dataset = ClusterDataset(
