@@ -9,7 +9,6 @@ import pandas as pd
 import torch
 from astroquery.vizier import Vizier
 
-
 class DataSource(str, Enum):
     """Enumeration of data sources."""
 
@@ -38,8 +37,12 @@ class IsCluster(int, Enum):
     IS_CLUSTER = 1
     NOT_CLUSTER = 0
 
+class RedShiftType(str, Enum):
 
-required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source", "target"])
+    PHOT = "phot"
+    SPEC = "spec"
+
+required_columns = set(["idx", "ra_deg", "dec_deg", "source", "target"])
 optional_columns = set(["red_shift", "red_shift_type"])
 
 
@@ -68,7 +71,6 @@ def inherit_columns(frame: pd.DataFrame) -> pd.DataFrame:
 
     return frame
 
-
 def read_vizier(catalogue: str) -> pd.DataFrame:
     """Fetches a catalogue from Vizier and converts it to a pandas DataFrame.
 
@@ -83,6 +85,81 @@ def read_vizier(catalogue: str) -> pd.DataFrame:
 
     catalogs = Vizier.get_catalogs(catalog_list.keys())
     frame = catalogs[0].to_pandas().reset_index(drop=True)
+    return frame
+
+def read_vizier_updated(
+        catalogue: str, 
+        source: DataSource,
+        target: IsCluster,
+        red_shift_type: RedShiftType | None = None,
+        rename_dict: dict | None = None,
+        row_limit = 1000
+    ) -> pd.DataFrame:
+    """Fetches a catalogue from Vizier and converts it to a pandas DataFrame.
+
+    Args:
+        catalogue (str): Name or identifier of the catalogue.
+
+    Returns:
+        pd.DataFrame: DataFrame containing the catalogue data.
+    """
+
+    if rename_dict is None:
+        rename_dict =  {
+            "RAJ2000": "ra_deg",
+            "DEJ2000": "dec_deg",
+            "z": "red_shift",
+            "f_z": "red_shift_type",
+        }
+
+
+    catalog_list = Vizier.find_catalogs(catalogue)
+    Vizier.ROW_LIMIT = row_limit
+
+    catalogs = Vizier.get_catalogs(catalog_list.keys())
+    frame: pd.DataFrame = catalogs[0].to_pandas().reset_index(drop=True)
+
+
+    frame = frame.rename(columns=rename_dict)
+
+    if "redshift_unc" in frame.columns:
+        frame = frame[frame["redshift_unc"] == 0]
+
+    if "n_z" in frame.columns:
+        frame = frame[frame["n_z"].str.contains(r"\+", na=False)]
+
+    if 'red_shift' in frame.columns:
+        frame = frame.loc[frame['red_shift'].notna()]
+
+        if red_shift_type is not None:
+            frame['red_shift_type'] = red_shift_type
+
+        else:
+
+            if 'red_shift_type' in frame.columns:
+
+                if frame['red_shift_type'].isna().all():
+                    frame = frame.drop(columns=['red_shift_type'])
+
+                frame = frame[frame["red_shift_type"].notna()
+                    & (frame["red_shift_type"] != "unct")
+                    & (frame["red_shift_type"] != "")
+                ]
+
+            else:
+                raise ValueError("Not allowed case: red_shift_type is not defined and not appearing in columns")
+            
+
+
+    common_columns = set(frame.columns) & (required_columns | optional_columns)
+    frame = frame.loc[:, list(common_columns)]
+
+    
+    frame['source'] = source.value 
+    frame['target'] = target.value
+
+    frame = inherit_columns(frame)
+
     return frame
 
 
