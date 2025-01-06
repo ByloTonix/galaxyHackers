@@ -252,12 +252,57 @@ def get_positive_class() -> pd.DataFrame:
         pd.DataFrame: Combined positive class dataset.
     """
     dr5 = collect_clusters.read_dr5()
-    upc_sz = collect_clusters.read_upc_sz()
-    spt_sz = collect_clusters.read_spt_sz()
-    pszspt = collect_clusters.read_pszspt()
-    comprass = collect_clusters.read_comprass()
-    spt2500d = collect_clusters.read_spt2500d()
-    sptecs = collect_clusters.read_sptecs()
+
+    upc_sz = util.read_vizier_updated(
+        catalogue="J/ApJS/272/7/table2",
+        source=DataSource.UPC_SZ,
+        target=IsCluster.IS_CLUSTER,
+        row_limit=-1
+    )
+    
+    spt_sz = util.read_vizier_updated(
+        catalogue="J/ApJS/216/27/table4",
+        source=DataSource.SPT_SZ,
+        target=IsCluster.IS_CLUSTER,
+        row_limit=-1,
+        red_shift_type="spec"
+    )
+
+    pszspt = util.read_vizier_updated(
+        catalogue="J/A+A/647/A106",
+        source=DataSource.PSZSPT,
+        target=IsCluster.IS_CLUSTER,
+        row_limit=-1,
+        red_shift_type="phot"
+    )
+    comprass = util.read_vizier_updated(
+        catalogue="J/A+A/626/A7/comprass",
+        source=DataSource.CCOMPRASS,
+        target=IsCluster.IS_CLUSTER,
+        row_limit=-1,
+        red_shift_type="phot"
+    )
+    spt2500d = util.read_vizier_updated(
+        catalogue="J/ApJ/878/55/table5",
+        source=DataSource.SPT2500D,
+        target=IsCluster.IS_CLUSTER,
+        row_limit=-1,
+        red_shift_type="spec"
+    )
+    sptecs_certified = util.read_vizier_updated(
+        catalogue="J/ApJS/247/25/table10",
+        source=DataSource.SPTECS,
+        target=IsCluster.IS_CLUSTER,
+        row_limit=-1,
+        red_shift_type="phot"
+    )
+    sptecs_candidates = util.read_vizier_updated(
+        catalogue="J/ApJS/247/25/cand",
+        source=DataSource.SPTECS,
+        target=IsCluster.IS_CLUSTER,
+        row_limit=-1,
+        red_shift_type="phot"
+    )
     spt100 = collect_clusters.read_spt100()
     act_mcmf = collect_clusters.read_act_mcmf()
 
@@ -269,7 +314,8 @@ def get_positive_class() -> pd.DataFrame:
             pszspt,
             comprass,
             spt2500d,
-            sptecs,
+            sptecs_certified,
+            sptecs_candidates,
             spt100,
             act_mcmf,
         ],
