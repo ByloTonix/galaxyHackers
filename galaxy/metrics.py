@@ -40,12 +40,11 @@ def probabilities_hist(
         pdf (PdfPages): PDF file to save the plots.
     """
     bins = np.arange(0, 1.01, 0.05)
-    plt.figure()
     plt.hist(predictions_clusters, bins, color="green", alpha=0.5, label="clusters")
-    plt.hist(predictions_galaxies, bins, color="red", alpha=0.5, label="non-clusters")
-    plt.hist(predictions_stars, bins, color="blue", alpha=0.5, label="non-clusters")
-    plt.hist(predictions_random, bins, color="pink", alpha=0.5, label="non-clusters")
-    plt.yscale("log")
+    plt.hist(predictions_galaxies, bins, color="red", alpha=0.5, label="galaxies")
+    plt.hist(predictions_stars, bins, color="blue", alpha=0.5, label="stars")
+    plt.hist(predictions_random, bins, color="pink", alpha=0.5, label="random")
+    plt.yscale("log") 
     plt.legend(loc="upper right")
     plt.title("Class prediction")
     pdf.savefig()
