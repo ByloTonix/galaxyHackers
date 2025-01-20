@@ -35,8 +35,10 @@ class DataSource(str, Enum):
 class IsCluster(int, Enum):
     """Enumeration for cluster classification."""
 
-    IS_CLUSTER = 1
-    NOT_CLUSTER = 0
+    IS_CLUSTER = 0
+    IS_GALAXY = 1
+    IS_STAR = 2
+    IS_RANDOM = 3
 
 
 required_columns = set(["idx", "ra_deg", "dec_deg", "name", "source", "target"])

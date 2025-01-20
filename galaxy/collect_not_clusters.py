@@ -67,7 +67,7 @@ def read_sga(sample_size: int = 10_000) -> pd.DataFrame:
     sample.index = np.arange(len(sample))
 
     sample["source"] = DataSource.SGA.value
-    sample["target"] = IsCluster.NOT_CLUSTER.value
+    sample["target"] = IsCluster.IS_GALAXY.value
 
     sample = inherit_columns(sample)
 
@@ -105,7 +105,7 @@ def read_tyc2(sample_size: int = 5_000) -> pd.DataFrame:
     frame = frame.sample(n=sample_size, random_state=settings.SEED)
 
     frame["source"] = DataSource.TYC2.value
-    frame["target"] = IsCluster.NOT_CLUSTER.value
+    frame["target"] = IsCluster.IS_STAR.value
 
     frame = inherit_columns(frame)
 
@@ -133,7 +133,7 @@ def read_gaia() -> pd.DataFrame:
     )
 
     frame["source"] = DataSource.GAIA.value
-    frame["target"] = IsCluster.NOT_CLUSTER.value
+    frame["target"] = IsCluster.IS_STAR.value
 
     frame = inherit_columns(frame)
 

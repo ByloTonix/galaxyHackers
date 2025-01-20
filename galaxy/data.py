@@ -669,7 +669,7 @@ def generate_random_sample() -> pd.DataFrame:
             "ra_deg": filtered_candidates.ra.deg,
             "dec_deg": filtered_candidates.dec.deg,
             "source": DataSource.RANDOM.value,
-            "target": IsCluster.NOT_CLUSTER.value,
+            "target": IsCluster.IS_RANDOM.value,
         }
     )
 

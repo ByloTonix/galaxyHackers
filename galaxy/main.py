@@ -136,7 +136,7 @@ criterion = nn.BCELoss()
 results = {}
 val_results = {}
 
-classes = ("random", "clusters")
+classes = ("clusters", "galaxies", "stars", "random")
 
 for model_name, model in selected_models:
 
