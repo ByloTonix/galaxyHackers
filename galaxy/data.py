@@ -11,6 +11,7 @@ import astropy.coordinates as coord
 import astropy.units as u
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
 import wget
@@ -28,10 +29,6 @@ np.random.seed(settings.SEED)
 TORCHVISION_MEAN = [23.19058950345032, 22.780995295792817]
 TORCHVISION_STD = [106.89880134344101, 100.32284196853638]
 
-main_transforms = [
-    transforms.Resize((224, 224)),
-    transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD),
-]
 
 
 class DataPart(str, Enum):
@@ -100,15 +97,15 @@ class ShiftAndMirrorPadTransform:
         self.shift_x = 0
         self.shift_y = 0
 
-    def __call__(self):
-        """Generates random shift values within the specified range."""
-        # Random shift values within the specified range
-        self.shift_x = torch.randint(
-            -self.max_shift_x, self.max_shift_x + 1, (1,)
-        ).item()
-        self.shift_y = torch.randint(
-            -self.max_shift_y, self.max_shift_y + 1, (1,)
-        ).item()
+    # def __call__(self):
+    #     """Generates random shift values within the specified range."""
+    #     # Random shift values within the specified range
+    #     self.shift_x = torch.randint(
+    #         -self.max_shift_x, self.max_shift_x + 1, (1,)
+    #     ).item()
+    #     self.shift_y = torch.randint(
+    #         -self.max_shift_y, self.max_shift_y + 1, (1,)
+    #     ).item()
 
     def apply_shift(self, ra_deg: float, dec_deg: float) -> tuple[float, float]:
         """Applies the generated shift to given coordinates.
@@ -124,10 +121,10 @@ class ShiftAndMirrorPadTransform:
         dec_deg += self.shift_y
         return ra_deg, dec_deg
 
-    # def __call__(self, image):
-    #     shift_x = torch.randint(-self.max_shift_x, self.max_shift_x + 1, (1,)).item()
-    #     shift_y = torch.randint(-self.max_shift_y, self.max_shift_y + 1, (1,)).item()
-    #     return shift_and_mirror_pad(image, shift_x, shift_y)
+    def __call__(self, image):
+        shift_x = torch.randint(-self.max_shift_x, self.max_shift_x + 1, (1,)).item()
+        shift_y = torch.randint(-self.max_shift_y, self.max_shift_y + 1, (1,)).item()
+        return shift_and_mirror_pad(image, shift_x, shift_y)
 
 
 class ClusterDataset(Dataset):
@@ -209,6 +206,15 @@ class ClusterDataset(Dataset):
 
         return img
 
+    def show_img(self, idx: int):
+
+        img = self.__getitem__(idx)['image']
+
+        rgb_image = util.fits_to_rgb_image(img)
+        
+        rgb_image = rgb_image.squeeze().permute(1,2,0)
+
+        plt.imshow(rgb_image)
 
 """Collecting clusters of galaxies for positive class"""
 
@@ -332,9 +338,9 @@ def get_cluster_catalog() -> coord.SkyCoord:
         coord.SkyCoord: Catalog of clusters as a SkyCoord object.
     """
     clusters = datasets_collection.load_clusters()
-    test_sample = collect_clusters.read_test_sample()
+    # test_sample = collect_clusters.read_test_sample()
 
-    clusters = pd.concat([clusters, test_sample], ignore_index=True)
+    # clusters = pd.concat([clusters, test_sample], ignore_index=True)
 
     # The catalog of known found galaxies
     catalog = coord.SkyCoord(
@@ -342,54 +348,6 @@ def get_cluster_catalog() -> coord.SkyCoord:
     )
 
     return catalog
-
-
-def expanded_positive_class() -> pd.DataFrame:
-    """Generates an expanded dataset of positive class by applying random shifts.
-
-    Returns:
-        pd.DataFrame: Expanded dataset of positive class with shifted coordinates.
-    """
-
-    # Для того чтобы выборка была сбалансирована, координаты подтверждённых скоплений
-    # немного шатаются => выборка увеличивается
-
-    clusters = datasets_collection.load_clusters()
-
-    more_clusters = []
-
-    # initialized not for loop to avoid adressing __init__ each time and simply generates random shifts
-    transform_positive = ShiftAndMirrorPadTransform()
-
-    for _, row in clusters.iterrows():
-        for _ in range(1):  # + новых картинок подтверждённых скоплений
-            transform_positive()
-            new_ra, new_dec = transform_positive.apply_shift(
-                row["ra_deg"], row["dec_deg"]
-            )
-            more_clusters.append(
-                {
-                    "name": row["name"],
-                    "ra_deg": new_ra,
-                    "dec_deg": new_dec,
-                    "red_shift": row["red_shift"],
-                    "red_shift_type": row["red_shift_type"],
-                    "target": IsCluster.IS_CLUSTER.value,
-                    "source": row["source"],
-                }
-            )
-
-    more_clusters_df = pd.DataFrame(more_clusters)
-
-    extended_clusters = pd.concat(
-        [
-            clusters,
-            more_clusters_df,
-        ],
-        ignore_index=True,
-    )
-
-    return extended_clusters
 
 
 def get_negative_class() -> pd.DataFrame:
@@ -572,7 +530,7 @@ def filter_candidates(candidates: coord.SkyCoord, max_len: int) -> coord.SkyCoor
 
 
 # TODO: ДОРАБОТАТЬ generate_random_sample
-def generate_random_candidates(len: int = 7500) -> coord.SkyCoord:
+def generate_random(n_sim: int = 10000, max_len=2000) -> coord.SkyCoord:
     """Generates random sky coordinates for candidates.
 
     Args:
@@ -581,145 +539,144 @@ def generate_random_candidates(len: int = 7500) -> coord.SkyCoord:
     Returns:
         coord.SkyCoord: SkyCoord object containing generated candidates.
     """
-    n_sim = 20_000
-    required_num = 7500
-
     np.random.seed(settings.SEED)
 
-    ras = np.random.uniform(0, 360, n_sim)
-    decs = np.random.uniform(-90, 90, n_sim)
+    min_ra_dec = (0, -90)
+    max_ra_dec = (360, 90)
+    sample = np.random.uniform(min_ra_dec, max_ra_dec, size=(n_sim, 2))
 
-    frame = pd.DataFrame({"ra_deg": ras, "dec_deg": decs})
-
-    valid_idx = (
-        (0 <= frame["ra_deg"])
-        & (frame["ra_deg"] <= 360)
-        & (-90 <= frame["dec_deg"])
-        & (frame["dec_deg"] <= 90)
-    )
-
-    frame = frame[valid_idx].reset_index(drop=True)
+    frame = pd.DataFrame(sample, columns=('ra_deg', 'dec_deg'))
 
     # Just points from our sky map
     candidates = coord.SkyCoord(
         ra=frame["ra_deg"] * u.degree, dec=frame["dec_deg"] * u.degree, unit="deg"
     )
-    filtered_candidates = filter_candidates(candidates, max_len=required_num)
-    return filtered_candidates
+    filtered_candidates = filter_candidates(candidates, max_len=max_len)
 
-
-def generate_random_based(required_num: int = 7500) -> coord.SkyCoord:
-    """Generates random candidates based on existing datasets.
-
-    Args:
-        required_num (int, optional): Number of candidates to generate. Defaults to 7500.
-
-    Returns:
-        coord.SkyCoord: SkyCoord object containing generated candidates.
-
-    опытным путём было выяснено, что generate_random_candidates не даёт 7500 даже если n_sim выкрутить до 50к,
-    предлагается брать собранные датасеты, брать ra_deg и dec_deg, перемешивать в независимости друг от друга
-    и затем в filter_candidates подавать len = required_num - len(<собранного из generate_random_candidates>)
-
-    #     ТЕХНИЧЕСКИЕ ШОКОЛАДКИ???
-    # /usr/local/lib/python3.10/dist-packages/astropy/coordinates/angles/core.py in _validate_angles(self, angles)
-    #     647                     f"<= 90 deg, got {angles.to(u.degree)}"
-    #     648                 )
-    # --> 649             raise ValueError(
-    #     650                 "Latitude angle(s) must be within -90 deg <= angle "
-    #     651                 f"<= 90 deg, got {angles.min().to(u.degree)} <= "
-
-    ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -100.8107 deg <= angle <= 106.2399 deg
-    """
-    clusters = datasets_collection.load_expanded_clusters()
-    non_clusters = datasets_collection.load_non_clusters()
-    frame = pd.concat(
-        [
-            clusters,
-            non_clusters,
-        ],
-        ignore_index=True,
-    )
-
-    ras = frame["ra_deg"].tolist()
-    decs = frame["dec_deg"].tolist()
-
-    # Shuffling candidates, imitating samples
-    np.random.seed(settings.SEED)
-    np.random.shuffle(ras)
-    np.random.shuffle(decs)
-
-    frame = pd.DataFrame({"ra_deg": ras, "dec_deg": decs})
-
-    valid_idx = (
-        (0 <= frame["ra_deg"])
-        & (frame["ra_deg"] <= 360)
-        & (-90 <= frame["dec_deg"])
-        & (frame["dec_deg"] <= 90)
-    )
-
-    frame = frame[valid_idx].reset_index(drop=True)
-
-    # Just points from our sky map
-    candidates = coord.SkyCoord(
-        ra=frame["ra_deg"] * u.degree, dec=frame["dec_deg"] * u.degree, unit="deg"
-    )
-    filtered_candidates = filter_candidates(candidates, max_len=required_num // 2)
-    return filtered_candidates
-
-
-def generate_random_sample() -> pd.DataFrame:
-    """Combines random candidates from `generate_random_candidates` and `generate_random_based`.
-
-    Ensures the required number of candidates is generated by combining both methods.
-
-    Returns:
-        pd.DataFrame: DataFrame containing generated random candidates.
-    """
-    # for example: see create_negative_class_dr5 and create_negative_class_mc from last commit
-
-    # 24195 - objects in extended positive class, 16700 - negative class from galaxies and stars
-    required_num = 7500
-
-    filtered_candidates1 = generate_random_candidates(required_num)
-    filtered_candidates2 = generate_random_based(
-        required_num - len(filtered_candidates1)
-    )
-    filtered_candidates = coord.SkyCoord(
-        ra=np.concatenate([filtered_candidates1.ra, filtered_candidates2.ra]),
-        dec=np.concatenate([filtered_candidates1.dec, filtered_candidates2.dec]),
-        unit="deg",
-    )
-
-    names = [
-        f"Rand {l:.3f}{b:+.3f}"
-        for l, b in zip(
-            filtered_candidates.galactic.l.degree, filtered_candidates.galactic.b.degree
-        )
-    ]
-
-    # frame = pd.DataFrame(
-    #     np.array([
-    #         names,
-    #         filtered_candidates.ra.deg,
-    #         filtered_candidates.dec.deg]).T,
-    #     columns=["name", "ra_deg", "dec_deg"],
-    # )
-
-    # frame["source"] = DataSource.RANDOM.value
-    # frame["target"] = IsCluster.NOT_CLUSTER.value
 
     frame = pd.DataFrame(
-        {
-            "name": names,
-            "ra_deg": filtered_candidates.ra.deg,
-            "dec_deg": filtered_candidates.dec.deg,
-            "source": DataSource.RANDOM.value,
-            "target": IsCluster.NOT_CLUSTER.value,
-        }
-    )
+    {
+        "ra_deg": filtered_candidates.ra.deg,
+        "dec_deg": filtered_candidates.dec.deg,
+        "source": DataSource.RANDOM.value,
+        "target": IsCluster.NOT_CLUSTER.value,
+    }
+)
+    return frame
 
-    return inherit_columns(frame)
+
+# def generate_random_based(required_num: int = 7500) -> coord.SkyCoord:
+#     """Generates random candidates based on existing datasets.
+
+#     Args:
+#         required_num (int, optional): Number of candidates to generate. Defaults to 7500.
+
+#     Returns:
+#         coord.SkyCoord: SkyCoord object containing generated candidates.
+
+#     опытным путём было выяснено, что generate_random_candidates не даёт 7500 даже если n_sim выкрутить до 50к,
+#     предлагается брать собранные датасеты, брать ra_deg и dec_deg, перемешивать в независимости друг от друга
+#     и затем в filter_candidates подавать len = required_num - len(<собранного из generate_random_candidates>)
+
+#     #     ТЕХНИЧЕСКИЕ ШОКОЛАДКИ???
+#     # /usr/local/lib/python3.10/dist-packages/astropy/coordinates/angles/core.py in _validate_angles(self, angles)
+#     #     647                     f"<= 90 deg, got {angles.to(u.degree)}"
+#     #     648                 )
+#     # --> 649             raise ValueError(
+#     #     650                 "Latitude angle(s) must be within -90 deg <= angle "
+#     #     651                 f"<= 90 deg, got {angles.min().to(u.degree)} <= "
+
+#     ValueError: Latitude angle(s) must be within -90 deg <= angle <= 90 deg, got -100.8107 deg <= angle <= 106.2399 deg
+#     """
+#     clusters = datasets_collection.load_expanded_clusters()
+#     non_clusters = datasets_collection.load_non_clusters()
+#     frame = pd.concat(
+#         [
+#             clusters,
+#             non_clusters,
+#         ],
+#         ignore_index=True,
+#     )
+
+#     ras = frame["ra_deg"].tolist()
+#     decs = frame["dec_deg"].tolist()
+
+#     # Shuffling candidates, imitating samples
+#     np.random.seed(settings.SEED)
+#     np.random.shuffle(ras)
+#     np.random.shuffle(decs)
+
+#     frame = pd.DataFrame({"ra_deg": ras, "dec_deg": decs})
+
+#     valid_idx = (
+#         (0 <= frame["ra_deg"])
+#         & (frame["ra_deg"] <= 360)
+#         & (-90 <= frame["dec_deg"])
+#         & (frame["dec_deg"] <= 90)
+#     )
+
+#     frame = frame[valid_idx].reset_index(drop=True)
+
+#     # Just points from our sky map
+#     candidates = coord.SkyCoord(
+#         ra=frame["ra_deg"] * u.degree, dec=frame["dec_deg"] * u.degree, unit="deg"
+#     )
+#     filtered_candidates = filter_candidates(candidates, max_len=required_num // 2)
+#     return filtered_candidates
+
+
+# def generate_random_sample() -> pd.DataFrame:
+#     """Combines random candidates from `generate_random_candidates` and `generate_random_based`.
+
+#     Ensures the required number of candidates is generated by combining both methods.
+
+#     Returns:
+#         pd.DataFrame: DataFrame containing generated random candidates.
+#     """
+#     # for example: see create_negative_class_dr5 and create_negative_class_mc from last commit
+
+#     # 24195 - objects in extended positive class, 16700 - negative class from galaxies and stars
+#     required_num = 7500
+
+#     filtered_candidates1 = generate_random_candidates(required_num)
+#     filtered_candidates2 = generate_random_based(
+#         required_num - len(filtered_candidates1)
+#     )
+#     filtered_candidates = coord.SkyCoord(
+#         ra=np.concatenate([filtered_candidates1.ra, filtered_candidates2.ra]),
+#         dec=np.concatenate([filtered_candidates1.dec, filtered_candidates2.dec]),
+#         unit="deg",
+#     )
+
+#     names = [
+#         f"Rand {l:.3f}{b:+.3f}"
+#         for l, b in zip(
+#             filtered_candidates.galactic.l.degree, filtered_candidates.galactic.b.degree
+#         )
+#     ]
+
+#     # frame = pd.DataFrame(
+#     #     np.array([
+#     #         names,
+#     #         filtered_candidates.ra.deg,
+#     #         filtered_candidates.dec.deg]).T,
+#     #     columns=["name", "ra_deg", "dec_deg"],
+#     # )
+
+#     # frame["source"] = DataSource.RANDOM.value
+#     # frame["target"] = IsCluster.NOT_CLUSTER.value
+
+#     frame = pd.DataFrame(
+#         {
+#             "name": names,
+#             "ra_deg": filtered_candidates.ra.deg,
+#             "dec_deg": filtered_candidates.dec.deg,
+#             "source": DataSource.RANDOM.value,
+#             "target": IsCluster.NOT_CLUSTER.value,
+#         }
+#     )
+
+#     return inherit_columns(frame)
 
 
 """Split samples into train, validation and tests and get pictures from legacy survey"""
@@ -732,9 +689,10 @@ def train_val_test_split() -> dict[DataPart, pd.DataFrame]:
     Returns:
         dict[DataPart, pd.DataFrame]: Dictionary mapping data parts to DataFrames.
     """
-    clusters = datasets_collection.load_expanded_clusters()
+    clusters = datasets_collection.load_clusters()
     non_clusters = datasets_collection.load_non_clusters()
-    random = generate_random_sample()
+    random = generate_random()
+    # random = generate_random_sample()
 
     frame = pd.concat([clusters, non_clusters, random], ignore_index=True)
 
@@ -769,24 +727,24 @@ def train_val_test_split() -> dict[DataPart, pd.DataFrame]:
         "is_cluster_1": test[test["target"] == 1].shape[0],
         "source_rand": test[test["source"] == "rand"].shape[0],
         "source_sga": test[test["source"] == "sga"].shape[0],
-        "is_cluster_0_stars": train[
-            (train["target"] == 0)
-            & (train["source"] != "sga")
-            & (train["source"] != "rand")
+        "is_cluster_0_stars": test[
+            (test["target"] == 0)
+            & (test["source"] != "sga")
+            & (test["source"] != "rand")
         ].shape[0],
     }
 
     print("Train Counts:", train_counts)
     print("Test Counts:", test_counts)
 
-    test_sample = datasets_collection.load_test_sample()
+    # test_sample = datasets_collection.load_test_sample()
     bright_stars = datasets_collection.load_bright_stars()
 
     pairs = [
         (DataPart.TRAIN, train),
         (DataPart.VALIDATE, validate),
         (DataPart.TEST, test),
-        (DataPart.TEST_SAMPLE, test_sample),
+        # # (DataPart.TEST_SAMPLE, test_sample),
         (DataPart.BRIGHT_STARS, bright_stars),
     ]
 
@@ -800,7 +758,12 @@ def ddos() -> None:
     os.makedirs(description_path, exist_ok=True)
 
     pairs = train_val_test_split()
+
+    g = grabber.Grabber()
+
     for part, description in pairs.items():
+
+        print(f"Grabbing part {part.value}")
 
         description_file_path = os.path.join(description_path, f"{part.value}.csv")
 
@@ -808,8 +771,10 @@ def ddos() -> None:
 
         path = os.path.join(settings.DATA_PATH, part.value)
 
-        g = grabber.Grabber()
+        print("Started grabbing")
         g.grab_cutouts(targets=description, output_dir=path)
+    
+    return list(pairs.keys())
 
 
 def create_dataloaders() -> tuple[dict[DataPart, Dataset], dict[DataPart, DataLoader]]:
@@ -821,7 +786,14 @@ def create_dataloaders() -> tuple[dict[DataPart, Dataset], dict[DataPart, DataLo
     """
 
     download_data()
-    ddos()
+    parts = ddos()
+
+    main_transforms = [
+        transforms.Resize((224, 224)),
+        transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD),
+        ShiftAndMirrorPadTransform(),
+    ]
+
 
     data_transforms = defaultdict(lambda: transforms.Compose(main_transforms))
 
@@ -837,13 +809,14 @@ def create_dataloaders() -> tuple[dict[DataPart, Dataset], dict[DataPart, DataLo
 
     custom_datasets = {}
     dataloaders = {}
-    for part in list(DataPart):
+    for part in parts:
         if part == DataPart.MC or part == DataPart.TEST_SAMPLE:
             continue
 
         cluster_dataset = ClusterDataset(
             os.path.join(settings.DATA_PATH, part.value),
             os.path.join(settings.DESCRIPTION_PATH, f"{part.value}.csv"),
+            transform=data_transforms[part]
         )
 
         custom_datasets[part] = cluster_dataset

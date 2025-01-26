@@ -159,7 +159,7 @@ def read_test_sample() -> pd.DataFrame:
     return frame
 
 
-def read_act_mcmf() -> pd.DataFrame:
+def read_act_mcmf(row_limit = 1000) -> pd.DataFrame:
     """Reads the ACT_MCMF catalog from VizieR.
 
     Returns:
@@ -168,7 +168,7 @@ def read_act_mcmf() -> pd.DataFrame:
     CATALOGUE = "J/A+A/690/A322/"
 
     catalog_list = Vizier.find_catalogs(CATALOGUE)
-    Vizier.ROW_LIMIT = -1
+    Vizier.ROW_LIMIT = row_limit
     catalogs = Vizier.get_catalogs(catalog_list.keys())
 
     interesting_table: atpy.Table = catalogs[os.path.join(CATALOGUE, "catalog")]

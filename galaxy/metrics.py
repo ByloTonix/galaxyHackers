@@ -8,7 +8,7 @@ from typing import Any, List, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from config import settings
+from galaxy.config import settings
 from matplotlib.backends.backend_pdf import PdfPages
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
