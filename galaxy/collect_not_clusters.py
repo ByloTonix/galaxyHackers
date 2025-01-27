@@ -95,8 +95,8 @@ def read_tyc2(sample_size: int = 2_000) -> pd.DataFrame:
     frame = frame.rename(
         columns={
             "TYC2": "name",
-            "RA_ICRS_": "ra_deg",
-            "DE_ICRS_": "dec_deg",
+            "RA(ICRS)": "ra_deg",
+            "DE(ICRS)": "dec_deg",
         }
     )
 
