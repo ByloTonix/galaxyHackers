@@ -22,6 +22,8 @@ from torch.utils.data import DataLoader
 from galaxy import data, grabber, train
 from galaxy.config import settings
 
+from galaxy.util import inherit_columns
+
 
 def cleanup_memory(*args) -> None:
     """Cleans up memory by deleting variables and freeing GPU memory.
@@ -172,6 +174,7 @@ def create_sample(
     )
 
     sample.to_csv(sample_description_path)
+    sample = inherit_columns(sample)
 
     dataset = data.ClusterDataset(
         images_dir_path=Path(settings.DATA_PATH, source.value),
