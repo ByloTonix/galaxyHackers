@@ -30,7 +30,6 @@ TORCHVISION_MEAN = [23.19058950345032, 22.780995295792817]
 TORCHVISION_STD = [106.89880134344101, 100.32284196853638]
 
 
-
 class DataPart(str, Enum):
 
     TRAIN = "train"
@@ -184,8 +183,8 @@ class ClusterDataset(Dataset):
 
         description = {
             "idx": img_name,
-            "red_shift": row["red_shift"],
-            "red_shift_type": str(row["red_shift_type"]),
+            "red_shift": row.get("red_shift", np.nan),
+            "red_shift_type": str(row.get("red_shift_type", "unknown")),
         }
         sample = {"image": img, "label": row["target"], "description": description}
 
@@ -208,13 +207,14 @@ class ClusterDataset(Dataset):
 
     def show_img(self, idx: int):
 
-        img = self.__getitem__(idx)['image']
+        img = self.__getitem__(idx)["image"]
 
         rgb_image = util.fits_to_rgb_image(img)
-        
-        rgb_image = rgb_image.squeeze().permute(1,2,0)
+
+        rgb_image = rgb_image.squeeze().permute(1, 2, 0)
 
         plt.imshow(rgb_image)
+
 
 """Collecting clusters of galaxies for positive class"""
 
@@ -263,15 +263,15 @@ def get_positive_class() -> pd.DataFrame:
         catalogue="J/ApJS/272/7/table2",
         source=DataSource.UPC_SZ,
         target=IsCluster.IS_CLUSTER,
-        row_limit=-1
+        row_limit=-1,
     )
-    
+
     spt_sz = util.read_vizier_updated(
         catalogue="J/ApJS/216/27/table4",
         source=DataSource.SPT_SZ,
         target=IsCluster.IS_CLUSTER,
         row_limit=-1,
-        red_shift_type="spec"
+        red_shift_type="spec",
     )
 
     pszspt = util.read_vizier_updated(
@@ -279,35 +279,35 @@ def get_positive_class() -> pd.DataFrame:
         source=DataSource.PSZSPT,
         target=IsCluster.IS_CLUSTER,
         row_limit=-1,
-        red_shift_type="phot"
+        red_shift_type="phot",
     )
     comprass = util.read_vizier_updated(
         catalogue="J/A+A/626/A7/comprass",
         source=DataSource.CCOMPRASS,
         target=IsCluster.IS_CLUSTER,
         row_limit=-1,
-        red_shift_type="phot"
+        red_shift_type="phot",
     )
     spt2500d = util.read_vizier_updated(
         catalogue="J/ApJ/878/55/table5",
         source=DataSource.SPT2500D,
         target=IsCluster.IS_CLUSTER,
         row_limit=-1,
-        red_shift_type="spec"
+        red_shift_type="spec",
     )
     sptecs_certified = util.read_vizier_updated(
         catalogue="J/ApJS/247/25/table10",
         source=DataSource.SPTECS,
         target=IsCluster.IS_CLUSTER,
         row_limit=-1,
-        red_shift_type="phot"
+        red_shift_type="phot",
     )
     sptecs_candidates = util.read_vizier_updated(
         catalogue="J/ApJS/247/25/cand",
         source=DataSource.SPTECS,
         target=IsCluster.IS_CLUSTER,
         row_limit=-1,
-        red_shift_type="phot"
+        red_shift_type="phot",
     )
     spt100 = collect_clusters.read_spt100()
     act_mcmf = collect_clusters.read_act_mcmf()
@@ -545,7 +545,7 @@ def generate_random(n_sim: int = 10000, max_len=2000) -> coord.SkyCoord:
     max_ra_dec = (360, 90)
     sample = np.random.uniform(min_ra_dec, max_ra_dec, size=(n_sim, 2))
 
-    frame = pd.DataFrame(sample, columns=('ra_deg', 'dec_deg'))
+    frame = pd.DataFrame(sample, columns=("ra_deg", "dec_deg"))
 
     # Just points from our sky map
     candidates = coord.SkyCoord(
@@ -553,15 +553,14 @@ def generate_random(n_sim: int = 10000, max_len=2000) -> coord.SkyCoord:
     )
     filtered_candidates = filter_candidates(candidates, max_len=max_len)
 
-
     frame = pd.DataFrame(
-    {
-        "ra_deg": filtered_candidates.ra.deg,
-        "dec_deg": filtered_candidates.dec.deg,
-        "source": DataSource.RANDOM.value,
-        "target": IsCluster.NOT_CLUSTER.value,
-    }
-)
+        {
+            "ra_deg": filtered_candidates.ra.deg,
+            "dec_deg": filtered_candidates.dec.deg,
+            "source": DataSource.RANDOM.value,
+            "target": IsCluster.NOT_CLUSTER.value,
+        }
+    )
     return frame
 
 
@@ -773,7 +772,7 @@ def ddos() -> None:
 
         print("Started grabbing")
         g.grab_cutouts(targets=description, output_dir=path)
-    
+
     return list(pairs.keys())
 
 
@@ -793,7 +792,6 @@ def create_dataloaders() -> tuple[dict[DataPart, Dataset], dict[DataPart, DataLo
         transforms.Normalize(mean=TORCHVISION_MEAN, std=TORCHVISION_STD),
         ShiftAndMirrorPadTransform(),
     ]
-
 
     data_transforms = defaultdict(lambda: transforms.Compose(main_transforms))
 
@@ -816,7 +814,7 @@ def create_dataloaders() -> tuple[dict[DataPart, Dataset], dict[DataPart, DataLo
         cluster_dataset = ClusterDataset(
             os.path.join(settings.DATA_PATH, part.value),
             os.path.join(settings.DESCRIPTION_PATH, f"{part.value}.csv"),
-            transform=data_transforms[part]
+            transform=data_transforms[part],
         )
 
         custom_datasets[part] = cluster_dataset
