@@ -13,7 +13,7 @@ from galaxy.util import DataSource, IsCluster, inherit_columns
 """Galaxies in short distances"""
 
 
-def read_sga(sample_size: int = 10_000) -> pd.DataFrame:
+def read_sga(sample_size: int = 2_000) -> pd.DataFrame:
     """Reads the SGA catalog and samples galaxies in short distances.
 
     Args:
@@ -77,7 +77,7 @@ def read_sga(sample_size: int = 10_000) -> pd.DataFrame:
 """Bright stars"""
 
 
-def read_tyc2(sample_size: int = 5_000) -> pd.DataFrame:
+def read_tyc2(sample_size: int = 2_000) -> pd.DataFrame:
     """Reads the TYC2 catalog and samples bright stars.
 
     Args:
@@ -95,8 +95,8 @@ def read_tyc2(sample_size: int = 5_000) -> pd.DataFrame:
     frame = frame.rename(
         columns={
             "TYC2": "name",
-            "RA_ICRS_": "ra_deg",
-            "DE_ICRS_": "dec_deg",
+            "RA(ICRS)": "ra_deg",
+            "DE(ICRS)": "dec_deg",
         }
     )
 

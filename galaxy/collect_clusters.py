@@ -90,219 +90,7 @@ def read_mc() -> pd.DataFrame:
     return frame
 
 
-def read_upc_sz() -> pd.DataFrame:
-    """Reads the UPC_SZ catalog from VizieR.
 
-    Returns:
-        pd.DataFrame: DataFrame containing UPC_SZ cluster data.
-    """
-    CATALOGUE = "J/ApJS/272/7/table2"
-    frame = util.read_vizier(CATALOGUE)
-
-    frame = frame.rename(
-        columns={
-            "PSZ2": "name",
-            "RAJ2000": "ra_deg",
-            "DEJ2000": "dec_deg",
-            "z": "red_shift",
-            "f_z": "red_shift_type",
-        }
-    )
-    # 'spec', '', 'phot', 'unct' - values in red_shift_type column. unct = uncertainty => skip?
-    frame = frame[
-        frame["red_shift"].notna()
-        & frame["red_shift_type"].notna()
-        & (frame["red_shift_type"] != "unct")
-    ]
-
-    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
-
-    frame["source"] = DataSource.UPC_SZ.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
-
-    frame = inherit_columns(frame)
-
-    return frame
-
-
-def read_spt_sz() -> pd.DataFrame:
-    """Reads the SPT_SZ catalog from VizieR.
-
-    Returns:
-        pd.DataFrame: DataFrame containing SPT_SZ cluster data.
-    """
-    CATALOGUE = "J/ApJS/216/27/table4"
-    frame = util.read_vizier(CATALOGUE)
-
-    frame = frame.rename(
-        columns={
-            "SPT-CL": "name",
-            "RAJ2000": "ra_deg",
-            "DEJ2000": "dec_deg",
-            "z": "red_shift",
-            "f_z": "red_shift_type",
-        }
-    )
-
-    frame = frame[
-        frame["red_shift"].notna() & frame["n_z"].str.contains(r"\+", na=False)
-    ]
-    frame["red_shift_type"] = "spec"
-
-    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
-    frame["source"] = DataSource.SPT_SZ.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
-
-    frame = inherit_columns(frame)
-
-    return frame
-
-
-def read_pszspt() -> pd.DataFrame:
-    """Reads the PSZSPT catalog from VizieR.
-
-    Returns:
-        pd.DataFrame: DataFrame containing PSZSPT cluster data.
-    """
-    CATALOGUE = "J/A+A/647/A106"
-    frame = util.read_vizier(CATALOGUE)
-
-    frame = frame.rename(
-        columns={
-            "Name": "name",
-            "RAJ2000": "ra_deg",
-            "DEJ2000": "dec_deg",
-            "z": "red_shift",
-        }
-    )
-
-    frame = frame[frame["red_shift"].notna()]
-
-    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
-
-    # данные берутся из psz и spt (предлагается ставить phot)
-    frame["red_shift_type"] = "phot"
-
-    frame["source"] = DataSource.PSZSPT.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
-
-    frame = inherit_columns(frame)
-
-    return frame
-
-
-def read_comprass() -> pd.DataFrame:
-    """Reads the COMPRASS catalog from VizieR.
-
-    Returns:
-        pd.DataFrame: DataFrame containing COMPRASS cluster data.
-    """
-    CATALOGUE = "J/A+A/626/A7/comprass"
-    frame = util.read_vizier(CATALOGUE)
-
-    frame = frame.rename(
-        columns={
-            "Name": "name",
-            "RAJ2000": "ra_deg",
-            "DEJ2000": "dec_deg",
-            "z": "red_shift",
-        }
-    )
-
-    frame = frame[frame["red_shift"].notna()]
-
-    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
-
-    # данные берутся из других каталогов (пока что предлагается ставить phot)
-    frame["red_shift_type"] = "phot"
-
-    frame["source"] = DataSource.CCOMPRASS.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
-
-    frame = inherit_columns(frame)
-
-    return frame
-
-
-def read_spt2500d() -> pd.DataFrame:
-    """Reads the SPT2500D catalog from VizieR.
-
-    Returns:
-        pd.DataFrame: DataFrame containing SPT2500D cluster data.
-    """
-    CATALOGUE = "J/ApJ/878/55/table5"
-    frame = util.read_vizier(CATALOGUE)
-
-    frame = frame.rename(
-        columns={
-            "SPT-CL": "name",
-            "RAJ2000": "ra_deg",
-            "DEJ2000": "dec_deg",
-            "z": "red_shift",
-        }
-    )
-
-    frame = frame[
-        frame["red_shift"].notna() & frame["n_z"].str.contains(r"\+", na=False)
-    ]
-
-    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
-
-    frame["red_shift_type"] = "spec"
-    frame["source"] = DataSource.SPT2500D.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
-
-    frame = inherit_columns(frame)
-
-    return frame
-
-
-def collect_sptecs(catalogue: str) -> pd.DataFrame:
-    """Reads the SPTECS catalog from VizieR.
-
-    Args:
-        catalogue (str): VizieR catalog identifier.
-
-    Returns:
-        pd.DataFrame: DataFrame containing SPTECS cluster data.
-    """
-    frame = util.read_vizier(catalogue)
-
-    frame = frame.rename(
-        columns={
-            "SPT-CL": "name",
-            "RAJ2000": "ra_deg",
-            "DEJ2000": "dec_deg",
-            "z": "red_shift",
-        }
-    )
-
-    frame = frame[frame["red_shift"].notna()]
-
-    frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
-
-    frame["red_shift_type"] = "phot"
-
-    frame["source"] = DataSource.SPTECS.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
-
-    frame = inherit_columns(frame)
-
-    return frame
-
-
-def read_sptecs() -> pd.DataFrame:
-    """Reads certified and candidate SPTECS clusters and combines them.
-
-    Returns:
-        pd.DataFrame: DataFrame containing combined SPTECS cluster data.
-    """
-    frame_certified = collect_sptecs("J/ApJS/247/25/table10")
-    frame_candidates = collect_sptecs("J/ApJS/247/25/cand")
-
-    frame = pd.concat([frame_certified, frame_candidates])
-
-    return frame
 
 
 def read_spt100() -> pd.DataFrame:
@@ -371,7 +159,7 @@ def read_test_sample() -> pd.DataFrame:
     return frame
 
 
-def read_act_mcmf() -> pd.DataFrame:
+def read_act_mcmf(row_limit = 1000) -> pd.DataFrame:
     """Reads the ACT_MCMF catalog from VizieR.
 
     Returns:
@@ -380,7 +168,7 @@ def read_act_mcmf() -> pd.DataFrame:
     CATALOGUE = "J/A+A/690/A322/"
 
     catalog_list = Vizier.find_catalogs(CATALOGUE)
-    Vizier.ROW_LIMIT = -1
+    Vizier.ROW_LIMIT = row_limit
     catalogs = Vizier.get_catalogs(catalog_list.keys())
 
     interesting_table: atpy.Table = catalogs[os.path.join(CATALOGUE, "catalog")]

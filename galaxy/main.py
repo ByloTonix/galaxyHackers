@@ -167,20 +167,6 @@ for model_name, model in selected_models:
     try:
         trainer.train(num_epochs)
 
-        train_table_data = trainer.train_table_data
-        val_table_data = trainer.val_table_data
-
-        experiment.log_table(
-            filename=f"{model_name}_train_metrics.csv",
-            tabular_data=train_table_data,
-            headers=["Step", "Train Loss", "Train Accuracy"],
-        )
-        experiment.log_table(
-            filename=f"{model_name}_val_metrics.csv",
-            tabular_data=val_table_data,
-            headers=["Epoch", "Validation Loss", "Validation Accuracy"],
-        )
-
     finally:
 
         predictions, *_ = trainer.test(test_loader)
@@ -188,9 +174,7 @@ for model_name, model in selected_models:
             model_name,
             optimizer_name,
             predictions,
-            classes,
-            train_table_data,
-            val_table_data,
+            classes
         )
 
         # if test_sample_loader:
