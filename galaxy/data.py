@@ -21,7 +21,7 @@ from torchvision import transforms
 
 from galaxy import collect_clusters, collect_not_clusters, grabber, util
 from galaxy.config import settings
-from galaxy.util import DataSource, IsCluster, inherit_columns
+from galaxy.util import DataSource, IsObject, inherit_columns
 
 
 np.random.seed(settings.SEED)
@@ -262,14 +262,14 @@ def get_positive_class() -> pd.DataFrame:
     upc_sz = util.read_vizier_updated(
         catalogue="J/ApJS/272/7/table2",
         source=DataSource.UPC_SZ,
-        target=IsCluster.IS_CLUSTER,
+        target=IsObject.IS_CLUSTER,
         row_limit=-1,
     )
 
     spt_sz = util.read_vizier_updated(
         catalogue="J/ApJS/216/27/table4",
         source=DataSource.SPT_SZ,
-        target=IsCluster.IS_CLUSTER,
+        target=IsObject.IS_CLUSTER,
         row_limit=-1,
         red_shift_type="spec",
     )
@@ -277,35 +277,35 @@ def get_positive_class() -> pd.DataFrame:
     pszspt = util.read_vizier_updated(
         catalogue="J/A+A/647/A106",
         source=DataSource.PSZSPT,
-        target=IsCluster.IS_CLUSTER,
+        target=IsObject.IS_CLUSTER,
         row_limit=-1,
         red_shift_type="phot",
     )
     comprass = util.read_vizier_updated(
         catalogue="J/A+A/626/A7/comprass",
         source=DataSource.CCOMPRASS,
-        target=IsCluster.IS_CLUSTER,
+        target=IsObject.IS_CLUSTER,
         row_limit=-1,
         red_shift_type="phot",
     )
     spt2500d = util.read_vizier_updated(
         catalogue="J/ApJ/878/55/table5",
         source=DataSource.SPT2500D,
-        target=IsCluster.IS_CLUSTER,
+        target=IsObject.IS_CLUSTER,
         row_limit=-1,
         red_shift_type="spec",
     )
     sptecs_certified = util.read_vizier_updated(
         catalogue="J/ApJS/247/25/table10",
         source=DataSource.SPTECS,
-        target=IsCluster.IS_CLUSTER,
+        target=IsObject.IS_CLUSTER,
         row_limit=-1,
         red_shift_type="phot",
     )
     sptecs_candidates = util.read_vizier_updated(
         catalogue="J/ApJS/247/25/cand",
         source=DataSource.SPTECS,
-        target=IsCluster.IS_CLUSTER,
+        target=IsObject.IS_CLUSTER,
         row_limit=-1,
         red_shift_type="phot",
     )
@@ -558,7 +558,7 @@ def generate_random(n_sim: int = 10000, max_len=2000) -> coord.SkyCoord:
             "ra_deg": filtered_candidates.ra.deg,
             "dec_deg": filtered_candidates.dec.deg,
             "source": DataSource.RANDOM.value,
-            "target": IsCluster.NOT_CLUSTER.value,
+            "target": IsObject.IS_RANDOM.value,
         }
     )
     return frame
@@ -663,7 +663,7 @@ def generate_random(n_sim: int = 10000, max_len=2000) -> coord.SkyCoord:
 #     # )
 
 #     # frame["source"] = DataSource.RANDOM.value
-#     # frame["target"] = IsCluster.NOT_CLUSTER.value
+#     # frame["target"] = IsObject.IS_RANDOM.value
 
 #     frame = pd.DataFrame(
 #         {
@@ -671,7 +671,7 @@ def generate_random(n_sim: int = 10000, max_len=2000) -> coord.SkyCoord:
 #             "ra_deg": filtered_candidates.ra.deg,
 #             "dec_deg": filtered_candidates.dec.deg,
 #             "source": DataSource.RANDOM.value,
-#             "target": IsCluster.NOT_CLUSTER.value,
+#             "target": IsObject.IS_RANDOM.value,
 #         }
 #     )
 

@@ -32,11 +32,13 @@ class DataSource(str, Enum):
     RANDOM = "rand"
 
 
-class IsCluster(int, Enum):
+class IsObject(int, Enum):
     """Enumeration for cluster classification."""
 
-    IS_CLUSTER = 1
-    NOT_CLUSTER = 0
+    IS_CLUSTER = 0
+    IS_GALAXY = 1
+    IS_STAR = 2
+    IS_RANDOM = 3
 
 
 class RedShiftType(str, Enum):
@@ -95,7 +97,7 @@ def read_vizier(catalogue: str) -> pd.DataFrame:
 def read_vizier_updated(
     catalogue: str,
     source: DataSource,
-    target: IsCluster,
+    target: IsObject,
     red_shift_type: RedShiftType | None = None,
     rename_dict: dict | None = None,
     row_limit=1000,

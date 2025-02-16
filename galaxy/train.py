@@ -240,7 +240,6 @@ class Trainer:
             [],
             [],
         )  # y_true - the real class of object in the dataset
-        y_negative_target_probs = []
 
         print("Testing...")
         with torch.no_grad():
@@ -250,8 +249,8 @@ class Trainer:
                 test_losses.append(loss.item())
                 test_accs.append(acc)
 
-                y_probs.extend(logits[:, 1].data.cpu().numpy().ravel())
-                y_negative_target_probs.extend(logits[:, 0].data.cpu().numpy().ravel())
+                class_probs = torch.softmax(logits, dim=1).data.cpu().numpy()
+                y_probs.extend(class_probs)                
                 y_pred.extend(outputs.data.cpu().numpy().ravel())
                 y_true.extend(labels.data.cpu().numpy().ravel())
 
@@ -267,9 +266,12 @@ class Trainer:
 
         predictions = pd.concat(descriptions).reset_index(drop=True)
         predictions["y_pred"] = y_pred
-        predictions["y_probs"] = y_probs
-        predictions["y_negative_probs"] = y_negative_target_probs
         predictions["y_true"] = y_true
+
+        # Split probabilities for each class into individual columns
+        y_probs_np = np.array(y_probs)
+        for class_idx in range(y_probs_np.shape[1]):
+            predictions[f"y_prob_class_{class_idx}"] = y_probs_np[:, class_idx]
 
         return (
             predictions,
@@ -293,9 +295,9 @@ class Trainer:
 
         assert self.criterion is not None
 
-        loss = self.criterion(logits[:, 1], y.float())
+        loss = self.criterion(logits, y.float())
 
-        assert logits.shape[1] == 2, logits.shape
+        assert logits.shape[1] == 4, logits.shape
 
         outputs = logits.argmax(axis=1)
         acc = (outputs == y).float().mean().cpu().numpy()

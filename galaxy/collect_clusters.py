@@ -10,7 +10,7 @@ from astroquery.vizier import Vizier
 
 from galaxy import util
 from galaxy.config import settings
-from galaxy.util import DataSource, IsCluster, inherit_columns
+from galaxy.util import DataSource, IsObject, inherit_columns
 
 
 def read_dr5() -> pd.DataFrame:
@@ -37,7 +37,7 @@ def read_dr5() -> pd.DataFrame:
 
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
     frame["source"] = DataSource.DR5.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsObject.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -83,7 +83,7 @@ def read_mc() -> pd.DataFrame:
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]]
 
     frame["source"] = DataSource.MC.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsObject.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -120,7 +120,7 @@ def read_spt100() -> pd.DataFrame:
     frame["red_shift_type"] = "spec"
 
     frame["source"] = DataSource.SPT100.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsObject.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -152,7 +152,7 @@ def read_test_sample() -> pd.DataFrame:
     frame = frame.loc[:, ["ra_deg", "dec_deg", "name", "red_shift"]]
 
     frame["source"] = DataSource.TEST_SAMPLE.value
-    frame["target"] = IsCluster.IS_CLUSTER.value
+    frame["target"] = IsObject.IS_CLUSTER.value
 
     frame = inherit_columns(frame)
 
@@ -194,7 +194,7 @@ def read_act_mcmf(row_limit = 1000) -> pd.DataFrame:
         :, ["ra_deg", "dec_deg", "name", "red_shift", "red_shift_type"]
     ]
     mc_frame["source"] = DataSource.ACT_MCMF.value
-    mc_frame["target"] = IsCluster.IS_CLUSTER.value
+    mc_frame["target"] = IsObject.IS_CLUSTER.value
     mc_frame = inherit_columns(mc_frame)
 
     return mc_frame

@@ -7,7 +7,7 @@ from astroquery.gaia import Gaia
 from astroquery.vizier import Vizier
 
 from galaxy.config import settings
-from galaxy.util import DataSource, IsCluster, inherit_columns
+from galaxy.util import DataSource, IsObject, inherit_columns
 
 
 """Galaxies in short distances"""
@@ -67,7 +67,7 @@ def read_sga(sample_size: int = 2_000) -> pd.DataFrame:
     sample.index = np.arange(len(sample))
 
     sample["source"] = DataSource.SGA.value
-    sample["target"] = IsCluster.NOT_CLUSTER.value
+    sample["target"] = IsObject.IS_GALAXY.value
 
     sample = inherit_columns(sample)
 
@@ -105,7 +105,7 @@ def read_tyc2(sample_size: int = 2_000) -> pd.DataFrame:
     frame = frame.sample(n=sample_size, random_state=settings.SEED)
 
     frame["source"] = DataSource.TYC2.value
-    frame["target"] = IsCluster.NOT_CLUSTER.value
+    frame["target"] = IsObject.IS_STAR.value
 
     frame = inherit_columns(frame)
 
@@ -133,7 +133,7 @@ def read_gaia() -> pd.DataFrame:
     )
 
     frame["source"] = DataSource.GAIA.value
-    frame["target"] = IsCluster.NOT_CLUSTER.value
+    frame["target"] = IsObject.IS_STAR.value
 
     frame = inherit_columns(frame)
 

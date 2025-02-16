@@ -26,7 +26,11 @@ from sklearn.metrics import (
 
 
 def probabilities_hist(
-    predictions_clusters: np.ndarray, predictions_non_clusters: np.ndarray, pdf: PdfPages
+    predictions_clusters: np.ndarray, 
+    predictions_galaxies: np.ndarray, 
+    predictions_stars: np.ndarray, 
+    predictions_random: np.ndarray, 
+    pdf: PdfPages
 ) -> None:
     """Plots histogram of prediction probabilities.
 
@@ -38,9 +42,9 @@ def probabilities_hist(
     bins = np.arange(0, 1.01, 0.05)
     plt.figure()
     plt.hist(predictions_clusters, bins, color="green", alpha=0.5, label="clusters")
-    plt.hist(
-        predictions_non_clusters, bins, color="red", alpha=0.5, label="non-clusters"
-    )
+    plt.hist(predictions_galaxies, bins, color="red", alpha=0.5, label="galaxies")
+    plt.hist(predictions_stars, bins, color="blue", alpha=0.5, label="stars")
+    plt.hist(predictions_random, bins, color="pink", alpha=0.5, label="random")
     plt.yscale("log")
     plt.legend(loc="upper right")
     plt.title("Class prediction")
@@ -55,7 +59,7 @@ def plot_roc_curve(pdf: PdfPages, predictions: pd.DataFrame) -> None:
         pdf (PdfPages): PDF file to save the plots.
         predictions (pd.DataFrame): DataFrame containing true labels and predicted probabilities.
     """
-    fpr, tpr, _ = roc_curve(predictions.y_true, predictions.y_probs)
+    fpr, tpr, _ = roc_curve(predictions.y_true, predictions.y_probs) #TODO: NEEDS CHANGE FOR MULTILABEL CLASSIFICATION
     plt.figure()
     plt.plot(fpr, tpr, linewidth=2, label="")
     plt.plot([0, 1], [0, 1], "k--")
@@ -95,7 +99,7 @@ def plot_pr_curve(pdf: PdfPages, predictions: pd.DataFrame) -> float:
 
 def plot_confusion_matrices(
     pdf: PdfPages, predictions: pd.DataFrame, classes: List[str]
-) -> Tuple[int, int, int, int]:
+):
     """Plots confusion matrices.
 
     Args:
@@ -106,23 +110,21 @@ def plot_confusion_matrices(
     Returns:
         Tuple[int, int, int, int]: Counts for TN, FP, FN, TP from the confusion matrix.
     """
-    cm = confusion_matrix(predictions.y_true, predictions.y_pred)
-    tn, fp, fn, tp = cm.ravel()
-    e_00, e_11 = cm[0, 0] / (cm[0, 0] + cm[0, 1]), cm[1, 1] / (cm[1, 0] + cm[1, 1])
-    weighted_cm = np.array([[e_00, 1 - e_00], [1 - e_11, e_11]])
+    cm = confusion_matrix(predictions["y_true"], predictions["y_pred"], labels=range(len(classes)))
+    weighted_cm = cm.astype('float') / cm.sum(axis=1, keepdims=True)
 
-    plt.figure()
+    plt.figure(figsize=(8, 8))
     _ = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=classes).plot()
+    plt.title("Confusion Matrix")
     pdf.savefig()
     plt.close()
 
-    plt.figure()
-    _ = ConfusionMatrixDisplay(
-        confusion_matrix=weighted_cm, display_labels=classes
-    ).plot()
+    plt.figure(figsize=(8, 8))
+    _ = ConfusionMatrixDisplay(confusion_matrix=weighted_cm, display_labels=classes).plot()
+    plt.title("Weighted Confusion Matrix")
     pdf.savefig()
     plt.close()
-    return tn, fp, fn, tp
+    return
 
 
 def plot_red_shift(pdf, predictions: pd.DataFrame):
@@ -326,7 +328,12 @@ def modelPerformance(
     # metrics_pdf_name = Path(model_path, 'metrics_plots.pdf')
 
     # plot probablities distribution
-    probabilities_hist(predictions.y_probs, predictions.y_negative_probs, pdf)
+    probabilities_hist(predictions.y_probs, 
+                       predictions.y_prob_class_0, #galaxy clusters
+                       predictions.y_prob_class_1, #just galaxies
+                       predictions.y_prob_class_2, #stars
+                       predictions.y_prob_class_3, #random
+                       pdf)
 
     # plot roc curve
     plot_roc_curve(pdf, predictions)
@@ -335,8 +342,8 @@ def modelPerformance(
     pr_auc = plot_pr_curve(pdf, predictions)
 
     # confusion matrices
-    tn, fp, fn, tp = plot_confusion_matrices(pdf, predictions, classes)
-    fpr_measure = fp / (fp + tn)
+    plot_confusion_matrices(pdf, predictions, classes)
+    # fpr_measure = fp / (fp + tn) #TODO: should be adapted if wanted in multilabel classification
 
     if train_table_data is not None and val_table_data is not None:
         # change of loss throughout epochs
@@ -354,7 +361,7 @@ def modelPerformance(
         "Accuracy": acc,
         "Precision": precision,
         "Recall (TPR)": recall,
-        "Fall-out (FPR)": fpr_measure,
+        # "Fall-out (FPR)": fpr_measure,
         "PR AUC": pr_auc,
         "ROC AUC": roc_auc,
         "F-1 score": f1_measure,
